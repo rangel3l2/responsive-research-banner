@@ -56,7 +56,17 @@ const BannerForm = () => {
     if (!formRef.current) return;
 
     try {
-      const canvas = await html2canvas(formRef.current, {
+      const element = formRef.current;
+      
+      // Remove borders temporarily for PDF generation
+      const textareas = element.getElementsByTagName('textarea');
+      const originalBorders = Array.from(textareas).map(textarea => textarea.style.border);
+      Array.from(textareas).forEach(textarea => {
+        textarea.style.border = 'none';
+        textarea.style.whiteSpace = 'pre-wrap'; // Preserve line breaks
+      });
+
+      const canvas = await html2canvas(element, {
         useCORS: true,
         allowTaint: true,
         logging: true,
@@ -68,6 +78,11 @@ const BannerForm = () => {
             element.style.height = '297mm';
           }
         }
+      });
+      
+      // Restore original borders
+      Array.from(textareas).forEach((textarea, index) => {
+        textarea.style.border = originalBorders[index];
       });
       
       const imgData = canvas.toDataURL('image/png');

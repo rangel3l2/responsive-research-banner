@@ -10,7 +10,6 @@ import BannerInputs from './BannerInputs';
 import ImageUpload from './ImageUpload';
 
 interface FormData {
-  title: string;
   introduction: string;
   objectives: string;
   methods: string;
@@ -21,7 +20,6 @@ interface FormData {
 
 const BannerForm = () => {
   const [formData, setFormData] = useState<FormData>({
-    title: '',
     introduction: '',
     objectives: '',
     methods: '',
@@ -61,7 +59,15 @@ const BannerForm = () => {
       const canvas = await html2canvas(formRef.current, {
         useCORS: true,
         allowTaint: true,
-        logging: true
+        logging: true,
+        scale: 2,
+        onclone: (document) => {
+          const element = document.querySelector('#root');
+          if (element instanceof HTMLElement) {
+            element.style.width = '210mm';
+            element.style.height = '297mm';
+          }
+        }
       });
       
       const imgData = canvas.toDataURL('image/png');
@@ -84,9 +90,6 @@ const BannerForm = () => {
         sections: [{
           properties: {},
           children: [
-            new Paragraph({
-              children: [new TextRun({ text: formData.title, bold: true, size: 28 })],
-            }),
             new Paragraph({
               children: [new TextRun({ text: "Introdução", bold: true })],
             }),

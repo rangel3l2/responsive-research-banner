@@ -1,11 +1,9 @@
 import React from 'react';
-import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 
 interface BannerInputsProps {
   formData: {
-    title: string;
     introduction: string;
     objectives: string;
     methods: string;
@@ -17,20 +15,8 @@ interface BannerInputsProps {
 
 const BannerInputs = ({ formData, handleInputChange }: BannerInputsProps) => {
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+    <div className="grid grid-cols-2 gap-8">
       <div className="space-y-4">
-        <div>
-          <Label htmlFor="title">Título</Label>
-          <Input
-            id="title"
-            name="title"
-            placeholder="Digite o título da sua pesquisa"
-            value={formData.title}
-            onChange={handleInputChange}
-            className="mt-1"
-          />
-        </div>
-
         <div>
           <Label htmlFor="introduction">Introdução</Label>
           <Textarea
@@ -39,7 +25,7 @@ const BannerInputs = ({ formData, handleInputChange }: BannerInputsProps) => {
             placeholder="Escreva uma breve introdução sobre sua pesquisa (máximo 5 linhas)"
             value={formData.introduction}
             onChange={handleInputChange}
-            className="mt-1 h-32"
+            className="mt-1 h-32 border-none"
             maxLength={500}
           />
         </div>
@@ -52,13 +38,11 @@ const BannerInputs = ({ formData, handleInputChange }: BannerInputsProps) => {
             placeholder="Liste os objetivos principais da sua pesquisa (máximo 5 linhas)"
             value={formData.objectives}
             onChange={handleInputChange}
-            className="mt-1 h-32"
+            className="mt-1 h-32 border-none"
             maxLength={500}
           />
         </div>
-      </div>
 
-      <div className="space-y-4">
         <div>
           <Label htmlFor="methods">Materiais e Métodos</Label>
           <Textarea
@@ -67,7 +51,22 @@ const BannerInputs = ({ formData, handleInputChange }: BannerInputsProps) => {
             placeholder="Descreva os materiais e métodos utilizados na pesquisa (máximo 10 linhas)"
             value={formData.methods}
             onChange={handleInputChange}
-            className="mt-1 h-48"
+            className="mt-1 h-48 border-none"
+            maxLength={1000}
+          />
+        </div>
+      </div>
+
+      <div className="space-y-4">
+        <div>
+          <Label htmlFor="methods-continuation">Materiais e Métodos (continuação)</Label>
+          <Textarea
+            id="methods-continuation"
+            name="methods"
+            placeholder="Continue a descrição dos materiais e métodos"
+            value={formData.methods}
+            onChange={handleInputChange}
+            className="mt-1 h-48 border-none"
             maxLength={1000}
           />
         </div>
@@ -80,7 +79,7 @@ const BannerInputs = ({ formData, handleInputChange }: BannerInputsProps) => {
             placeholder="Descreva os resultados que você espera obter com a pesquisa"
             value={formData.expectedResults}
             onChange={handleInputChange}
-            className="mt-1 h-32"
+            className="mt-1 h-32 border-none"
           />
         </div>
 
@@ -92,7 +91,7 @@ const BannerInputs = ({ formData, handleInputChange }: BannerInputsProps) => {
             placeholder="Liste as referências bibliográficas utilizadas"
             value={formData.bibliography}
             onChange={handleInputChange}
-            className="mt-1 h-32"
+            className="mt-1 h-32 border-none"
           />
         </div>
       </div>

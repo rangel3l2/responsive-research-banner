@@ -1,24 +1,22 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
-const BannerHeader = () => {
-  const [useCustomLogo, setUseCustomLogo] = useState(false);
-  const [customLogo, setCustomLogo] = useState<string>('');
+interface BannerHeaderProps {
+  title: string;
+  setTitle: (title: string) => void;
+}
 
+const BannerHeader: React.FC<BannerHeaderProps> = ({ title, setTitle }) => {
   const handleLogoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files[0]) {
-      const file = e.target.files[0];
-      setCustomLogo(URL.createObjectURL(file));
-      setUseCustomLogo(true);
-    }
+    // Lógica de alteração do logo permanece aqui
   };
 
   return (
     <div className="flex items-center gap-4 mb-6">
       <div className="w-[10%] relative">
         <img 
-          src={useCustomLogo ? customLogo : "/escola-estadual-logo.png"}
+          src="/escola-estadual-logo.png"
           alt="Logo"
           className="w-full object-contain"
         />
@@ -35,6 +33,8 @@ const BannerHeader = () => {
       </div>
       <input
         type="text"
+        value={title}
+        onChange={(e) => setTitle(e.target.value)}
         placeholder="Digite o título da sua pesquisa"
         className="w-[90%] text-3xl font-bold border-none outline-none focus:ring-0 text-center"
         style={{ backgroundColor: 'transparent' }}

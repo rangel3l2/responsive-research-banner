@@ -4,6 +4,7 @@ import { Label } from "@/components/ui/label";
 
 interface BannerInputsProps {
   formData: {
+    title : string;
     introduction: string;
     objectives: string;
     methods: string;
@@ -27,7 +28,7 @@ const BannerInputs = ({ formData, handleInputChange }: BannerInputsProps) => {
             onChange={handleInputChange}
             className="mt-1 h-32 border-none"
             maxLength={500}
-            style={{ whiteSpace: 'pre-wrap' }}
+            style={{ whiteSpace: 'pre-wrap', overflowWrap: 'break-word' }}
           />
         </div>
 
@@ -41,7 +42,7 @@ const BannerInputs = ({ formData, handleInputChange }: BannerInputsProps) => {
             onChange={handleInputChange}
             className="mt-1 h-32 border-none"
             maxLength={500}
-            style={{ whiteSpace: 'pre-wrap' }}
+            style={{ whiteSpace: 'pre-wrap', overflowWrap: 'break-word' }}
           />
         </div>
 
@@ -55,7 +56,7 @@ const BannerInputs = ({ formData, handleInputChange }: BannerInputsProps) => {
             onChange={handleInputChange}
             className="mt-1 h-48 border-none"
             maxLength={1000}
-            style={{ whiteSpace: 'pre-wrap' }}
+            style={{ whiteSpace: 'pre-wrap', overflowWrap: 'break-word' }}
           />
         </div>
       </div>
@@ -71,7 +72,7 @@ const BannerInputs = ({ formData, handleInputChange }: BannerInputsProps) => {
             onChange={handleInputChange}
             className="mt-1 h-48 border-none"
             maxLength={1000}
-            style={{ whiteSpace: 'pre-wrap' }}
+            style={{ whiteSpace: 'pre-wrap', overflowWrap: 'break-word' }}
           />
         </div>
 
@@ -84,7 +85,7 @@ const BannerInputs = ({ formData, handleInputChange }: BannerInputsProps) => {
             value={formData.expectedResults}
             onChange={handleInputChange}
             className="mt-1 h-32 border-none"
-            style={{ whiteSpace: 'pre-wrap' }}
+            style={{ whiteSpace: 'pre-wrap', overflowWrap: 'break-word' }}
           />
         </div>
 
@@ -97,7 +98,7 @@ const BannerInputs = ({ formData, handleInputChange }: BannerInputsProps) => {
             value={formData.bibliography}
             onChange={handleInputChange}
             className="mt-1 h-32 border-none"
-            style={{ whiteSpace: 'pre-wrap' }}
+            style={{ whiteSpace: 'pre-wrap', overflowWrap: 'break-word' }}
           />
         </div>
       </div>

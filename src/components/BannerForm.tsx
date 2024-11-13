@@ -1,15 +1,14 @@
 import React, { useState, useRef } from 'react';
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import html2canvas from 'html2canvas';
-import jsPDF from 'jspdf';
-import { Document, Packer, Paragraph, TextRun } from 'docx';
+import { Document, Packer, Paragraph, TextRun, AlignmentType, Table, TableRow, TableCell, BorderStyle } from 'docx'; 
 import { toast } from 'sonner';
 import BannerHeader from './BannerHeader';
 import BannerInputs from './BannerInputs';
 import ImageUpload from './ImageUpload';
 
 interface FormData {
+  title: string;
   introduction: string;
   objectives: string;
   methods: string;
@@ -20,6 +19,7 @@ interface FormData {
 
 const BannerForm = () => {
   const [formData, setFormData] = useState<FormData>({
+    title: '',
     introduction: '',
     objectives: '',
     methods: '',
@@ -28,8 +28,15 @@ const BannerForm = () => {
     images: [],
   });
 
+  const [title, setTitle] = useState<string>('');
   const [imageUrls, setImageUrls] = useState<string[]>([]);
   const formRef = useRef<HTMLDivElement>(null);
+
+  // Função para atualizar o título em formData
+  const handleTitleChange = (newTitle: string) => {
+    setTitle(newTitle);
+    setFormData((prev) => ({ ...prev, title: newTitle }));
+  };
 
   const handleInputChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
@@ -52,88 +59,91 @@ const BannerForm = () => {
     setImageUrls((prev) => [...prev, ...newUrls]);
   };
 
-  const downloadAsPDF = async () => {
-    if (!formRef.current) return;
-
-    try {
-      const element = formRef.current;
-      
-      // Remove borders temporarily for PDF generation
-      const textareas = element.getElementsByTagName('textarea');
-      const originalBorders = Array.from(textareas).map(textarea => textarea.style.border);
-      Array.from(textareas).forEach(textarea => {
-        textarea.style.border = 'none';
-        textarea.style.whiteSpace = 'pre-wrap'; // Preserve line breaks
-      });
-
-      const canvas = await html2canvas(element, {
-        useCORS: true,
-        allowTaint: true,
-        logging: true,
-        scale: 2,
-        onclone: (document) => {
-          const element = document.querySelector('#root');
-          if (element instanceof HTMLElement) {
-            element.style.width = '210mm';
-            element.style.height = '297mm';
-          }
-        }
-      });
-      
-      // Restore original borders
-      Array.from(textareas).forEach((textarea, index) => {
-        textarea.style.border = originalBorders[index];
-      });
-      
-      const imgData = canvas.toDataURL('image/png');
-      const pdf = new jsPDF('p', 'mm', 'a4');
-      const pdfWidth = pdf.internal.pageSize.getWidth();
-      const pdfHeight = pdf.internal.pageSize.getHeight();
-      
-      pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
-      pdf.save('banner-cientifico.pdf');
-      toast.success("PDF baixado com sucesso!");
-    } catch (error) {
-      console.error('Error generating PDF:', error);
-      toast.error("Erro ao gerar PDF. Por favor, tente novamente.");
-    }
-  };
-
   const downloadAsDocx = async () => {
     try {
       const doc = new Document({
         sections: [{
           properties: {},
           children: [
+            // Título no topo, centralizado
             new Paragraph({
-              children: [new TextRun({ text: "Introdução", bold: true })],
+              children: [
+                new TextRun({
+                  text: formData.title || "Título não fornecido",  // Usar o título do formulário
+                  bold: true,
+                  size: 32,  // Tamanho maior para o título
+                }),
+              ],
+              alignment: AlignmentType.CENTER,  // Centralizado
             }),
-            new Paragraph({
-              children: [new TextRun({ text: formData.introduction })],
-            }),
-            new Paragraph({
-              children: [new TextRun({ text: "Objetivos", bold: true })],
-            }),
-            new Paragraph({
-              children: [new TextRun({ text: formData.objectives })],
-            }),
-            new Paragraph({
-              children: [new TextRun({ text: "Materiais e Métodos", bold: true })],
-            }),
-            new Paragraph({
-              children: [new TextRun({ text: formData.methods })],
-            }),
-            new Paragraph({
-              children: [new TextRun({ text: "Resultados Esperados", bold: true })],
-            }),
-            new Paragraph({
-              children: [new TextRun({ text: formData.expectedResults })],
-            }),
-            new Paragraph({
-              children: [new TextRun({ text: "Referências Bibliográficas", bold: true })],
-            }),
-            new Paragraph({
-              children: [new TextRun({ text: formData.bibliography })],
+
+            // Tabela com duas colunas para o conteúdo
+            new Table({
+              rows: [
+                new TableRow({
+                  children: [
+                    // Primeira coluna
+                    new TableCell({
+                      children: [
+                        new Paragraph({
+                          children: [
+                            new TextRun({ text: "Introdução", bold: true }),
+                            new TextRun({ text: formData.introduction }),
+                          ],
+                        }),
+                        new Paragraph({
+                          children: [
+                            new TextRun({ text: "Objetivos", bold: true }),
+                            new TextRun({ text: formData.objectives }),
+                          ],
+                        }),
+                        new Paragraph({
+                          children: [
+                            new TextRun({ text: "Materiais e Métodos", bold: true }),
+                            new TextRun({ text: formData.methods }),
+                          ],
+                        }),
+                      ],
+                      borders: { 
+                        top: { style: BorderStyle.NONE, size: 0, color: "FFFFFF" },
+                        bottom: { style: BorderStyle.NONE, size: 0, color: "FFFFFF" },
+                        left: { style: BorderStyle.NONE, size: 0, color: "FFFFFF" },
+                        right: { style: BorderStyle.NONE, size: 0, color: "FFFFFF" },
+                      },
+                    }),
+
+                    // Segunda coluna
+                    new TableCell({
+                      children: [
+                        new Paragraph({
+                          children: [
+                            new TextRun({ text: "Materiais e Métodos (continuação)", bold: true }),
+                            new TextRun({ text: formData.methods }),
+                          ],
+                        }),
+                        new Paragraph({
+                          children: [
+                            new TextRun({ text: "Resultados Esperados", bold: true }),
+                            new TextRun({ text: formData.expectedResults }),
+                          ],
+                        }),
+                        new Paragraph({
+                          children: [
+                            new TextRun({ text: "Referências Bibliográficas", bold: true }),
+                            new TextRun({ text: formData.bibliography }),
+                          ],
+                        }),
+                      ],
+                      borders: { 
+                        top: { style: BorderStyle.NONE, size: 0, color: "FFFFFF" },
+                        bottom: { style: BorderStyle.NONE, size: 0, color: "FFFFFF" },
+                        left: { style: BorderStyle.NONE, size: 0, color: "FFFFFF" },
+                        right: { style: BorderStyle.NONE, size: 0, color: "FFFFFF" },
+                      },
+                    }),
+                  ],
+                }),
+              ],
             }),
           ],
         }],
@@ -158,17 +168,14 @@ const BannerForm = () => {
   return (
     <div className="container mx-auto px-4 py-8 max-w-4xl">
       <Card className="p-6 space-y-8" ref={formRef}>
-        <BannerHeader />
+        <BannerHeader title={title} setTitle={handleTitleChange} />
         <BannerInputs formData={formData} handleInputChange={handleInputChange} />
         <ImageUpload 
           handleImageUpload={handleImageUpload} 
           imageUrls={imageUrls} 
           maxImages={2} 
         />
-        <div className="flex justify-end space-x-4">
-          <Button onClick={downloadAsPDF}>
-            Baixar PDF
-          </Button>
+        <div className="flex justify-end space-x-4 pdf-docx-buttons">
           <Button onClick={downloadAsDocx} variant="outline">
             Baixar DOCX
           </Button>

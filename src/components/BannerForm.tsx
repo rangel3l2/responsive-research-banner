@@ -42,14 +42,13 @@ const BannerForm = () => {
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || []);
     if (files.length + formData.images.length > 2) {
-      toast.error("Maximum of 2 images allowed");
+      toast.error("Máximo de 2 imagens permitido");
       return;
     }
 
     const newImages = [...formData.images, ...files];
     setFormData((prev) => ({ ...prev, images: newImages }));
 
-    // Create URLs for preview
     const newUrls = files.map(file => URL.createObjectURL(file));
     setImageUrls((prev) => [...prev, ...newUrls]);
   };
@@ -63,118 +62,136 @@ const BannerForm = () => {
       const pdf = new jsPDF('p', 'mm', 'a4');
       const pdfWidth = pdf.internal.pageSize.getWidth();
       const pdfHeight = pdf.internal.pageSize.getHeight();
-      pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
-      pdf.save('scientific-banner.pdf');
-      toast.success("PDF downloaded successfully!");
+      
+      // Add school logo
+      const logoImg = document.getElementById('schoolLogo') as HTMLImageElement;
+      if (logoImg) {
+        pdf.addImage(logoImg.src, 'PNG', 0, 0, pdfWidth, 40);
+      }
+      
+      pdf.addImage(imgData, 'PNG', 0, 40, pdfWidth, pdfHeight - 40);
+      pdf.save('banner-cientifico.pdf');
+      toast.success("PDF baixado com sucesso!");
     } catch (error) {
-      toast.error("Error generating PDF");
+      toast.error("Erro ao gerar PDF");
     }
   };
 
   return (
     <div className="container mx-auto px-4 py-8 max-w-4xl">
       <Card className="p-6 space-y-8" ref={formRef}>
-        <div className="space-y-4">
-          <div>
-            <Label htmlFor="title">Title</Label>
-            <Input
-              id="title"
-              name="title"
-              placeholder="Enter your research title"
-              value={formData.title}
-              onChange={handleInputChange}
-              className="mt-1"
-            />
-          </div>
+        <img 
+          id="schoolLogo"
+          src="/escola-estadual-logo.png" 
+          alt="Escola Estadual Padre João Tomes"
+          className="w-full max-h-40 object-contain mb-6"
+        />
+        
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+          <div className="space-y-4">
+            <div>
+              <Label htmlFor="title">Título</Label>
+              <Input
+                id="title"
+                name="title"
+                placeholder="Digite o título da sua pesquisa"
+                value={formData.title}
+                onChange={handleInputChange}
+                className="mt-1"
+              />
+            </div>
 
-          <div>
-            <Label htmlFor="introduction">Introduction (max 5 lines)</Label>
-            <Textarea
-              id="introduction"
-              name="introduction"
-              placeholder="Write your introduction here (max 5 lines)"
-              value={formData.introduction}
-              onChange={handleInputChange}
-              className="mt-1 h-32"
-              maxLength={500}
-            />
-          </div>
+            <div>
+              <Label htmlFor="introduction">Introdução (máximo 5 linhas)</Label>
+              <Textarea
+                id="introduction"
+                name="introduction"
+                placeholder="Escreva uma breve introdução sobre sua pesquisa"
+                value={formData.introduction}
+                onChange={handleInputChange}
+                className="mt-1 h-32"
+                maxLength={500}
+              />
+            </div>
 
-          <div>
-            <Label htmlFor="objectives">Objectives (max 5 lines)</Label>
-            <Textarea
-              id="objectives"
-              name="objectives"
-              placeholder="Outline your objectives here (max 5 lines)"
-              value={formData.objectives}
-              onChange={handleInputChange}
-              className="mt-1 h-32"
-              maxLength={500}
-            />
-          </div>
-
-          <div>
-            <Label htmlFor="methods">Materials and Methods (max 10 lines)</Label>
-            <Textarea
-              id="methods"
-              name="methods"
-              placeholder="Describe your materials and methods here (max 10 lines)"
-              value={formData.methods}
-              onChange={handleInputChange}
-              className="mt-1 h-48"
-              maxLength={1000}
-            />
-          </div>
-
-          <div>
-            <Label>Images (max 2)</Label>
-            <Input
-              type="file"
-              accept="image/*"
-              onChange={handleImageUpload}
-              className="mt-1"
-              disabled={formData.images.length >= 2}
-            />
-            <div className="grid grid-cols-2 gap-4 mt-4">
-              {imageUrls.map((url, index) => (
-                <img
-                  key={index}
-                  src={url}
-                  alt={`Uploaded image ${index + 1}`}
-                  className="w-full h-48 object-cover rounded-md"
-                />
-              ))}
+            <div>
+              <Label htmlFor="objectives">Objetivos (máximo 5 linhas)</Label>
+              <Textarea
+                id="objectives"
+                name="objectives"
+                placeholder="Liste os objetivos principais da sua pesquisa"
+                value={formData.objectives}
+                onChange={handleInputChange}
+                className="mt-1 h-32"
+                maxLength={500}
+              />
             </div>
           </div>
 
-          <div>
-            <Label htmlFor="expectedResults">Expected Results</Label>
-            <Textarea
-              id="expectedResults"
-              name="expectedResults"
-              placeholder="Describe the expected results of your research"
-              value={formData.expectedResults}
-              onChange={handleInputChange}
-              className="mt-1 h-32"
-            />
-          </div>
+          <div className="space-y-4">
+            <div>
+              <Label htmlFor="methods">Materiais e Métodos (máximo 10 linhas)</Label>
+              <Textarea
+                id="methods"
+                name="methods"
+                placeholder="Descreva os materiais e métodos utilizados na pesquisa"
+                value={formData.methods}
+                onChange={handleInputChange}
+                className="mt-1 h-48"
+                maxLength={1000}
+              />
+            </div>
 
-          <div>
-            <Label htmlFor="bibliography">Bibliographic References</Label>
-            <Textarea
-              id="bibliography"
-              name="bibliography"
-              placeholder="List your references here"
-              value={formData.bibliography}
-              onChange={handleInputChange}
-              className="mt-1 h-32"
-            />
+            <div>
+              <Label>Imagens (máximo 2)</Label>
+              <Input
+                type="file"
+                accept="image/*"
+                onChange={handleImageUpload}
+                className="mt-1"
+                disabled={formData.images.length >= 2}
+              />
+              <div className="grid grid-cols-2 gap-4 mt-4">
+                {imageUrls.map((url, index) => (
+                  <img
+                    key={index}
+                    src={url}
+                    alt={`Imagem ${index + 1}`}
+                    className="w-full h-48 object-cover rounded-md"
+                  />
+                ))}
+              </div>
+            </div>
+
+            <div>
+              <Label htmlFor="expectedResults">Resultados Esperados</Label>
+              <Textarea
+                id="expectedResults"
+                name="expectedResults"
+                placeholder="Descreva os resultados que você espera obter com a pesquisa"
+                value={formData.expectedResults}
+                onChange={handleInputChange}
+                className="mt-1 h-32"
+              />
+            </div>
+
+            <div>
+              <Label htmlFor="bibliography">Referências Bibliográficas</Label>
+              <Textarea
+                id="bibliography"
+                name="bibliography"
+                placeholder="Liste as referências bibliográficas utilizadas"
+                value={formData.bibliography}
+                onChange={handleInputChange}
+                className="mt-1 h-32"
+              />
+            </div>
           </div>
         </div>
 
         <div className="flex justify-end space-x-4">
           <Button onClick={downloadAsPDF}>
-            Download PDF
+            Baixar PDF
           </Button>
         </div>
       </Card>

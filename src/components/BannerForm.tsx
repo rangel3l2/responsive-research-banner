@@ -1,7 +1,7 @@
 import React, { useState, useRef } from 'react';
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { Document, Packer, Paragraph, TextRun, AlignmentType, Table, TableRow, TableCell, BorderStyle } from 'docx'; 
+import { Document, Packer, Paragraph, TextRun, AlignmentType, Table, TableRow, TableCell, BorderStyle, convertInchesToTwip } from 'docx'; 
 import { toast } from 'sonner';
 import BannerHeader from './BannerHeader';
 import BannerInputs from './BannerInputs';
@@ -63,82 +63,98 @@ const BannerForm = () => {
     try {
       const doc = new Document({
         sections: [{
-          properties: {},
+          properties: {
+            page: {
+              margin: {
+                top: convertInchesToTwip(0.08), // 2mm converted to twips
+                bottom: convertInchesToTwip(0.08),
+                left: convertInchesToTwip(0.08),
+                right: convertInchesToTwip(0.08),
+              },
+            },
+          },
           children: [
-            // Título no topo, centralizado
             new Paragraph({
               children: [
                 new TextRun({
-                  text: formData.title || "Título não fornecido",  // Usar o título do formulário
+                  text: formData.title || "Título não fornecido",
                   bold: true,
-                  size: 32,  // Tamanho maior para o título
+                  size: 28, // 14pt
                 }),
               ],
-              alignment: AlignmentType.CENTER,  // Centralizado
+              alignment: AlignmentType.CENTER,
             }),
-
-            // Tabela com duas colunas para o conteúdo
             new Table({
+              width: {
+                size: 100,
+                type: "pct",
+              },
+              columnWidths: [4500, 4500], // Each column takes 45% of the page width
               rows: [
                 new TableRow({
                   children: [
-                    // Primeira coluna
                     new TableCell({
+                      width: {
+                        size: 45,
+                        type: "pct",
+                      },
                       children: [
                         new Paragraph({
                           children: [
-                            new TextRun({ text: "Introdução", bold: true }),
-                            new TextRun({ text: formData.introduction }),
+                            new TextRun({ text: "Introdução", bold: true, size: 24 }), // 12pt
+                            new TextRun({ text: formData.introduction, size: 24 }),
                           ],
                         }),
                         new Paragraph({
                           children: [
-                            new TextRun({ text: "Objetivos", bold: true }),
-                            new TextRun({ text: formData.objectives }),
+                            new TextRun({ text: "Objetivos", bold: true, size: 24 }),
+                            new TextRun({ text: formData.objectives, size: 24 }),
                           ],
                         }),
                         new Paragraph({
                           children: [
-                            new TextRun({ text: "Materiais e Métodos", bold: true }),
-                            new TextRun({ text: formData.methods }),
+                            new TextRun({ text: "Materiais e Métodos", bold: true, size: 24 }),
+                            new TextRun({ text: formData.methods, size: 24 }),
                           ],
                         }),
                       ],
                       borders: { 
-                        top: { style: BorderStyle.NONE, size: 0, color: "FFFFFF" },
-                        bottom: { style: BorderStyle.NONE, size: 0, color: "FFFFFF" },
-                        left: { style: BorderStyle.NONE, size: 0, color: "FFFFFF" },
-                        right: { style: BorderStyle.NONE, size: 0, color: "FFFFFF" },
+                        top: { style: BorderStyle.NONE },
+                        bottom: { style: BorderStyle.NONE },
+                        left: { style: BorderStyle.NONE },
+                        right: { style: BorderStyle.NONE },
                       },
                     }),
-
-                    // Segunda coluna
                     new TableCell({
+                      width: {
+                        size: 45,
+                        type: "pct",
+                      },
                       children: [
                         new Paragraph({
                           children: [
-                            new TextRun({ text: "Materiais e Métodos (continuação)", bold: true }),
-                            new TextRun({ text: formData.methods }),
+                            new TextRun({ text: "Materiais e Métodos (continuação)", bold: true, size: 24 }),
+                            new TextRun({ text: formData.methods, size: 24 }),
                           ],
                         }),
                         new Paragraph({
                           children: [
-                            new TextRun({ text: "Resultados Esperados", bold: true }),
-                            new TextRun({ text: formData.expectedResults }),
+                            new TextRun({ text: "Resultados Esperados", bold: true, size: 24 }),
+                            new TextRun({ text: formData.expectedResults, size: 24 }),
                           ],
                         }),
                         new Paragraph({
                           children: [
-                            new TextRun({ text: "Referências Bibliográficas", bold: true }),
-                            new TextRun({ text: formData.bibliography }),
+                            new TextRun({ text: "Referências Bibliográficas", bold: true, size: 24 }),
+                            new TextRun({ text: formData.bibliography, size: 24 }),
                           ],
                         }),
                       ],
                       borders: { 
-                        top: { style: BorderStyle.NONE, size: 0, color: "FFFFFF" },
-                        bottom: { style: BorderStyle.NONE, size: 0, color: "FFFFFF" },
-                        left: { style: BorderStyle.NONE, size: 0, color: "FFFFFF" },
-                        right: { style: BorderStyle.NONE, size: 0, color: "FFFFFF" },
+                        top: { style: BorderStyle.NONE },
+                        bottom: { style: BorderStyle.NONE },
+                        left: { style: BorderStyle.NONE },
+                        right: { style: BorderStyle.NONE },
                       },
                     }),
                   ],

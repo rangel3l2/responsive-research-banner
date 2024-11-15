@@ -15,6 +15,15 @@ interface BannerInputsProps {
 }
 
 const BannerInputs = ({ formData, handleInputChange }: BannerInputsProps) => {
+  const textareaStyle = {
+    whiteSpace: 'pre-wrap',
+    overflowWrap: 'break-word',
+    fontSize: '12px',
+    lineHeight: '1.5',
+    padding: '2px',
+    width: '45%',
+  };
+
   return (
     <div className="grid grid-cols-2 gap-8">
       <div className="space-y-4">
@@ -28,7 +37,7 @@ const BannerInputs = ({ formData, handleInputChange }: BannerInputsProps) => {
             onChange={handleInputChange}
             className="mt-1 h-32 border-none"
             maxLength={500}
-            style={{ whiteSpace: 'pre-wrap', overflowWrap: 'break-word' }}
+            style={textareaStyle}
           />
         </div>
 
@@ -42,7 +51,7 @@ const BannerInputs = ({ formData, handleInputChange }: BannerInputsProps) => {
             onChange={handleInputChange}
             className="mt-1 h-32 border-none"
             maxLength={500}
-            style={{ whiteSpace: 'pre-wrap', overflowWrap: 'break-word' }}
+            style={textareaStyle}
           />
         </div>
 
@@ -56,7 +65,7 @@ const BannerInputs = ({ formData, handleInputChange }: BannerInputsProps) => {
             onChange={handleInputChange}
             className="mt-1 h-48 border-none"
             maxLength={1000}
-            style={{ whiteSpace: 'pre-wrap', overflowWrap: 'break-word' }}
+            style={textareaStyle}
           />
         </div>
       </div>
@@ -72,7 +81,7 @@ const BannerInputs = ({ formData, handleInputChange }: BannerInputsProps) => {
             onChange={handleInputChange}
             className="mt-1 h-48 border-none"
             maxLength={1000}
-            style={{ whiteSpace: 'pre-wrap', overflowWrap: 'break-word' }}
+            style={textareaStyle}
           />
         </div>
 
@@ -85,7 +94,7 @@ const BannerInputs = ({ formData, handleInputChange }: BannerInputsProps) => {
             value={formData.expectedResults}
             onChange={handleInputChange}
             className="mt-1 h-32 border-none"
-            style={{ whiteSpace: 'pre-wrap', overflowWrap: 'break-word' }}
+            style={textareaStyle}
           />
         </div>
 
@@ -98,7 +107,7 @@ const BannerInputs = ({ formData, handleInputChange }: BannerInputsProps) => {
             value={formData.bibliography}
             onChange={handleInputChange}
             className="mt-1 h-32 border-none"
-            style={{ whiteSpace: 'pre-wrap', overflowWrap: 'break-word' }}
+            style={textareaStyle}
           />
         </div>
       </div>

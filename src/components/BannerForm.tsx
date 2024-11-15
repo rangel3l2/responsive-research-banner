@@ -1,11 +1,11 @@
 import React, { useState, useRef } from 'react';
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { Document, Packer, Paragraph, TextRun, AlignmentType, Table, TableRow, TableCell, BorderStyle } from 'docx'; 
 import { toast } from 'sonner';
 import BannerHeader from './BannerHeader';
 import BannerInputs from './BannerInputs';
 import ImageUpload from './ImageUpload';
+import { generateBannerDocx } from '@/utils/docxGenerator';
 
 interface FormData {
   title: string;
@@ -32,7 +32,6 @@ const BannerForm = () => {
   const [imageUrls, setImageUrls] = useState<string[]>([]);
   const formRef = useRef<HTMLDivElement>(null);
 
-  // Função para atualizar o título em formData
   const handleTitleChange = (newTitle: string) => {
     setTitle(newTitle);
     setFormData((prev) => ({ ...prev, title: newTitle }));
@@ -61,128 +60,10 @@ const BannerForm = () => {
 
   const downloadAsDocx = async () => {
     try {
-      const doc = new Document({
-        sections: [{
-          properties: {},
-          children: [
-            new Paragraph({
-              children: [
-                new TextRun({
-                  text: formData.title || "Título não fornecido",
-                  bold: true,
-                  size: 24,  // 12pt
-                  font: "Times New Roman"
-                }),
-              ],
-              alignment: AlignmentType.CENTER,
-            }),
-
-            new Table({
-              rows: [
-                new TableRow({
-                  children: [
-                    new TableCell({
-                      children: [
-                        new Paragraph({
-                          children: [
-                            new TextRun({ text: "Introdução", bold: true, size: 24, font: "Times New Roman" }),
-                            new TextRun({ text: formData.introduction, size: 24, font: "Times New Roman" }),
-                          ],
-                        }),
-                        new Paragraph({
-                          children: [
-                            new TextRun({ text: "Objetivos", bold: true, size: 24, font: "Times New Roman" }),
-                            new TextRun({ text: formData.objectives, size: 24, font: "Times New Roman" }),
-                          ],
-                        }),
-                        new Paragraph({
-                          children: [
-                            new TextRun({ text: "Materiais e Métodos", bold: true, size: 24, font: "Times New Roman" }),
-                            new TextRun({ text: formData.methods, size: 24, font: "Times New Roman" }),
-                          ],
-                        }),
-                      ],
-                      width: {
-                        size: 50,
-                        type: WidthType.PERCENTAGE,
-                      },
-                      margins: {
-                        top: 100,
-                        bottom: 100,
-                        left: 100,
-                        right: 100,
-                      },
-                      borders: { 
-                        top: { style: BorderStyle.NONE },
-                        bottom: { style: BorderStyle.NONE },
-                        left: { style: BorderStyle.NONE },
-                        right: { style: BorderStyle.NONE },
-                      },
-                    }),
-
-                    new TableCell({
-                      children: [
-                        new Paragraph({
-                          children: [
-                            new TextRun({ text: "Materiais e Métodos (continuação)", bold: true, size: 24, font: "Times New Roman" }),
-                            new TextRun({ text: formData.methods, size: 24, font: "Times New Roman" }),
-                          ],
-                        }),
-                        new Paragraph({
-                          children: [
-                            new TextRun({ text: "Resultados Esperados", bold: true, size: 24, font: "Times New Roman" }),
-                            new TextRun({ text: formData.expectedResults, size: 24, font: "Times New Roman" }),
-                          ],
-                        }),
-                        new Paragraph({
-                          children: [
-                            new TextRun({ text: "Referências Bibliográficas", bold: true, size: 24, font: "Times New Roman" }),
-                            new TextRun({ text: formData.bibliography, size: 24, font: "Times New Roman" }),
-                          ],
-                        }),
-                      ],
-                      width: {
-                        size: 50,
-                        type: WidthType.PERCENTAGE,
-                      },
-                      margins: {
-                        top: 100,
-                        bottom: 100,
-                        left: 100,
-                        right: 100,
-                      },
-                      borders: { 
-                        top: { style: BorderStyle.NONE },
-                        bottom: { style: BorderStyle.NONE },
-                        left: { style: BorderStyle.NONE },
-                        right: { style: BorderStyle.NONE },
-                      },
-                    }),
-                  ],
-                }),
-              ],
-              width: {
-                size: 100,
-                type: WidthType.PERCENTAGE,
-              },
-            }),
-          ],
-        }],
-        styles: {
-          paragraphStyles: [
-            {
-              id: "Normal",
-              name: "Normal",
-              run: {
-                size: 24, // 12pt
-                font: "Times New Roman",
-              },
-            },
-          ],
-        },
-      });
-
-      const blob = await Packer.toBlob(doc);
+      console.log('Iniciando geração do DOCX...', formData);
+      const blob = await generateBannerDocx(formData);
+      console.log('DOCX gerado com sucesso');
+      
       const url = window.URL.createObjectURL(blob);
       const link = document.createElement('a');
       link.href = url;
@@ -193,7 +74,7 @@ const BannerForm = () => {
       window.URL.revokeObjectURL(url);
       toast.success("DOCX baixado com sucesso!");
     } catch (error) {
-      console.error('Error generating DOCX:', error);
+      console.error('Erro ao gerar DOCX:', error);
       toast.error("Erro ao gerar DOCX. Por favor, tente novamente.");
     }
   };

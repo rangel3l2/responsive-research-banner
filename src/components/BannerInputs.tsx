@@ -4,7 +4,7 @@ import { Label } from "@/components/ui/label";
 
 interface BannerInputsProps {
   formData: {
-    title : string;
+    title: string;
     introduction: string;
     objectives: string;
     methods: string;
@@ -15,6 +15,13 @@ interface BannerInputsProps {
 }
 
 const BannerInputs = ({ formData, handleInputChange }: BannerInputsProps) => {
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>, maxLines: number) => {
+    const lines = e.currentTarget.value.split('\n');
+    if (e.key === 'Enter' && lines.length >= maxLines) {
+      e.preventDefault();
+    }
+  };
+
   return (
     <div className="grid grid-cols-2 gap-8">
       <div className="space-y-4">
@@ -26,6 +33,7 @@ const BannerInputs = ({ formData, handleInputChange }: BannerInputsProps) => {
             placeholder="Escreva uma breve introdução sobre sua pesquisa (máximo 5 linhas)"
             value={formData.introduction}
             onChange={handleInputChange}
+            onKeyDown={(e) => handleKeyDown(e, 5)}
             className="mt-1 h-32 border-none"
             maxLength={500}
             style={{ whiteSpace: 'pre-wrap', overflowWrap: 'break-word' }}
@@ -40,6 +48,7 @@ const BannerInputs = ({ formData, handleInputChange }: BannerInputsProps) => {
             placeholder="Liste os objetivos principais da sua pesquisa (máximo 5 linhas)"
             value={formData.objectives}
             onChange={handleInputChange}
+            onKeyDown={(e) => handleKeyDown(e, 5)}
             className="mt-1 h-32 border-none"
             maxLength={500}
             style={{ whiteSpace: 'pre-wrap', overflowWrap: 'break-word' }}
@@ -54,6 +63,7 @@ const BannerInputs = ({ formData, handleInputChange }: BannerInputsProps) => {
             placeholder="Descreva os materiais e métodos utilizados na pesquisa (máximo 10 linhas)"
             value={formData.methods}
             onChange={handleInputChange}
+            onKeyDown={(e) => handleKeyDown(e, 10)}
             className="mt-1 h-48 border-none"
             maxLength={1000}
             style={{ whiteSpace: 'pre-wrap', overflowWrap: 'break-word' }}
@@ -70,6 +80,7 @@ const BannerInputs = ({ formData, handleInputChange }: BannerInputsProps) => {
             placeholder="Continue a descrição dos materiais e métodos"
             value={formData.methods}
             onChange={handleInputChange}
+            onKeyDown={(e) => handleKeyDown(e, 10)}
             className="mt-1 h-48 border-none"
             maxLength={1000}
             style={{ whiteSpace: 'pre-wrap', overflowWrap: 'break-word' }}
@@ -81,9 +92,10 @@ const BannerInputs = ({ formData, handleInputChange }: BannerInputsProps) => {
           <Textarea
             id="expectedResults"
             name="expectedResults"
-            placeholder="Descreva os resultados que você espera obter com a pesquisa"
+            placeholder="Descreva os resultados que você espera obter com a pesquisa (máximo 5 linhas)"
             value={formData.expectedResults}
             onChange={handleInputChange}
+            onKeyDown={(e) => handleKeyDown(e, 5)}
             className="mt-1 h-32 border-none"
             style={{ whiteSpace: 'pre-wrap', overflowWrap: 'break-word' }}
           />
@@ -94,9 +106,10 @@ const BannerInputs = ({ formData, handleInputChange }: BannerInputsProps) => {
           <Textarea
             id="bibliography"
             name="bibliography"
-            placeholder="Liste as referências bibliográficas utilizadas"
+            placeholder="Liste as referências bibliográficas utilizadas (máximo 5 linhas)"
             value={formData.bibliography}
             onChange={handleInputChange}
+            onKeyDown={(e) => handleKeyDown(e, 5)}
             className="mt-1 h-32 border-none"
             style={{ whiteSpace: 'pre-wrap', overflowWrap: 'break-word' }}
           />

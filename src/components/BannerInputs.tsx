@@ -4,7 +4,7 @@ import { Label } from "@/components/ui/label";
 
 interface BannerInputsProps {
   formData: {
-    title: string;
+    title : string;
     introduction: string;
     objectives: string;
     methods: string;
@@ -15,16 +15,13 @@ interface BannerInputsProps {
 }
 
 const BannerInputs = ({ formData, handleInputChange }: BannerInputsProps) => {
-  const textareaStyle: React.CSSProperties = {
+  const textareaStyle = {
     whiteSpace: 'pre-wrap',
-    wordBreak: 'break-word',
-    fontSize: '16px',
+    overflowWrap: 'break-word',
+    fontSize: '12px',
     lineHeight: '1.5',
-    padding: '8px',
-    width: '44%',
-    minHeight: '150px',
-    border: '1px solid #e2e8f0',
-    borderRadius: '4px',
+    padding: '2px',
+    width: '45%',
   };
 
   return (
@@ -38,7 +35,7 @@ const BannerInputs = ({ formData, handleInputChange }: BannerInputsProps) => {
             placeholder="Escreva uma breve introdução sobre sua pesquisa (máximo 5 linhas)"
             value={formData.introduction}
             onChange={handleInputChange}
-            className="mt-1"
+            className="mt-1 h-32 border-none"
             maxLength={500}
             style={textareaStyle}
           />
@@ -52,7 +49,7 @@ const BannerInputs = ({ formData, handleInputChange }: BannerInputsProps) => {
             placeholder="Liste os objetivos principais da sua pesquisa (máximo 5 linhas)"
             value={formData.objectives}
             onChange={handleInputChange}
-            className="mt-1"
+            className="mt-1 h-32 border-none"
             maxLength={500}
             style={textareaStyle}
           />
@@ -66,7 +63,7 @@ const BannerInputs = ({ formData, handleInputChange }: BannerInputsProps) => {
             placeholder="Descreva os materiais e métodos utilizados na pesquisa (máximo 10 linhas)"
             value={formData.methods}
             onChange={handleInputChange}
-            className="mt-1"
+            className="mt-1 h-48 border-none"
             maxLength={1000}
             style={textareaStyle}
           />
@@ -82,7 +79,7 @@ const BannerInputs = ({ formData, handleInputChange }: BannerInputsProps) => {
             placeholder="Continue a descrição dos materiais e métodos"
             value={formData.methods}
             onChange={handleInputChange}
-            className="mt-1"
+            className="mt-1 h-48 border-none"
             maxLength={1000}
             style={textareaStyle}
           />
@@ -96,7 +93,7 @@ const BannerInputs = ({ formData, handleInputChange }: BannerInputsProps) => {
             placeholder="Descreva os resultados que você espera obter com a pesquisa"
             value={formData.expectedResults}
             onChange={handleInputChange}
-            className="mt-1"
+            className="mt-1 h-32 border-none"
             style={textareaStyle}
           />
         </div>
@@ -109,7 +106,7 @@ const BannerInputs = ({ formData, handleInputChange }: BannerInputsProps) => {
             placeholder="Liste as referências bibliográficas utilizadas"
             value={formData.bibliography}
             onChange={handleInputChange}
-            className="mt-1"
+            className="mt-1 h-32 border-none"
             style={textareaStyle}
           />
         </div>

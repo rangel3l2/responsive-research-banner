@@ -65,88 +65,121 @@ const BannerForm = () => {
         sections: [{
           properties: {},
           children: [
-            // Título no topo, centralizado
             new Paragraph({
               children: [
                 new TextRun({
-                  text: formData.title || "Título não fornecido",  // Usar o título do formulário
+                  text: formData.title || "Título não fornecido",
                   bold: true,
-                  size: 32,  // Tamanho maior para o título
+                  size: 24,  // 12pt
+                  font: "Times New Roman"
                 }),
               ],
-              alignment: AlignmentType.CENTER,  // Centralizado
+              alignment: AlignmentType.CENTER,
             }),
 
-            // Tabela com duas colunas para o conteúdo
             new Table({
               rows: [
                 new TableRow({
                   children: [
-                    // Primeira coluna
                     new TableCell({
                       children: [
                         new Paragraph({
                           children: [
-                            new TextRun({ text: "Introdução", bold: true }),
-                            new TextRun({ text: formData.introduction }),
+                            new TextRun({ text: "Introdução", bold: true, size: 24, font: "Times New Roman" }),
+                            new TextRun({ text: formData.introduction, size: 24, font: "Times New Roman" }),
                           ],
                         }),
                         new Paragraph({
                           children: [
-                            new TextRun({ text: "Objetivos", bold: true }),
-                            new TextRun({ text: formData.objectives }),
+                            new TextRun({ text: "Objetivos", bold: true, size: 24, font: "Times New Roman" }),
+                            new TextRun({ text: formData.objectives, size: 24, font: "Times New Roman" }),
                           ],
                         }),
                         new Paragraph({
                           children: [
-                            new TextRun({ text: "Materiais e Métodos", bold: true }),
-                            new TextRun({ text: formData.methods }),
+                            new TextRun({ text: "Materiais e Métodos", bold: true, size: 24, font: "Times New Roman" }),
+                            new TextRun({ text: formData.methods, size: 24, font: "Times New Roman" }),
                           ],
                         }),
                       ],
+                      width: {
+                        size: 50,
+                        type: WidthType.PERCENTAGE,
+                      },
+                      margins: {
+                        top: 100,
+                        bottom: 100,
+                        left: 100,
+                        right: 100,
+                      },
                       borders: { 
-                        top: { style: BorderStyle.NONE, size: 0, color: "FFFFFF" },
-                        bottom: { style: BorderStyle.NONE, size: 0, color: "FFFFFF" },
-                        left: { style: BorderStyle.NONE, size: 0, color: "FFFFFF" },
-                        right: { style: BorderStyle.NONE, size: 0, color: "FFFFFF" },
+                        top: { style: BorderStyle.NONE },
+                        bottom: { style: BorderStyle.NONE },
+                        left: { style: BorderStyle.NONE },
+                        right: { style: BorderStyle.NONE },
                       },
                     }),
 
-                    // Segunda coluna
                     new TableCell({
                       children: [
                         new Paragraph({
                           children: [
-                            new TextRun({ text: "Materiais e Métodos (continuação)", bold: true }),
-                            new TextRun({ text: formData.methods }),
+                            new TextRun({ text: "Materiais e Métodos (continuação)", bold: true, size: 24, font: "Times New Roman" }),
+                            new TextRun({ text: formData.methods, size: 24, font: "Times New Roman" }),
                           ],
                         }),
                         new Paragraph({
                           children: [
-                            new TextRun({ text: "Resultados Esperados", bold: true }),
-                            new TextRun({ text: formData.expectedResults }),
+                            new TextRun({ text: "Resultados Esperados", bold: true, size: 24, font: "Times New Roman" }),
+                            new TextRun({ text: formData.expectedResults, size: 24, font: "Times New Roman" }),
                           ],
                         }),
                         new Paragraph({
                           children: [
-                            new TextRun({ text: "Referências Bibliográficas", bold: true }),
-                            new TextRun({ text: formData.bibliography }),
+                            new TextRun({ text: "Referências Bibliográficas", bold: true, size: 24, font: "Times New Roman" }),
+                            new TextRun({ text: formData.bibliography, size: 24, font: "Times New Roman" }),
                           ],
                         }),
                       ],
+                      width: {
+                        size: 50,
+                        type: WidthType.PERCENTAGE,
+                      },
+                      margins: {
+                        top: 100,
+                        bottom: 100,
+                        left: 100,
+                        right: 100,
+                      },
                       borders: { 
-                        top: { style: BorderStyle.NONE, size: 0, color: "FFFFFF" },
-                        bottom: { style: BorderStyle.NONE, size: 0, color: "FFFFFF" },
-                        left: { style: BorderStyle.NONE, size: 0, color: "FFFFFF" },
-                        right: { style: BorderStyle.NONE, size: 0, color: "FFFFFF" },
+                        top: { style: BorderStyle.NONE },
+                        bottom: { style: BorderStyle.NONE },
+                        left: { style: BorderStyle.NONE },
+                        right: { style: BorderStyle.NONE },
                       },
                     }),
                   ],
                 }),
               ],
+              width: {
+                size: 100,
+                type: WidthType.PERCENTAGE,
+              },
             }),
           ],
         }],
+        styles: {
+          paragraphStyles: [
+            {
+              id: "Normal",
+              name: "Normal",
+              run: {
+                size: 24, // 12pt
+                font: "Times New Roman",
+              },
+            },
+          ],
+        },
       });
 
       const blob = await Packer.toBlob(doc);

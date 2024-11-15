@@ -17,11 +17,15 @@ interface BannerInputsProps {
 const BannerInputs = ({ formData, handleInputChange }: BannerInputsProps) => {
   const handleTextAreaChange = (
     e: React.ChangeEvent<HTMLTextAreaElement>,
-    maxLines: number
+    maxLines: number,
+    maxChars: number
   ) => {
     const lines = e.target.value.split('\n');
     if (lines.length > maxLines) {
       e.target.value = lines.slice(0, maxLines).join('\n');
+    }
+    if (e.target.value.length > maxChars) {
+      e.target.value = e.target.value.slice(0, maxChars);
     }
     handleInputChange(e);
   };
@@ -36,9 +40,8 @@ const BannerInputs = ({ formData, handleInputChange }: BannerInputsProps) => {
             name="introduction"
             placeholder="Escreva uma breve introdução sobre sua pesquisa (máximo 5 linhas)"
             value={formData.introduction}
-            onChange={(e) => handleTextAreaChange(e, 5)}
+            onChange={(e) => handleTextAreaChange(e, 5, 250)}
             className="mt-1 h-32 border-none"
-            maxLength={500}
             style={{ whiteSpace: 'pre-wrap', overflowWrap: 'break-word' }}
           />
         </div>
@@ -50,9 +53,8 @@ const BannerInputs = ({ formData, handleInputChange }: BannerInputsProps) => {
             name="objectives"
             placeholder="Liste os objetivos principais da sua pesquisa (máximo 5 linhas)"
             value={formData.objectives}
-            onChange={(e) => handleTextAreaChange(e, 5)}
+            onChange={(e) => handleTextAreaChange(e, 5, 250)}
             className="mt-1 h-32 border-none"
-            maxLength={500}
             style={{ whiteSpace: 'pre-wrap', overflowWrap: 'break-word' }}
           />
         </div>
@@ -64,9 +66,8 @@ const BannerInputs = ({ formData, handleInputChange }: BannerInputsProps) => {
             name="methods"
             placeholder="Descreva os materiais e métodos utilizados na pesquisa (máximo 10 linhas)"
             value={formData.methods}
-            onChange={(e) => handleTextAreaChange(e, 10)}
+            onChange={(e) => handleTextAreaChange(e, 10, 500)}
             className="mt-1 h-48 border-none"
-            maxLength={1000}
             style={{ whiteSpace: 'pre-wrap', overflowWrap: 'break-word' }}
           />
         </div>
@@ -80,9 +81,8 @@ const BannerInputs = ({ formData, handleInputChange }: BannerInputsProps) => {
             name="methods"
             placeholder="Continue a descrição dos materiais e métodos"
             value={formData.methods}
-            onChange={(e) => handleTextAreaChange(e, 10)}
+            onChange={(e) => handleTextAreaChange(e, 10, 500)}
             className="mt-1 h-48 border-none"
-            maxLength={1000}
             style={{ whiteSpace: 'pre-wrap', overflowWrap: 'break-word' }}
           />
         </div>
@@ -94,7 +94,7 @@ const BannerInputs = ({ formData, handleInputChange }: BannerInputsProps) => {
             name="expectedResults"
             placeholder="Descreva os resultados que você espera obter com a pesquisa (máximo 5 linhas)"
             value={formData.expectedResults}
-            onChange={(e) => handleTextAreaChange(e, 5)}
+            onChange={(e) => handleTextAreaChange(e, 5, 250)}
             className="mt-1 h-32 border-none"
             style={{ whiteSpace: 'pre-wrap', overflowWrap: 'break-word' }}
           />
@@ -107,7 +107,7 @@ const BannerInputs = ({ formData, handleInputChange }: BannerInputsProps) => {
             name="bibliography"
             placeholder="Liste as referências bibliográficas utilizadas (máximo 5 linhas)"
             value={formData.bibliography}
-            onChange={(e) => handleTextAreaChange(e, 5)}
+            onChange={(e) => handleTextAreaChange(e, 5, 250)}
             className="mt-1 h-32 border-none"
             style={{ whiteSpace: 'pre-wrap', overflowWrap: 'break-word' }}
           />

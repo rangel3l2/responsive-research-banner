@@ -15,6 +15,8 @@ interface FormData {
   expectedResults: string;
   bibliography: string;
   images: File[];
+  imageCaptions: string[];
+  logo?: File;
 }
 
 const BannerForm = () => {
@@ -26,6 +28,8 @@ const BannerForm = () => {
     expectedResults: '',
     bibliography: '',
     images: [],
+    imageCaptions: [],
+    logo: undefined,
   });
 
   const [title, setTitle] = useState<string>('');
@@ -52,10 +56,27 @@ const BannerForm = () => {
     }
 
     const newImages = [...formData.images, ...files];
-    setFormData((prev) => ({ ...prev, images: newImages }));
+    const newCaptions = [...formData.imageCaptions, ...Array(files.length).fill('')];
+    setFormData((prev) => ({ 
+      ...prev, 
+      images: newImages,
+      imageCaptions: newCaptions,
+    }));
 
     const newUrls = files.map(file => URL.createObjectURL(file));
     setImageUrls((prev) => [...prev, ...newUrls]);
+  };
+
+  const handleCaptionChange = (index: number, caption: string) => {
+    setFormData((prev) => {
+      const newCaptions = [...prev.imageCaptions];
+      newCaptions[index] = caption;
+      return { ...prev, imageCaptions: newCaptions };
+    });
+  };
+
+  const handleLogoUpload = (file: File) => {
+    setFormData((prev) => ({ ...prev, logo: file }));
   };
 
   const downloadAsDocx = async () => {
@@ -82,14 +103,20 @@ const BannerForm = () => {
   return (
     <div className="container mx-auto px-4 py-8 max-w-4xl">
       <Card className="p-6 space-y-8" ref={formRef}>
-        <BannerHeader title={title} setTitle={handleTitleChange} />
+        <BannerHeader 
+          title={title} 
+          setTitle={handleTitleChange} 
+          onLogoUpload={handleLogoUpload}
+        />
         <BannerInputs formData={formData} handleInputChange={handleInputChange} />
         <ImageUpload 
           handleImageUpload={handleImageUpload} 
           imageUrls={imageUrls} 
-          maxImages={2} 
+          maxImages={2}
+          imageCaptions={formData.imageCaptions}
+          onCaptionChange={handleCaptionChange}
         />
-        <div className="flex justify-end space-x-4 pdf-docx-buttons">
+        <div className="flex justify-end space-x-4">
           <Button onClick={downloadAsDocx} variant="outline">
             Baixar DOCX
           </Button>

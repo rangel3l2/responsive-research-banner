@@ -5,11 +5,15 @@ import { Label } from "@/components/ui/label";
 interface BannerHeaderProps {
   title: string;
   setTitle: (title: string) => void;
+  onLogoUpload: (file: File) => void;
 }
 
-const BannerHeader: React.FC<BannerHeaderProps> = ({ title, setTitle }) => {
+const BannerHeader: React.FC<BannerHeaderProps> = ({ title, setTitle, onLogoUpload }) => {
   const handleLogoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    // Lógica de alteração do logo permanece aqui
+    const file = e.target.files?.[0];
+    if (file) {
+      onLogoUpload(file);
+    }
   };
 
   return (

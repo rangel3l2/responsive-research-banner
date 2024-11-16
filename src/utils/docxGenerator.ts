@@ -8,7 +8,9 @@ import {
   CELL_WIDTH,
   TABLE_WIDTH,
   PAGE_MARGINS,
-  PARAGRAPH_SPACING
+  PARAGRAPH_SPACING,
+  IMAGE_WIDTH,
+  IMAGE_HEIGHT
 } from './docxStyles';
 
 interface FormDataWithImages {
@@ -49,7 +51,29 @@ const createSectionParagraphs = (title: string, content: string) => [
     ],
     spacing: PARAGRAPH_SPACING,
   }),
-];
+};
+
+const createImageWithCaption = (imageBase64: string, caption: string) => [
+  new Paragraph({
+    children: [
+      new ImageRun(createImageRunOptions(imageBase64, IMAGE_WIDTH, IMAGE_HEIGHT)),
+    ],
+    spacing: { after: 200 },
+    alignment: AlignmentType.CENTER,
+  }),
+  new Paragraph({
+    children: [
+      new TextRun({ 
+        text: `Figura: ${caption}`, 
+        size: DEFAULT_FONT_SIZE - 2, 
+        font: DEFAULT_FONT,
+        italics: true
+      }),
+    ],
+    alignment: AlignmentType.CENTER,
+    spacing: PARAGRAPH_SPACING,
+  }),
+};
 
 export const generateBannerDocx = async (formData: FormDataWithImages) => {
   const imageBase64Promises = formData.images.map(convertImageToBase64);
@@ -58,7 +82,7 @@ export const generateBannerDocx = async (formData: FormDataWithImages) => {
 
   const logoParagraph = logoBase64 ? new Paragraph({
     children: [
-      new ImageRun(createImageRunOptions(logoBase64, 100, 100)),
+      new ImageRun(createImageRunOptions(logoBase64, IMAGE_WIDTH / 2, IMAGE_HEIGHT / 2)),
     ],
     spacing: PARAGRAPH_SPACING,
     alignment: AlignmentType.CENTER,
@@ -75,27 +99,10 @@ export const generateBannerDocx = async (formData: FormDataWithImages) => {
     }));
     
     if (index < methodsContent.length - 1 && imageBase64Results[index]) {
-      acc.push(new Paragraph({
-        children: [
-          new ImageRun(createImageRunOptions(imageBase64Results[index], 300, 200)),
-        ],
-        spacing: { after: 200 },
-        alignment: AlignmentType.CENTER,
-      }));
-      
-      if (formData.imageCaptions?.[index]) {
-        acc.push(new Paragraph({
-          children: [
-            new TextRun({ 
-              text: formData.imageCaptions[index] || '', 
-              size: DEFAULT_FONT_SIZE, 
-              font: DEFAULT_FONT 
-            }),
-          ],
-          alignment: AlignmentType.CENTER,
-          spacing: PARAGRAPH_SPACING,
-        }));
-      }
+      acc.push(...createImageWithCaption(
+        imageBase64Results[index],
+        formData.imageCaptions?.[index] || ''
+      ));
     }
     return acc;
   }, []);

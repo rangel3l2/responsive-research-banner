@@ -4,7 +4,6 @@ import { Card } from "@/components/ui/card";
 import { toast } from 'sonner';
 import BannerHeader from './BannerHeader';
 import BannerInputs from './BannerInputs';
-import ImageUpload from './ImageUpload';
 import { generateBannerDocx } from '@/utils/docxGenerator';
 
 interface FormData {
@@ -108,11 +107,11 @@ const BannerForm = () => {
           setTitle={handleTitleChange} 
           onLogoUpload={handleLogoUpload}
         />
-        <BannerInputs formData={formData} handleInputChange={handleInputChange} />
-        <ImageUpload 
-          handleImageUpload={handleImageUpload} 
-          imageUrls={imageUrls} 
-          maxImages={2}
+        <BannerInputs 
+          formData={formData} 
+          handleInputChange={handleInputChange}
+          handleImageUpload={handleImageUpload}
+          imageUrls={imageUrls}
           imageCaptions={formData.imageCaptions}
           onCaptionChange={handleCaptionChange}
         />

@@ -13,9 +13,9 @@ export const createImageRunOptions = (base64Data: string, width: number, height:
     width,
     height,
   },
-  type: 'png',
+  type: "svg" as const,
   fallback: {
-    type: 'png',
+    type: "png",
     width,
     height,
   }

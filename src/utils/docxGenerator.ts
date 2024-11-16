@@ -1,4 +1,15 @@
-import { Document, Packer, Paragraph, TextRun, AlignmentType, Table, TableRow, TableCell, BorderStyle, WidthType, ImageRun } from 'docx';
+import { Document, Packer, Paragraph, TextRun, AlignmentType, Table, TableRow, TableCell, ImageRun } from 'docx';
+import { convertImageToBase64, createImageRunOptions } from './imageUtils';
+import { 
+  DEFAULT_FONT,
+  DEFAULT_FONT_SIZE,
+  CELL_MARGINS,
+  NO_BORDERS,
+  CELL_WIDTH,
+  TABLE_WIDTH,
+  PAGE_MARGINS,
+  PARAGRAPH_SPACING
+} from './docxStyles';
 
 interface FormDataWithImages {
   title: string;
@@ -12,67 +23,65 @@ interface FormDataWithImages {
   logo?: File;
 }
 
-const convertImageToBase64 = (file: File): Promise<string> => {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.readAsDataURL(file);
-    reader.onload = () => resolve(reader.result as string);
-    reader.onerror = error => reject(error);
-  });
-};
+const createTitleParagraph = (title: string) => new Paragraph({
+  children: [
+    new TextRun({
+      text: title || "Título não fornecido",
+      bold: true,
+      size: DEFAULT_FONT_SIZE,
+      font: DEFAULT_FONT
+    }),
+  ],
+  alignment: AlignmentType.CENTER,
+  spacing: PARAGRAPH_SPACING,
+});
+
+const createSectionParagraphs = (title: string, content: string) => [
+  new Paragraph({
+    children: [
+      new TextRun({ text: title, bold: true, size: DEFAULT_FONT_SIZE, font: DEFAULT_FONT }),
+    ],
+    spacing: { after: 200 },
+  }),
+  new Paragraph({
+    children: [
+      new TextRun({ text: content, size: DEFAULT_FONT_SIZE, font: DEFAULT_FONT }),
+    ],
+    spacing: PARAGRAPH_SPACING,
+  }),
+];
 
 export const generateBannerDocx = async (formData: FormDataWithImages) => {
-  // Convert images to base64
   const imageBase64Promises = formData.images.map(convertImageToBase64);
   const imageBase64Results = await Promise.all(imageBase64Promises);
   const logoBase64 = formData.logo ? await convertImageToBase64(formData.logo) : null;
 
-  // Create logo paragraph if logo exists
   const logoParagraph = logoBase64 ? new Paragraph({
     children: [
-      new ImageRun({
-        data: logoBase64.split(',')[1],
-        transformation: {
-          width: 100,
-          height: 100,
-        },
-      }),
+      new ImageRun(createImageRunOptions(logoBase64, 100, 100)),
     ],
-    spacing: {
-      after: 400,
-    },
+    spacing: PARAGRAPH_SPACING,
     alignment: AlignmentType.CENTER,
   }) : undefined;
 
-  // Create image paragraphs with captions
   const imagesParagraphs = imageBase64Results.map((base64, index) => [
     new Paragraph({
       children: [
-        new ImageRun({
-          data: base64.split(',')[1],
-          transformation: {
-            width: 300,
-            height: 200,
-          },
-        }),
+        new ImageRun(createImageRunOptions(base64, 300, 200)),
       ],
-      spacing: {
-        after: 200,
-      },
+      spacing: { after: 200 },
       alignment: AlignmentType.CENTER,
     }),
     new Paragraph({
       children: [
         new TextRun({
           text: formData.imageCaptions?.[index] || '',
-          size: 24,
-          font: "Times New Roman",
+          size: DEFAULT_FONT_SIZE,
+          font: DEFAULT_FONT,
         }),
       ],
       alignment: AlignmentType.CENTER,
-      spacing: {
-        after: 400,
-      },
+      spacing: PARAGRAPH_SPACING,
     }),
   ]).flat();
 
@@ -80,144 +89,40 @@ export const generateBannerDocx = async (formData: FormDataWithImages) => {
     sections: [{
       properties: {
         page: {
-          margin: {
-            top: 1440, // 1 inch = 1440 twips
-            right: 1440,
-            bottom: 1440,
-            left: 1440,
-          },
+          margin: PAGE_MARGINS,
         },
       },
       children: [
         ...(logoParagraph ? [logoParagraph] : []),
-        new Paragraph({
-          children: [
-            new TextRun({
-              text: formData.title || "Título não fornecido",
-              bold: true,
-              size: 24,
-              font: "Times New Roman"
-            }),
-          ],
-          alignment: AlignmentType.CENTER,
-          spacing: {
-            after: 400,
-          },
-        }),
-
+        createTitleParagraph(formData.title),
         new Table({
           rows: [
             new TableRow({
               children: [
                 new TableCell({
                   children: [
-                    new Paragraph({
-                      children: [
-                        new TextRun({ text: "Introdução", bold: true, size: 24, font: "Times New Roman" }),
-                      ],
-                      spacing: { after: 200 },
-                    }),
-                    new Paragraph({
-                      children: [
-                        new TextRun({ text: formData.introduction, size: 24, font: "Times New Roman" }),
-                      ],
-                      spacing: { after: 400 },
-                    }),
-                    new Paragraph({
-                      children: [
-                        new TextRun({ text: "Objetivos", bold: true, size: 24, font: "Times New Roman" }),
-                      ],
-                      spacing: { after: 200 },
-                    }),
-                    new Paragraph({
-                      children: [
-                        new TextRun({ text: formData.objectives, size: 24, font: "Times New Roman" }),
-                      ],
-                      spacing: { after: 400 },
-                    }),
-                    new Paragraph({
-                      children: [
-                        new TextRun({ text: "Materiais e Métodos", bold: true, size: 24, font: "Times New Roman" }),
-                      ],
-                      spacing: { after: 200 },
-                    }),
-                    new Paragraph({
-                      children: [
-                        new TextRun({ text: formData.methods, size: 24, font: "Times New Roman" }),
-                      ],
-                      spacing: { after: 400 },
-                    }),
+                    ...createSectionParagraphs("Introdução", formData.introduction),
+                    ...createSectionParagraphs("Objetivos", formData.objectives),
+                    ...createSectionParagraphs("Materiais e Métodos", formData.methods),
                     ...imagesParagraphs,
                   ],
-                  width: {
-                    size: 50,
-                    type: WidthType.PERCENTAGE,
-                  },
-                  margins: {
-                    top: 200,
-                    bottom: 200,
-                    left: 200,
-                    right: 200,
-                  },
-                  borders: { 
-                    top: { style: BorderStyle.NONE },
-                    bottom: { style: BorderStyle.NONE },
-                    left: { style: BorderStyle.NONE },
-                    right: { style: BorderStyle.NONE },
-                  },
+                  width: CELL_WIDTH,
+                  margins: CELL_MARGINS,
+                  borders: NO_BORDERS,
                 }),
-
                 new TableCell({
                   children: [
-                    new Paragraph({
-                      children: [
-                        new TextRun({ text: "Resultados Esperados", bold: true, size: 24, font: "Times New Roman" }),
-                      ],
-                      spacing: { after: 200 },
-                    }),
-                    new Paragraph({
-                      children: [
-                        new TextRun({ text: formData.expectedResults, size: 24, font: "Times New Roman" }),
-                      ],
-                      spacing: { after: 400 },
-                    }),
-                    new Paragraph({
-                      children: [
-                        new TextRun({ text: "Referências Bibliográficas", bold: true, size: 24, font: "Times New Roman" }),
-                      ],
-                      spacing: { after: 200 },
-                    }),
-                    new Paragraph({
-                      children: [
-                        new TextRun({ text: formData.bibliography, size: 24, font: "Times New Roman" }),
-                      ],
-                      spacing: { after: 400 },
-                    }),
+                    ...createSectionParagraphs("Resultados Esperados", formData.expectedResults),
+                    ...createSectionParagraphs("Referências Bibliográficas", formData.bibliography),
                   ],
-                  width: {
-                    size: 50,
-                    type: WidthType.PERCENTAGE,
-                  },
-                  margins: {
-                    top: 200,
-                    bottom: 200,
-                    left: 200,
-                    right: 200,
-                  },
-                  borders: { 
-                    top: { style: BorderStyle.NONE },
-                    bottom: { style: BorderStyle.NONE },
-                    left: { style: BorderStyle.NONE },
-                    right: { style: BorderStyle.NONE },
-                  },
+                  width: CELL_WIDTH,
+                  margins: CELL_MARGINS,
+                  borders: NO_BORDERS,
                 }),
               ],
             }),
           ],
-          width: {
-            size: 100,
-            type: WidthType.PERCENTAGE,
-          },
+          width: TABLE_WIDTH,
         }),
       ],
     }],
@@ -227,8 +132,8 @@ export const generateBannerDocx = async (formData: FormDataWithImages) => {
           id: "Normal",
           name: "Normal",
           run: {
-            size: 24,
-            font: "Times New Roman",
+            size: DEFAULT_FONT_SIZE,
+            font: DEFAULT_FONT,
           },
         },
       ],

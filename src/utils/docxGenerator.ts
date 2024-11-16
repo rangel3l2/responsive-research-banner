@@ -43,7 +43,7 @@ const createSectionParagraphs = (title: string, content: string) => [
     children: [
       new TextRun({ text: title, bold: true, size: DEFAULT_FONT_SIZE, font: DEFAULT_FONT }),
     ],
-    spacing: { after: 200 },
+    spacing: { before: 100, after: 100 },
   }),
   new Paragraph({
     children: [
@@ -58,7 +58,7 @@ const createImageWithCaption = (imageBase64: string, caption: string) => [
     children: [
       new ImageRun(createImageRunOptions(imageBase64, IMAGE_WIDTH, IMAGE_HEIGHT)),
     ],
-    spacing: { after: 200 },
+    spacing: { before: 100, after: 100 },
     alignment: AlignmentType.CENTER,
   }),
   new Paragraph({
@@ -112,6 +112,10 @@ export const generateBannerDocx = async (formData: FormDataWithImages) => {
       properties: {
         page: {
           margin: PAGE_MARGINS,
+          size: {
+            width: 11906, // Standard A4 width in twips
+            height: 16838, // Standard A4 height in twips
+          },
         },
       },
       children: [
@@ -146,6 +150,7 @@ export const generateBannerDocx = async (formData: FormDataWithImages) => {
             }),
           ],
           width: TABLE_WIDTH,
+          columnWidths: [4500, 4500], // Ensure equal column widths
         }),
       ],
     }],

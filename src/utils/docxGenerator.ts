@@ -50,8 +50,8 @@ const createSectionParagraphs = (title: string, content: string) => [
       new TextRun({ text: content, size: DEFAULT_FONT_SIZE, font: DEFAULT_FONT }),
     ],
     spacing: PARAGRAPH_SPACING,
-  })
-];
+  }),
+};
 
 const createImageWithCaption = (imageBase64: string, caption: string) => [
   new Paragraph({
@@ -72,8 +72,8 @@ const createImageWithCaption = (imageBase64: string, caption: string) => [
     ],
     alignment: AlignmentType.CENTER,
     spacing: PARAGRAPH_SPACING,
-  })
-];
+  }),
+};
 
 export const generateBannerDocx = async (formData: FormDataWithImages) => {
   const imageBase64Promises = formData.images.map(convertImageToBase64);

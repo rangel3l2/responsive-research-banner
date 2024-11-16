@@ -13,9 +13,9 @@ interface ImageUploadProps {
 
 const ImageUpload = ({ 
   handleImageUpload, 
-  imageUrls, 
+  imageUrls = [], 
   maxImages,
-  imageCaptions,
+  imageCaptions = [],
   onCaptionChange,
 }: ImageUploadProps) => {
   return (
@@ -26,10 +26,10 @@ const ImageUpload = ({
         accept="image/*"
         onChange={handleImageUpload}
         className="mt-1"
-        disabled={imageUrls.length >= maxImages}
+        disabled={imageUrls?.length >= maxImages}
       />
       <div className="grid grid-cols-2 gap-4 mt-4">
-        {imageUrls.map((url, index) => (
+        {imageUrls?.map((url, index) => (
           <div key={index} className="space-y-2">
             <img
               src={url}
@@ -38,7 +38,7 @@ const ImageUpload = ({
             />
             <Textarea
               placeholder={`Legenda para imagem ${index + 1}`}
-              value={imageCaptions[index]}
+              value={imageCaptions[index] || ''}
               onChange={(e) => onCaptionChange(index, e.target.value)}
               className="mt-2"
             />

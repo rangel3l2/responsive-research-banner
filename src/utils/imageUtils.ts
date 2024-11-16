@@ -7,16 +7,14 @@ export const convertImageToBase64 = (file: File): Promise<string> => {
   });
 };
 
-export const createImageRunOptions = (base64Data: string, width: number, height: number) => ({
-  data: base64Data.split(',')[1],
-  transformation: {
-    width,
-    height,
-  },
-  type: "svg" as const,
-  fallback: {
-    type: "png",
-    width,
-    height,
-  }
-});
+export const createImageRunOptions = (base64Data: string, width: number, height: number) => {
+  const imageData = base64Data.split(',')[1];
+  return {
+    data: imageData,
+    transformation: {
+      width,
+      height,
+    },
+    type: "png" as const,
+  };
+};

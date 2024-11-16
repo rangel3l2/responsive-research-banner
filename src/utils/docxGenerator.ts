@@ -64,26 +64,41 @@ export const generateBannerDocx = async (formData: FormDataWithImages) => {
     alignment: AlignmentType.CENTER,
   }) : undefined;
 
-  const imagesParagraphs = imageBase64Results.map((base64, index) => [
-    new Paragraph({
+  // Split methods content and images based on position markers
+  const methodsContent = formData.methods.split('[IMG]');
+  const methodsParagraphs = methodsContent.reduce((acc: Paragraph[], text, index) => {
+    acc.push(new Paragraph({
       children: [
-        new ImageRun(createImageRunOptions(base64, 300, 200)),
+        new TextRun({ text, size: DEFAULT_FONT_SIZE, font: DEFAULT_FONT }),
       ],
-      spacing: { after: 200 },
-      alignment: AlignmentType.CENTER,
-    }),
-    new Paragraph({
-      children: [
-        new TextRun({
-          text: formData.imageCaptions?.[index] || '',
-          size: DEFAULT_FONT_SIZE,
-          font: DEFAULT_FONT,
-        }),
-      ],
-      alignment: AlignmentType.CENTER,
       spacing: PARAGRAPH_SPACING,
-    }),
-  ]).flat();
+    }));
+    
+    if (index < methodsContent.length - 1 && imageBase64Results[index]) {
+      acc.push(new Paragraph({
+        children: [
+          new ImageRun(createImageRunOptions(imageBase64Results[index], 300, 200)),
+        ],
+        spacing: { after: 200 },
+        alignment: AlignmentType.CENTER,
+      }));
+      
+      if (formData.imageCaptions?.[index]) {
+        acc.push(new Paragraph({
+          children: [
+            new TextRun({ 
+              text: formData.imageCaptions[index] || '', 
+              size: DEFAULT_FONT_SIZE, 
+              font: DEFAULT_FONT 
+            }),
+          ],
+          alignment: AlignmentType.CENTER,
+          spacing: PARAGRAPH_SPACING,
+        }));
+      }
+    }
+    return acc;
+  }, []);
 
   const doc = new Document({
     sections: [{
@@ -103,8 +118,8 @@ export const generateBannerDocx = async (formData: FormDataWithImages) => {
                   children: [
                     ...createSectionParagraphs("Introdução", formData.introduction),
                     ...createSectionParagraphs("Objetivos", formData.objectives),
-                    ...createSectionParagraphs("Materiais e Métodos", formData.methods),
-                    ...imagesParagraphs,
+                    ...createSectionParagraphs("Materiais e Métodos", ""),
+                    ...methodsParagraphs.slice(0, Math.ceil(methodsParagraphs.length / 2)),
                   ],
                   width: CELL_WIDTH,
                   margins: CELL_MARGINS,
@@ -112,6 +127,7 @@ export const generateBannerDocx = async (formData: FormDataWithImages) => {
                 }),
                 new TableCell({
                   children: [
+                    ...methodsParagraphs.slice(Math.ceil(methodsParagraphs.length / 2)),
                     ...createSectionParagraphs("Resultados Esperados", formData.expectedResults),
                     ...createSectionParagraphs("Referências Bibliográficas", formData.bibliography),
                   ],

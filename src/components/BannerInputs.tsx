@@ -42,6 +42,22 @@ const BannerInputs = ({
     handleInputChange(e);
   };
 
+  const insertImageMarker = () => {
+    const textarea = document.getElementById('methods') as HTMLTextAreaElement;
+    if (textarea) {
+      const cursorPosition = textarea.selectionStart;
+      const currentValue = textarea.value;
+      const newValue = currentValue.slice(0, cursorPosition) + '[IMG]' + currentValue.slice(cursorPosition);
+      const event = {
+        target: {
+          name: 'methods',
+          value: newValue
+        }
+      } as React.ChangeEvent<HTMLTextAreaElement>;
+      handleInputChange(event);
+    }
+  };
+
   return (
     <div className="grid grid-cols-2 gap-8">
       <div className="space-y-4">
@@ -69,22 +85,25 @@ const BannerInputs = ({
           />
         </div>
 
-        <div>
+        <div className="space-y-2">
           <Label htmlFor="methods">Materiais e Métodos</Label>
-          <Textarea
-            id="methods"
-            name="methods"
-            placeholder="Descreva os materiais e métodos utilizados na pesquisa (máximo 10 linhas)"
-            value={formData.methods}
-            onChange={(e) => handleTextAreaChange(e, 10, 500)}
-            className="mt-1 h-48 whitespace-pre-line"
-          />
+          <div className="flex gap-2 items-center">
+            <Textarea
+              id="methods"
+              name="methods"
+              placeholder="Descreva os materiais e métodos utilizados na pesquisa"
+              value={formData.methods}
+              onChange={(e) => handleTextAreaChange(e, 20, 1000)}
+              className="mt-1 h-96 whitespace-pre-line"
+            />
+          </div>
           <ImageUpload 
             handleImageUpload={handleImageUpload}
             imageUrls={imageUrls}
             maxImages={2}
             imageCaptions={imageCaptions}
             onCaptionChange={onCaptionChange}
+            onImageInsert={insertImageMarker}
           />
         </div>
       </div>

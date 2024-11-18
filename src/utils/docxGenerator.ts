@@ -1,8 +1,12 @@
-import { Document, Packer, Paragraph, TextRun, AlignmentType, ImageRun } from 'docx';
+import { Document, Packer, Paragraph, TextRun, AlignmentType, Table, TableRow, TableCell, ImageRun } from 'docx';
 import { convertImageToBase64, createImageRunOptions } from './imageUtils';
 import { 
   DEFAULT_FONT,
   DEFAULT_FONT_SIZE,
+  CELL_MARGINS,
+  NO_BORDERS,
+  CELL_WIDTH,
+  TABLE_WIDTH,
   PAGE_MARGINS,
   PARAGRAPH_SPACING
 } from './docxStyles';
@@ -101,25 +105,41 @@ export const generateBannerDocx = async (formData: FormDataWithImages) => {
       properties: {
         page: {
           margin: PAGE_MARGINS,
-          size: {
-            orientation: 'landscape'
-          },
-          columns: {
-            space: 708,
-            count: 2,
-            equalWidth: true,
-          }
         },
       },
       children: [
         ...(logoParagraph ? [logoParagraph] : []),
         createTitleParagraph(formData.title),
-        ...createSectionParagraphs("Introdução", formData.introduction),
-        ...createSectionParagraphs("Objetivos", formData.objectives),
-        ...createSectionParagraphs("Materiais e Métodos", ""),
-        ...methodsParagraphs,
-        ...createSectionParagraphs("Resultados Esperados", formData.expectedResults),
-        ...createSectionParagraphs("Referências Bibliográficas", formData.bibliography),
+        new Table({
+          rows: [
+            new TableRow({
+              children: [
+                new TableCell({
+                  children: [
+                    ...createSectionParagraphs("Introdução", formData.introduction),
+                    ...createSectionParagraphs("Objetivos", formData.objectives),
+                    ...createSectionParagraphs("Materiais e Métodos", ""),
+                    ...methodsParagraphs.slice(0, Math.ceil(methodsParagraphs.length / 2)),
+                  ],
+                  width: CELL_WIDTH,
+                  margins: CELL_MARGINS,
+                  borders: NO_BORDERS,
+                }),
+                new TableCell({
+                  children: [
+                    ...methodsParagraphs.slice(Math.ceil(methodsParagraphs.length / 2)),
+                    ...createSectionParagraphs("Resultados Esperados", formData.expectedResults),
+                    ...createSectionParagraphs("Referências Bibliográficas", formData.bibliography),
+                  ],
+                  width: CELL_WIDTH,
+                  margins: CELL_MARGINS,
+                  borders: NO_BORDERS,
+                }),
+              ],
+            }),
+          ],
+          width: TABLE_WIDTH,
+        }),
       ],
     }],
     styles: {

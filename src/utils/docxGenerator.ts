@@ -102,13 +102,13 @@ export const generateBannerDocx = async (formData: FormDataWithImages) => {
         page: {
           margin: PAGE_MARGINS,
           size: {
-            orientation: 'landscape',
+            orientation: 'landscape'
           },
-        },
-        columnProperties: {
-          space: 708,
-          count: 2,
-          equalWidth: true,
+          columns: {
+            space: 708,
+            count: 2,
+            equalWidth: true,
+          }
         },
       },
       children: [

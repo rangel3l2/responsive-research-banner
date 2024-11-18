@@ -23,15 +23,69 @@ interface FormDataWithImages {
   logo?: File;
 }
 
+const parseFormattedText = (text: string): TextRun[] => {
+  const parts: TextRun[] = [];
+  let currentText = '';
+  let i = 0;
+
+  while (i < text.length) {
+    if (text[i] === '*' && text[i + 1] === '*') {
+      // Bold text
+      if (currentText) {
+        parts.push(new TextRun({ text: currentText, size: DEFAULT_FONT_SIZE, font: DEFAULT_FONT }));
+        currentText = '';
+      }
+      i += 2;
+      let boldText = '';
+      while (i < text.length && !(text[i] === '*' && text[i + 1] === '*')) {
+        boldText += text[i];
+        i++;
+      }
+      parts.push(new TextRun({ text: boldText, bold: true, size: DEFAULT_FONT_SIZE, font: DEFAULT_FONT }));
+      i += 2;
+    } else if (text[i] === '_' && text[i + 1] !== '_') {
+      // Italic text
+      if (currentText) {
+        parts.push(new TextRun({ text: currentText, size: DEFAULT_FONT_SIZE, font: DEFAULT_FONT }));
+        currentText = '';
+      }
+      i++;
+      let italicText = '';
+      while (i < text.length && text[i] !== '_') {
+        italicText += text[i];
+        i++;
+      }
+      parts.push(new TextRun({ text: italicText, italics: true, size: DEFAULT_FONT_SIZE, font: DEFAULT_FONT }));
+      i++;
+    } else if (text[i] === '_' && text[i + 1] === '_') {
+      // Underlined text
+      if (currentText) {
+        parts.push(new TextRun({ text: currentText, size: DEFAULT_FONT_SIZE, font: DEFAULT_FONT }));
+        currentText = '';
+      }
+      i += 2;
+      let underlinedText = '';
+      while (i < text.length && !(text[i] === '_' && text[i + 1] === '_')) {
+        underlinedText += text[i];
+        i++;
+      }
+      parts.push(new TextRun({ text: underlinedText, underline: {}, size: DEFAULT_FONT_SIZE, font: DEFAULT_FONT }));
+      i += 2;
+    } else {
+      currentText += text[i];
+      i++;
+    }
+  }
+
+  if (currentText) {
+    parts.push(new TextRun({ text: currentText, size: DEFAULT_FONT_SIZE, font: DEFAULT_FONT }));
+  }
+
+  return parts;
+};
+
 const createTitleParagraph = (title: string) => new Paragraph({
-  children: [
-    new TextRun({
-      text: title || "Título não fornecido",
-      bold: true,
-      size: DEFAULT_FONT_SIZE,
-      font: DEFAULT_FONT
-    }),
-  ],
+  children: parseFormattedText(title),
   alignment: AlignmentType.CENTER,
   spacing: PARAGRAPH_SPACING,
 });
@@ -44,9 +98,7 @@ const createSectionParagraphs = (title: string, content: string) => [
     spacing: { after: 200 },
   }),
   new Paragraph({
-    children: [
-      new TextRun({ text: content, size: DEFAULT_FONT_SIZE, font: DEFAULT_FONT }),
-    ],
+    children: parseFormattedText(content),
     spacing: PARAGRAPH_SPACING,
   }),
 ];

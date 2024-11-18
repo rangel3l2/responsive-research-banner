@@ -1,6 +1,8 @@
 import React from 'react';
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Edit } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 interface BannerHeaderProps {
   title: string;
@@ -24,15 +26,22 @@ const BannerHeader: React.FC<BannerHeaderProps> = ({ title, setTitle, onLogoUplo
           alt="Logo"
           className="w-full object-contain"
         />
-        <div className="mt-2">
-          <Label htmlFor="logo-upload" className="text-xs">Alterar logo</Label>
+        <div className="mt-2 relative">
           <Input
             id="logo-upload"
             type="file"
             accept="image/*"
             onChange={handleLogoChange}
-            className="text-xs"
+            className="hidden"
           />
+          <Button
+            variant="ghost"
+            size="icon"
+            className="absolute -bottom-2 -right-2"
+            onClick={() => document.getElementById('logo-upload')?.click()}
+          >
+            <Edit className="h-4 w-4" />
+          </Button>
         </div>
       </div>
       <input

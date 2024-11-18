@@ -13,10 +13,12 @@ export const CELL_MARGINS = {
 };
 
 export const NO_BORDERS = {
-  top: { style: BorderStyle.NONE },
-  bottom: { style: BorderStyle.NONE },
-  left: { style: BorderStyle.NONE },
-  right: { style: BorderStyle.NONE },
+  top: { style: BorderStyle.NONE, size: 0 },
+  bottom: { style: BorderStyle.NONE, size: 0 },
+  left: { style: BorderStyle.NONE, size: 0 },
+  right: { style: BorderStyle.NONE, size: 0 },
+  insideHorizontal: { style: BorderStyle.NONE, size: 0 },
+  insideVertical: { style: BorderStyle.NONE, size: 0 },
 };
 
 export const CELL_WIDTH = {

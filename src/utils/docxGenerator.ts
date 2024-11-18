@@ -105,7 +105,7 @@ export const generateBannerDocx = async (formData: FormDataWithImages) => {
             orientation: 'landscape',
           },
         },
-        columnProperties: {
+        columns: {
           space: 708,
           count: 2,
           equalWidth: true,

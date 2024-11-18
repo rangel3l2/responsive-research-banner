@@ -139,6 +139,7 @@ export const generateBannerDocx = async (formData: FormDataWithImages) => {
             }),
           ],
           width: TABLE_WIDTH,
+          borders: NO_BORDERS,
         }),
       ],
     }],

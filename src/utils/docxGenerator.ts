@@ -1,14 +1,12 @@
-import { Document, Packer, Paragraph, TextRun, AlignmentType, Table, TableRow, TableCell, ImageRun } from 'docx';
+import { Document, Packer, ImageRun, Table, TableRow, TableCell, Paragraph } from 'docx';
 import { convertImageToBase64, createImageRunOptions } from './imageUtils';
+import { createTitleParagraph, createSectionParagraphs } from './docxParagraphs';
 import { 
-  DEFAULT_FONT,
-  DEFAULT_FONT_SIZE,
-  CELL_MARGINS,
-  NO_BORDERS,
+  CELL_MARGINS, 
+  NO_BORDERS, 
   CELL_WIDTH,
   TABLE_WIDTH,
   PAGE_MARGINS,
-  PARAGRAPH_SPACING
 } from './docxStyles';
 
 interface FormDataWithImages {
@@ -23,127 +21,35 @@ interface FormDataWithImages {
   logo?: File;
 }
 
-const parseFormattedText = (text: string): TextRun[] => {
-  const parts: TextRun[] = [];
-  let currentText = '';
-  let i = 0;
-
-  while (i < text.length) {
-    if (text[i] === '*' && text[i + 1] === '*') {
-      // Bold text
-      if (currentText) {
-        parts.push(new TextRun({ text: currentText, size: DEFAULT_FONT_SIZE, font: DEFAULT_FONT }));
-        currentText = '';
-      }
-      i += 2;
-      let boldText = '';
-      while (i < text.length && !(text[i] === '*' && text[i + 1] === '*')) {
-        boldText += text[i];
-        i++;
-      }
-      parts.push(new TextRun({ text: boldText, bold: true, size: DEFAULT_FONT_SIZE, font: DEFAULT_FONT }));
-      i += 2;
-    } else if (text[i] === '_' && text[i + 1] !== '_') {
-      // Italic text
-      if (currentText) {
-        parts.push(new TextRun({ text: currentText, size: DEFAULT_FONT_SIZE, font: DEFAULT_FONT }));
-        currentText = '';
-      }
-      i++;
-      let italicText = '';
-      while (i < text.length && text[i] !== '_') {
-        italicText += text[i];
-        i++;
-      }
-      parts.push(new TextRun({ text: italicText, italics: true, size: DEFAULT_FONT_SIZE, font: DEFAULT_FONT }));
-      i++;
-    } else if (text[i] === '_' && text[i + 1] === '_') {
-      // Underlined text
-      if (currentText) {
-        parts.push(new TextRun({ text: currentText, size: DEFAULT_FONT_SIZE, font: DEFAULT_FONT }));
-        currentText = '';
-      }
-      i += 2;
-      let underlinedText = '';
-      while (i < text.length && !(text[i] === '_' && text[i + 1] === '_')) {
-        underlinedText += text[i];
-        i++;
-      }
-      parts.push(new TextRun({ text: underlinedText, underline: {}, size: DEFAULT_FONT_SIZE, font: DEFAULT_FONT }));
-      i += 2;
-    } else {
-      currentText += text[i];
-      i++;
-    }
-  }
-
-  if (currentText) {
-    parts.push(new TextRun({ text: currentText, size: DEFAULT_FONT_SIZE, font: DEFAULT_FONT }));
-  }
-
-  return parts;
-};
-
-const createTitleParagraph = (title: string) => new Paragraph({
-  children: parseFormattedText(title),
-  alignment: AlignmentType.CENTER,
-  spacing: PARAGRAPH_SPACING,
-});
-
-const createSectionParagraphs = (title: string, content: string) => [
-  new Paragraph({
-    children: [
-      new TextRun({ text: title, bold: true, size: DEFAULT_FONT_SIZE, font: DEFAULT_FONT }),
-    ],
-    spacing: { after: 200 },
-  }),
-  new Paragraph({
-    children: parseFormattedText(content),
-    spacing: PARAGRAPH_SPACING,
-  }),
-];
-
 export const generateBannerDocx = async (formData: FormDataWithImages) => {
   const imageBase64Promises = formData.images.map(convertImageToBase64);
   const imageBase64Results = await Promise.all(imageBase64Promises);
   const logoBase64 = formData.logo ? await convertImageToBase64(formData.logo) : null;
 
   const logoParagraph = logoBase64 ? new Paragraph({
-    children: [
-      new ImageRun(createImageRunOptions(logoBase64, 100, 100)),
-    ],
+    children: [new ImageRun(createImageRunOptions(logoBase64, 100, 100))],
     spacing: PARAGRAPH_SPACING,
     alignment: AlignmentType.CENTER,
   }) : undefined;
 
-  // Split methods content and images based on position markers
+  // Split methods content and create paragraphs with images
   const methodsContent = formData.methods.split('[IMG]');
   const methodsParagraphs = methodsContent.reduce((acc: Paragraph[], text, index) => {
     acc.push(new Paragraph({
-      children: [
-        new TextRun({ text, size: DEFAULT_FONT_SIZE, font: DEFAULT_FONT }),
-      ],
+      children: parseFormattedText(text),
       spacing: PARAGRAPH_SPACING,
     }));
     
     if (index < methodsContent.length - 1 && imageBase64Results[index]) {
       acc.push(new Paragraph({
-        children: [
-          new ImageRun(createImageRunOptions(imageBase64Results[index], 300, 200)),
-        ],
+        children: [new ImageRun(createImageRunOptions(imageBase64Results[index], 300, 200))],
         spacing: { after: 200 },
         alignment: AlignmentType.CENTER,
       }));
       
       if (formData.imageCaptions?.[index]) {
         acc.push(new Paragraph({
-          children: [
-            new TextRun({ 
-              text: formData.imageCaptions[index] || '', 
-              size: DEFAULT_FONT_SIZE, 
-              font: DEFAULT_FONT 
-            }),
-          ],
+          children: parseFormattedText(formData.imageCaptions[index] || ''),
           alignment: AlignmentType.CENTER,
           spacing: PARAGRAPH_SPACING,
         }));
@@ -177,6 +83,8 @@ export const generateBannerDocx = async (formData: FormDataWithImages) => {
                   margins: CELL_MARGINS,
                   borders: NO_BORDERS,
                   columnSpan: 1,
+                  verticalAlign: "top",
+                  textDirection: "lrTb",
                 }),
                 new TableCell({
                   children: [
@@ -187,6 +95,8 @@ export const generateBannerDocx = async (formData: FormDataWithImages) => {
                   margins: CELL_MARGINS,
                   borders: NO_BORDERS,
                   columnSpan: 1,
+                  verticalAlign: "top",
+                  textDirection: "lrTb",
                 }),
               ],
             }),
@@ -194,6 +104,7 @@ export const generateBannerDocx = async (formData: FormDataWithImages) => {
           width: TABLE_WIDTH,
           borders: NO_BORDERS,
           layout: "fixed",
+          columnWidths: [4500, 4500],
         }),
       ],
     }],
@@ -203,8 +114,8 @@ export const generateBannerDocx = async (formData: FormDataWithImages) => {
           id: "Normal",
           name: "Normal",
           run: {
-            size: DEFAULT_FONT_SIZE,
-            font: DEFAULT_FONT,
+            size: 24,
+            font: "Times New Roman",
           },
         },
       ],

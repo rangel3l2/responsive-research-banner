@@ -8,6 +8,7 @@ import {
   ImageRun,
   AlignmentType,
   TextRun,
+  WidthType,
 } from 'docx';
 import { convertImageToBase64, createImageRunOptions } from './imageUtils';
 import { parseFormattedText } from './docxTextParser';
@@ -44,31 +45,31 @@ export const generateBannerDocx = async (formData: FormDataWithImages) => {
       alignment: AlignmentType.CENTER,
     }) : undefined;
 
-    // Split methods content and create paragraphs with images
+    // Split methods content into paragraphs
+    const methodsParagraphs = [];
     const methodsContent = formData.methods.split('[IMG]');
-    const methodsParagraphs = methodsContent.reduce((acc: Paragraph[], text, index) => {
-      acc.push(new Paragraph({
+    methodsContent.forEach((text, index) => {
+      methodsParagraphs.push(new Paragraph({
         children: parseFormattedText(text),
         spacing: PARAGRAPH_SPACING,
       }));
       
       if (index < methodsContent.length - 1 && imageBase64Results[index]) {
-        acc.push(new Paragraph({
+        methodsParagraphs.push(new Paragraph({
           children: [new ImageRun(createImageRunOptions(imageBase64Results[index], 300, 200))],
           spacing: { after: 200 },
           alignment: AlignmentType.CENTER,
         }));
         
         if (formData.imageCaptions?.[index]) {
-          acc.push(new Paragraph({
+          methodsParagraphs.push(new Paragraph({
             children: parseFormattedText(formData.imageCaptions[index] || ''),
             alignment: AlignmentType.CENTER,
             spacing: PARAGRAPH_SPACING,
           }));
         }
       }
-      return acc;
-    }, []);
+    });
 
     const doc = new Document({
       sections: [{
@@ -112,7 +113,10 @@ export const generateBannerDocx = async (formData: FormDataWithImages) => {
                       }),
                       ...methodsParagraphs,
                     ],
-                    width: CELL_WIDTH,
+                    width: {
+                      size: 4500,
+                      type: WidthType.DXA,
+                    },
                     margins: CELL_MARGINS,
                     borders: NO_BORDERS,
                     columnSpan: 1,
@@ -136,7 +140,10 @@ export const generateBannerDocx = async (formData: FormDataWithImages) => {
                         spacing: PARAGRAPH_SPACING,
                       }),
                     ],
-                    width: CELL_WIDTH,
+                    width: {
+                      size: 4500,
+                      type: WidthType.DXA,
+                    },
                     margins: CELL_MARGINS,
                     borders: NO_BORDERS,
                     columnSpan: 1,
@@ -144,9 +151,15 @@ export const generateBannerDocx = async (formData: FormDataWithImages) => {
                 ],
               }),
             ],
-            width: TABLE_WIDTH,
+            width: {
+              size: 9000,
+              type: WidthType.DXA,
+            },
             borders: NO_BORDERS,
             columnWidths: [4500, 4500],
+            layout: {
+              type: 'fixed',
+            },
           }),
         ],
       }],

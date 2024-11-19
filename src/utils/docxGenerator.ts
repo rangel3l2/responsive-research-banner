@@ -15,8 +15,6 @@ import { parseFormattedText } from './docxTextParser';
 import { 
   CELL_MARGINS, 
   NO_BORDERS, 
-  CELL_WIDTH,
-  TABLE_WIDTH,
   PAGE_MARGINS,
   PARAGRAPH_SPACING,
 } from './docxStyles';
@@ -45,7 +43,6 @@ export const generateBannerDocx = async (formData: FormDataWithImages) => {
       alignment: AlignmentType.CENTER,
     }) : undefined;
 
-    // Split methods content into paragraphs
     const methodsParagraphs = [];
     const methodsContent = formData.methods.split('[IMG]');
     methodsContent.forEach((text, index) => {
@@ -119,7 +116,6 @@ export const generateBannerDocx = async (formData: FormDataWithImages) => {
                     },
                     margins: CELL_MARGINS,
                     borders: NO_BORDERS,
-                    columnSpan: 1,
                   }),
                   new TableCell({
                     children: [
@@ -146,7 +142,6 @@ export const generateBannerDocx = async (formData: FormDataWithImages) => {
                     },
                     margins: CELL_MARGINS,
                     borders: NO_BORDERS,
-                    columnSpan: 1,
                   }),
                 ],
               }),
@@ -158,7 +153,7 @@ export const generateBannerDocx = async (formData: FormDataWithImages) => {
             borders: NO_BORDERS,
             columnWidths: [4500, 4500],
             layout: {
-              type: 'fixed',
+              type: "fixed" as "fixed" | "autofit",
             },
           }),
         ],

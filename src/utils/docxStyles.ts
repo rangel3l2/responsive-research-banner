@@ -2,8 +2,8 @@ import { BorderStyle, WidthType } from 'docx';
 
 export const DEFAULT_FONT = "Times New Roman";
 export const DEFAULT_FONT_SIZE = 24;
-export const MAX_CHARS_PER_PAGE = 3000; // Aproximadamente uma página
-export const MAX_IMAGE_SIZE_KB = 500; // 500KB
+export const MAX_CHARS_PER_PAGE = 3000;
+export const MAX_IMAGE_SIZE_KB = 500;
 
 export const CELL_MARGINS = {
   top: 200,

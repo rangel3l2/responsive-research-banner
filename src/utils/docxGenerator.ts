@@ -10,6 +10,7 @@ import {
   TextRun,
   WidthType,
   TableLayoutType,
+  convertInchesToTwip,
 } from 'docx';
 import { convertImageToBase64, createImageRunOptions } from './imageUtils';
 import { parseFormattedText } from './docxTextParser';
@@ -95,7 +96,7 @@ export const generateBannerDocx = async (formData: FormDataWithImages) => {
                       }),
                       new Paragraph({
                         children: parseFormattedText(formData.introduction),
-                        spacing: PARAGRAPH_SPACING,
+                        spacing: { ...PARAGRAPH_SPACING, after: convertInchesToTwip(0.2) },
                       }),
                       new Paragraph({
                         children: [new TextRun({ text: "Objetivos", bold: true })],
@@ -103,7 +104,7 @@ export const generateBannerDocx = async (formData: FormDataWithImages) => {
                       }),
                       new Paragraph({
                         children: parseFormattedText(formData.objectives),
-                        spacing: PARAGRAPH_SPACING,
+                        spacing: { ...PARAGRAPH_SPACING, after: convertInchesToTwip(0.2) },
                       }),
                       new Paragraph({
                         children: [new TextRun({ text: "Materiais e Métodos", bold: true })],
@@ -115,18 +116,18 @@ export const generateBannerDocx = async (formData: FormDataWithImages) => {
                       size: 4500,
                       type: WidthType.DXA,
                     },
-                    margins: CELL_MARGINS,
+                    margins: { ...CELL_MARGINS, right: convertInchesToTwip(0.2) },
                     borders: NO_BORDERS,
                   }),
                   new TableCell({
                     children: [
                       new Paragraph({
                         children: [new TextRun({ text: "Resultados Esperados", bold: true })],
-                        spacing: PARAGRAPH_SPACING,
+                        spacing: { ...PARAGRAPH_SPACING, before: convertInchesToTwip(0.3) },
                       }),
                       new Paragraph({
                         children: parseFormattedText(formData.expectedResults),
-                        spacing: PARAGRAPH_SPACING,
+                        spacing: { ...PARAGRAPH_SPACING, after: convertInchesToTwip(0.3) },
                       }),
                       new Paragraph({
                         children: [new TextRun({ text: "Referências Bibliográficas", bold: true })],
@@ -141,7 +142,7 @@ export const generateBannerDocx = async (formData: FormDataWithImages) => {
                       size: 4500,
                       type: WidthType.DXA,
                     },
-                    margins: CELL_MARGINS,
+                    margins: { ...CELL_MARGINS, left: convertInchesToTwip(0.2) },
                     borders: NO_BORDERS,
                   }),
                 ],

@@ -9,6 +9,7 @@ import {
   AlignmentType,
   TextRun,
   WidthType,
+  TableLayoutType,
 } from 'docx';
 import { convertImageToBase64, createImageRunOptions } from './imageUtils';
 import { parseFormattedText } from './docxTextParser';
@@ -152,7 +153,7 @@ export const generateBannerDocx = async (formData: FormDataWithImages) => {
             },
             borders: NO_BORDERS,
             columnWidths: [4500, 4500],
-            layout: "fixed",
+            layout: TableLayoutType.FIXED,
           }),
         ],
       }],

@@ -50,13 +50,13 @@ export const generateBannerDocx = async (formData: FormDataWithImages) => {
     methodsContent.forEach((text, index) => {
       methodsParagraphs.push(new Paragraph({
         children: parseFormattedText(text),
-        spacing: PARAGRAPH_SPACING,
+        spacing: { before: 0, after: 0 },
       }));
       
       if (index < methodsContent.length - 1 && imageBase64Results[index]) {
         methodsParagraphs.push(new Paragraph({
           children: [new ImageRun(createImageRunOptions(imageBase64Results[index], 300, 200))],
-          spacing: { after: 200 },
+          spacing: { before: 100, after: 100 },
           alignment: AlignmentType.CENTER,
         }));
         
@@ -64,7 +64,7 @@ export const generateBannerDocx = async (formData: FormDataWithImages) => {
           methodsParagraphs.push(new Paragraph({
             children: parseFormattedText(formData.imageCaptions[index] || ''),
             alignment: AlignmentType.CENTER,
-            spacing: PARAGRAPH_SPACING,
+            spacing: { before: 0, after: 200 },
           }));
         }
       }
@@ -82,7 +82,7 @@ export const generateBannerDocx = async (formData: FormDataWithImages) => {
           new Paragraph({
             children: parseFormattedText(formData.title),
             alignment: AlignmentType.CENTER,
-            spacing: PARAGRAPH_SPACING,
+            spacing: { before: 0, after: 200 },
           }),
           new Table({
             rows: [
@@ -92,23 +92,23 @@ export const generateBannerDocx = async (formData: FormDataWithImages) => {
                     children: [
                       new Paragraph({
                         children: [new TextRun({ text: "Introdução", bold: true })],
-                        spacing: PARAGRAPH_SPACING,
+                        spacing: { before: 0, after: 100 },
                       }),
                       new Paragraph({
                         children: parseFormattedText(formData.introduction),
-                        spacing: { ...PARAGRAPH_SPACING, after: convertInchesToTwip(0.2) },
+                        spacing: { before: 0, after: 200 },
                       }),
                       new Paragraph({
                         children: [new TextRun({ text: "Objetivos", bold: true })],
-                        spacing: PARAGRAPH_SPACING,
+                        spacing: { before: 0, after: 100 },
                       }),
                       new Paragraph({
                         children: parseFormattedText(formData.objectives),
-                        spacing: { ...PARAGRAPH_SPACING, after: convertInchesToTwip(0.2) },
+                        spacing: { before: 0, after: 200 },
                       }),
                       new Paragraph({
                         children: [new TextRun({ text: "Materiais e Métodos", bold: true })],
-                        spacing: PARAGRAPH_SPACING,
+                        spacing: { before: 0, after: 100 },
                       }),
                       ...methodsParagraphs,
                     ],
@@ -116,33 +116,33 @@ export const generateBannerDocx = async (formData: FormDataWithImages) => {
                       size: 4500,
                       type: WidthType.DXA,
                     },
-                    margins: { ...CELL_MARGINS, right: convertInchesToTwip(0.2) },
+                    margins: { ...CELL_MARGINS, right: 100 },
                     borders: NO_BORDERS,
                   }),
                   new TableCell({
                     children: [
                       new Paragraph({
                         children: [new TextRun({ text: "Resultados Esperados", bold: true })],
-                        spacing: { ...PARAGRAPH_SPACING, before: convertInchesToTwip(0.3) },
+                        spacing: { before: 400, after: 100 },
                       }),
                       new Paragraph({
                         children: parseFormattedText(formData.expectedResults),
-                        spacing: { ...PARAGRAPH_SPACING, after: convertInchesToTwip(0.3) },
+                        spacing: { before: 0, after: 200 },
                       }),
                       new Paragraph({
                         children: [new TextRun({ text: "Referências Bibliográficas", bold: true })],
-                        spacing: PARAGRAPH_SPACING,
+                        spacing: { before: 0, after: 100 },
                       }),
                       new Paragraph({
                         children: parseFormattedText(formData.bibliography),
-                        spacing: PARAGRAPH_SPACING,
+                        spacing: { before: 0, after: 0 },
                       }),
                     ],
                     width: {
                       size: 4500,
                       type: WidthType.DXA,
                     },
-                    margins: { ...CELL_MARGINS, left: convertInchesToTwip(0.2) },
+                    margins: { ...CELL_MARGINS, left: 100 },
                     borders: NO_BORDERS,
                   }),
                 ],

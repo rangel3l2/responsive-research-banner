@@ -152,9 +152,7 @@ export const generateBannerDocx = async (formData: FormDataWithImages) => {
             },
             borders: NO_BORDERS,
             columnWidths: [4500, 4500],
-            layout: {
-              type: "fixed" as "fixed" | "autofit",
-            },
+            layout: "fixed",
           }),
         ],
       }],

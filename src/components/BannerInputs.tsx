@@ -10,7 +10,8 @@ const BannerInputs = ({
   handleImageUpload,
   imageUrls,
   imageCaptions,
-  onCaptionChange
+  onCaptionChange,
+  errors
 }: BannerInputsProps) => {
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
@@ -26,6 +27,7 @@ const BannerInputs = ({
             height="h-20"
             maxLines={3}
             fontSize="text-xs"
+            className={errors.authors ? "bg-red-50" : ""}
           />
         </div>
 
@@ -40,6 +42,7 @@ const BannerInputs = ({
             height="h-16"
             maxLines={2}
             fontSize="text-xs"
+            className={errors.institution ? "bg-red-50" : ""}
           />
         </div>
 
@@ -54,6 +57,7 @@ const BannerInputs = ({
             height="h-40"
             maxLines={10}
             fontSize="text-xs"
+            className={errors.introduction ? "bg-red-50" : ""}
           />
         </div>
 
@@ -68,6 +72,7 @@ const BannerInputs = ({
             height="h-32"
             maxLines={8}
             fontSize="text-xs"
+            className={errors.methodology ? "bg-red-50" : ""}
           />
         </div>
       </div>
@@ -84,6 +89,7 @@ const BannerInputs = ({
             height="h-48"
             maxLines={12}
             fontSize="text-xs"
+            className={errors.resultsAndDiscussion ? "bg-red-50" : ""}
           />
           <ImageUpload
             handleImageUpload={handleImageUpload}
@@ -91,7 +97,6 @@ const BannerInputs = ({
             maxImages={2}
             imageCaptions={imageCaptions}
             onCaptionChange={onCaptionChange}
-            onImageInsert={() => {}}
           />
         </div>
 
@@ -106,6 +111,7 @@ const BannerInputs = ({
             height="h-32"
             maxLines={8}
             fontSize="text-xs"
+            className={errors.conclusion ? "bg-red-50" : ""}
           />
         </div>
 
@@ -120,6 +126,7 @@ const BannerInputs = ({
             height="h-24"
             maxLines={6}
             fontSize="text-[8px]"
+            className={errors.references ? "bg-red-50" : ""}
           />
         </div>
       </div>

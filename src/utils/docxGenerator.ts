@@ -27,22 +27,7 @@ export const generateBannerDocx = async (formData: BannerFormData) => {
     const imageBase64Results = await Promise.all(imageBase64Promises);
     const logoBase64 = formData.logo ? await convertImageToBase64(formData.logo) : null;
 
-    const logoParagraph = logoBase64 ? new Paragraph({
-      children: [new ImageRun(createImageRunOptions(logoBase64, 100, 100))],
-      spacing: PARAGRAPH_SPACING,
-      alignment: AlignmentType.CENTER,
-    }) : undefined;
-
-    // Pre-process methodology content
-    const methodologyParagraphs = formData.methodology.split('[IMG]').map(text => 
-      new Paragraph({
-        children: parseFormattedText(text),
-        spacing: { before: 0, after: 0 },
-        alignment: AlignmentType.JUSTIFIED,
-      })
-    );
-
-    // Split results and discussion text for two columns
+    // Calculate text split for Results and Discussion
     const resultsText = formData.resultsAndDiscussion;
     const approximateMiddle = Math.ceil(resultsText.length / 2);
     const firstHalf = resultsText.substring(0, approximateMiddle);
@@ -56,7 +41,11 @@ export const generateBannerDocx = async (formData: BannerFormData) => {
           },
         },
         children: [
-          ...(logoParagraph ? [logoParagraph] : []),
+          ...(logoBase64 ? [new Paragraph({
+            children: [new ImageRun(createImageRunOptions(logoBase64, 100, 100))],
+            spacing: PARAGRAPH_SPACING,
+            alignment: AlignmentType.CENTER,
+          })] : []),
           new Paragraph({
             children: parseFormattedText(formData.title),
             alignment: AlignmentType.CENTER,
@@ -94,17 +83,21 @@ export const generateBannerDocx = async (formData: BannerFormData) => {
                         spacing: { before: 0, after: 100 },
                         alignment: AlignmentType.JUSTIFIED,
                       }),
-                      ...methodologyParagraphs,
+                      new Paragraph({
+                        children: parseFormattedText(formData.methodology),
+                        spacing: { before: 0, after: 200 },
+                        alignment: AlignmentType.JUSTIFIED,
+                      }),
                       new Paragraph({
                         children: [new TextRun({ text: "Resultados e Discussão", bold: true })],
-                        spacing: { before: 200, after: 100 },
+                        spacing: { before: 0, after: 100 },
                         alignment: AlignmentType.JUSTIFIED,
                       }),
                       new Paragraph({
                         children: parseFormattedText(firstHalf),
                         spacing: { before: 0, after: 200 },
                         alignment: AlignmentType.JUSTIFIED,
-                      })
+                      }),
                     ],
                     width: {
                       size: 4500,
@@ -120,6 +113,20 @@ export const generateBannerDocx = async (formData: BannerFormData) => {
                         spacing: { before: 0, after: 200 },
                         alignment: AlignmentType.JUSTIFIED,
                       }),
+                      ...(formData.images.length > 0 ? [
+                        ...formData.images.map((_, index) => new Paragraph({
+                          children: [
+                            new ImageRun(createImageRunOptions(imageBase64Results[index], 200, 150))
+                          ],
+                          spacing: { before: 120, after: 120 },
+                          alignment: AlignmentType.CENTER,
+                        })),
+                        ...formData.imageCaptions.map((caption, index) => new Paragraph({
+                          children: parseFormattedText(caption),
+                          spacing: { before: 0, after: 120 },
+                          alignment: AlignmentType.CENTER,
+                        }))
+                      ] : []),
                       new Paragraph({
                         children: [new TextRun({ text: "Conclusão", bold: true })],
                         spacing: { before: 200, after: 100 },

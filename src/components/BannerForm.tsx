@@ -24,6 +24,7 @@ const BannerForm = () => {
     logo: undefined,
   });
 
+  const [errors, setErrors] = useState<{ [key: string]: boolean }>({});
   const [imageUrls, setImageUrls] = useState<string[]>([]);
   const formRef = useRef<HTMLDivElement>(null);
 
@@ -51,6 +52,9 @@ const BannerForm = () => {
     }
 
     setFormData((prev) => ({ ...prev, [name]: value }));
+    if (errors[name]) {
+      setErrors((prev) => ({ ...prev, [name]: false }));
+    }
   };
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -95,7 +99,28 @@ const BannerForm = () => {
     setFormData((prev) => ({ ...prev, logo: file }));
   };
 
+  const validateForm = () => {
+    const requiredFields = ['title', 'authors', 'institution', 'introduction', 'methodology', 'resultsAndDiscussion', 'conclusion', 'references'];
+    const newErrors: { [key: string]: boolean } = {};
+    let isValid = true;
+
+    requiredFields.forEach(field => {
+      if (!formData[field as keyof BannerFormData]) {
+        newErrors[field] = true;
+        isValid = false;
+      }
+    });
+
+    setErrors(newErrors);
+    if (!isValid) {
+      toast.error("Por favor, preencha todos os campos obrigatórios destacados em vermelho.");
+    }
+    return isValid;
+  };
+
   const downloadAsDocx = async () => {
+    if (!validateForm()) return;
+
     try {
       const blob = await generateBannerDocx(formData);
       const url = window.URL.createObjectURL(blob);
@@ -106,10 +131,10 @@ const BannerForm = () => {
       link.click();
       document.body.removeChild(link);
       window.URL.revokeObjectURL(url);
-      toast.success("DOCX baixado com sucesso!");
+      toast.success("Banner científico gerado com sucesso!");
     } catch (error) {
       console.error('Erro ao gerar DOCX:', error);
-      toast.error("Erro ao gerar DOCX. Por favor, tente novamente.");
+      toast.error("Erro ao gerar o banner. Por favor, verifique os dados e tente novamente.");
     }
   };
 
@@ -124,6 +149,7 @@ const BannerForm = () => {
           institution={formData.institution}
           setInstitution={(institution) => setFormData(prev => ({ ...prev, institution }))}
           onLogoUpload={handleLogoUpload}
+          errors={errors}
         />
         <BannerInputs 
           formData={formData}
@@ -132,6 +158,7 @@ const BannerForm = () => {
           imageUrls={imageUrls}
           imageCaptions={formData.imageCaptions}
           onCaptionChange={handleCaptionChange}
+          errors={errors}
         />
         <div className="flex justify-end space-x-4">
           <Button onClick={downloadAsDocx} variant="outline">

@@ -11,6 +11,7 @@ const BannerInputs = ({
   imageUrls,
   imageCaptions,
   onCaptionChange,
+  onImageInsert,
   errors
 }: BannerInputsProps) => {
   return (
@@ -97,6 +98,7 @@ const BannerInputs = ({
             maxImages={2}
             imageCaptions={imageCaptions}
             onCaptionChange={onCaptionChange}
+            onImageInsert={onImageInsert}
           />
         </div>
 

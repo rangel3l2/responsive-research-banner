@@ -138,6 +138,18 @@ const BannerForm = () => {
     }
   };
 
+  const handleImageInsert = () => {
+    if (formData.images.length > 0) {
+      const imageTag = `[IMG${formData.images.length}]`;
+      const currentText = formData.resultsAndDiscussion;
+      const newText = currentText + '\n' + imageTag;
+      setFormData(prev => ({ ...prev, resultsAndDiscussion: newText }));
+      toast.success('Imagem inserida no texto com sucesso!');
+    } else {
+      toast.error('Nenhuma imagem disponível para inserir.');
+    }
+  };
+
   return (
     <div className="container mx-auto px-4 py-8 max-w-4xl">
       <Card className="p-6 space-y-8" ref={formRef}>
@@ -149,7 +161,6 @@ const BannerForm = () => {
           institution={formData.institution}
           setInstitution={(institution) => setFormData(prev => ({ ...prev, institution }))}
           onLogoUpload={handleLogoUpload}
-          errors={errors}
         />
         <BannerInputs 
           formData={formData}
@@ -158,6 +169,7 @@ const BannerForm = () => {
           imageUrls={imageUrls}
           imageCaptions={formData.imageCaptions}
           onCaptionChange={handleCaptionChange}
+          onImageInsert={handleImageInsert}
           errors={errors}
         />
         <div className="flex justify-end space-x-4">

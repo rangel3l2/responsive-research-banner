@@ -20,5 +20,6 @@ export interface BannerInputsProps {
   imageUrls: string[];
   imageCaptions: string[];
   onCaptionChange: (index: number, caption: string) => void;
+  onImageInsert: () => void;
   errors: { [key: string]: boolean };
 }

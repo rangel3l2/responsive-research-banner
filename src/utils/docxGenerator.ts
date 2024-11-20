@@ -4,34 +4,33 @@ import {
   Paragraph, 
   Table, 
   TableRow, 
-  TableCell, 
-  ImageRun,
+  TableCell,
   AlignmentType,
-  TextRun,
-  WidthType,
   TableLayoutType,
 } from 'docx';
-import { convertImageToBase64, createImageRunOptions } from './imageUtils';
-import { parseFormattedText } from './docxTextParser';
+import { BannerFormData } from '@/models/formData';
+import { splitTextAtWordBoundary } from './docxTextSplitter';
+import { createImageParagraphs, createLogoHeader } from './docxImageHandler';
 import { 
   CELL_MARGINS, 
   NO_BORDERS, 
   PAGE_MARGINS,
   PARAGRAPH_SPACING,
 } from './docxStyles';
-import { BannerFormData } from '@/models/formData';
+import { parseFormattedText } from './docxTextParser';
 
 export const generateBannerDocx = async (formData: BannerFormData) => {
   try {
-    const imageBase64Promises = formData.images.map(convertImageToBase64);
-    const imageBase64Results = await Promise.all(imageBase64Promises);
-    const logoBase64 = formData.logo ? await convertImageToBase64(formData.logo) : null;
-
-    // Calculate text split for Results and Discussion
+    // Split results and discussion text at word boundary
     const resultsText = formData.resultsAndDiscussion;
     const approximateMiddle = Math.ceil(resultsText.length / 2);
-    const firstHalf = resultsText.substring(0, approximateMiddle);
-    const secondHalf = resultsText.substring(approximateMiddle);
+    const [firstHalf, secondHalf] = splitTextAtWordBoundary(resultsText, approximateMiddle);
+
+    // Create logo header
+    const logoHeader = await createLogoHeader(formData.logo, '/escola-estadual-logo.png');
+
+    // Create image paragraphs for results section
+    const imageParagraphs = await createImageParagraphs(formData.images, formData.imageCaptions);
 
     const doc = new Document({
       sections: [{
@@ -41,11 +40,7 @@ export const generateBannerDocx = async (formData: BannerFormData) => {
           },
         },
         children: [
-          ...(logoBase64 ? [new Paragraph({
-            children: [new ImageRun(createImageRunOptions(logoBase64, 100, 100))],
-            spacing: PARAGRAPH_SPACING,
-            alignment: AlignmentType.CENTER,
-          })] : []),
+          logoHeader,
           new Paragraph({
             children: parseFormattedText(formData.title),
             alignment: AlignmentType.CENTER,
@@ -69,27 +64,12 @@ export const generateBannerDocx = async (formData: BannerFormData) => {
                   new TableCell({
                     children: [
                       new Paragraph({
-                        children: [new TextRun({ text: "Introdução", bold: true })],
-                        spacing: { before: 0, after: 100 },
-                        alignment: AlignmentType.JUSTIFIED,
-                      }),
-                      new Paragraph({
                         children: parseFormattedText(formData.introduction),
-                        spacing: { before: 0, after: 200 },
-                        alignment: AlignmentType.JUSTIFIED,
-                      }),
-                      new Paragraph({
-                        children: [new TextRun({ text: "Materiais e Métodos", bold: true })],
                         spacing: { before: 0, after: 100 },
                         alignment: AlignmentType.JUSTIFIED,
                       }),
                       new Paragraph({
                         children: parseFormattedText(formData.methodology),
-                        spacing: { before: 0, after: 200 },
-                        alignment: AlignmentType.JUSTIFIED,
-                      }),
-                      new Paragraph({
-                        children: [new TextRun({ text: "Resultados e Discussão", bold: true })],
                         spacing: { before: 0, after: 100 },
                         alignment: AlignmentType.JUSTIFIED,
                       }),
@@ -113,33 +93,10 @@ export const generateBannerDocx = async (formData: BannerFormData) => {
                         spacing: { before: 0, after: 200 },
                         alignment: AlignmentType.JUSTIFIED,
                       }),
-                      ...(formData.images.length > 0 ? [
-                        ...formData.images.map((_, index) => new Paragraph({
-                          children: [
-                            new ImageRun(createImageRunOptions(imageBase64Results[index], 200, 150))
-                          ],
-                          spacing: { before: 120, after: 120 },
-                          alignment: AlignmentType.CENTER,
-                        })),
-                        ...formData.imageCaptions.map((caption, index) => new Paragraph({
-                          children: parseFormattedText(caption),
-                          spacing: { before: 0, after: 120 },
-                          alignment: AlignmentType.CENTER,
-                        }))
-                      ] : []),
-                      new Paragraph({
-                        children: [new TextRun({ text: "Conclusão", bold: true })],
-                        spacing: { before: 200, after: 100 },
-                        alignment: AlignmentType.JUSTIFIED,
-                      }),
+                      ...imageParagraphs,
                       new Paragraph({
                         children: parseFormattedText(formData.conclusion),
                         spacing: { before: 0, after: 200 },
-                        alignment: AlignmentType.JUSTIFIED,
-                      }),
-                      new Paragraph({
-                        children: [new TextRun({ text: "Referências Bibliográficas", bold: true })],
-                        spacing: { before: 0, after: 100 },
                         alignment: AlignmentType.JUSTIFIED,
                       }),
                       new Paragraph({

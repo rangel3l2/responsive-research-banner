@@ -49,6 +49,7 @@ const ImageUpload = ({
               type="button" 
               onClick={onImageInsert}
               variant="outline"
+              disabled={imageUrls.length === 0}
             >
               Inserir Imagem no Texto
             </Button>
@@ -61,7 +62,7 @@ const ImageUpload = ({
             <img
               src={url}
               alt={`Imagem ${index + 1}`}
-              className="w-full h-48 object-cover rounded-md"
+              className="w-full h-48 object-contain rounded-md"
             />
             <Textarea
               placeholder={`Legenda para imagem ${index + 1}`}

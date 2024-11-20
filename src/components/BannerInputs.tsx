@@ -2,22 +2,7 @@ import React from 'react';
 import { Label } from "@/components/ui/label";
 import ImageUpload from './ImageUpload';
 import FormattedTextArea from './FormattedTextArea';
-
-interface BannerInputsProps {
-  formData: {
-    title: string;
-    introduction: string;
-    objectives: string;
-    methods: string;
-    expectedResults: string;
-    bibliography: string;
-  };
-  handleInputChange: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void;
-  handleImageUpload: (e: React.ChangeEvent<HTMLInputElement>) => void;
-  imageUrls: string[];
-  imageCaptions: string[];
-  onCaptionChange: (index: number, caption: string) => void;
-}
+import { BannerInputsProps } from '@/models/formData';
 
 const BannerInputs = ({
   formData,
@@ -27,57 +12,62 @@ const BannerInputs = ({
   imageCaptions,
   onCaptionChange
 }: BannerInputsProps) => {
-  const handleTextAreaChange = (
-    e: React.ChangeEvent<HTMLTextAreaElement>,
-    maxLines: number,
-    maxChars: number
-  ) => {
-    const lines = e.target.value.split('\n');
-    if (lines.length > maxLines) {
-      e.target.value = lines.slice(0, maxLines).join('\n');
-    }
-    if (e.target.value.length > maxChars) {
-      e.target.value = e.target.value.slice(0, maxChars);
-    }
-    handleInputChange(e);
-  };
-
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
       <div className="space-y-4">
+        <div>
+          <Label htmlFor="authors">Autores</Label>
+          <FormattedTextArea
+            id="authors"
+            name="authors"
+            placeholder="Nome dos autores (2-3 linhas)"
+            value={formData.authors}
+            onChange={handleInputChange}
+            height="h-20"
+            maxLines={3}
+            fontSize="text-xs"
+          />
+        </div>
+
+        <div>
+          <Label htmlFor="institution">Instituição</Label>
+          <FormattedTextArea
+            id="institution"
+            name="institution"
+            placeholder="Nome da instituição"
+            value={formData.institution}
+            onChange={handleInputChange}
+            height="h-16"
+            maxLines={2}
+            fontSize="text-xs"
+          />
+        </div>
+
         <div>
           <Label htmlFor="introduction">Introdução</Label>
           <FormattedTextArea
             id="introduction"
             name="introduction"
-            placeholder="Escreva uma breve introdução sobre sua pesquisa (máximo 5 linhas)"
+            placeholder="Contextualização e objetivo (8-10 linhas)"
             value={formData.introduction}
-            onChange={(e) => handleTextAreaChange(e, 5, 250)}
-            height="h-32"
+            onChange={handleInputChange}
+            height="h-40"
+            maxLines={10}
+            fontSize="text-xs"
           />
         </div>
 
         <div>
-          <Label htmlFor="objectives">Objetivos</Label>
+          <Label htmlFor="methodology">Metodologia</Label>
           <FormattedTextArea
-            id="objectives"
-            name="objectives"
-            placeholder="Liste os objetivos principais da sua pesquisa (máximo 5 linhas)"
-            value={formData.objectives}
-            onChange={(e) => handleTextAreaChange(e, 5, 250)}
+            id="methodology"
+            name="methodology"
+            placeholder="Descreva a metodologia (6-8 linhas)"
+            value={formData.methodology}
+            onChange={handleInputChange}
             height="h-32"
-          />
-        </div>
-
-        <div className="space-y-2">
-          <Label htmlFor="methods">Materiais e Métodos</Label>
-          <FormattedTextArea
-            id="methods"
-            name="methods"
-            placeholder="Descreva os materiais e métodos utilizados na pesquisa"
-            value={formData.methods}
-            onChange={(e) => handleTextAreaChange(e, 20, 1000)}
-            height="h-96"
+            maxLines={8}
+            fontSize="text-xs"
           />
           <ImageUpload
             handleImageUpload={handleImageUpload}
@@ -85,33 +75,51 @@ const BannerInputs = ({
             maxImages={2}
             imageCaptions={imageCaptions}
             onCaptionChange={onCaptionChange}
-            onImageInsert={() => {}} // Add empty function to satisfy TypeScript
+            onImageInsert={() => {}}
           />
         </div>
       </div>
 
       <div className="space-y-4">
         <div>
-          <Label htmlFor="expectedResults">Resultados Esperados</Label>
+          <Label htmlFor="resultsAndDiscussion">Resultados e Discussão</Label>
           <FormattedTextArea
-            id="expectedResults"
-            name="expectedResults"
-            placeholder="Descreva os resultados que você espera obter com a pesquisa (máximo 5 linhas)"
-            value={formData.expectedResults}
-            onChange={(e) => handleTextAreaChange(e, 5, 250)}
-            height="h-32"
+            id="resultsAndDiscussion"
+            name="resultsAndDiscussion"
+            placeholder="Resultados e discussão (10-12 linhas)"
+            value={formData.resultsAndDiscussion}
+            onChange={handleInputChange}
+            height="h-48"
+            maxLines={12}
+            fontSize="text-xs"
           />
         </div>
 
         <div>
-          <Label htmlFor="bibliography">Referências Bibliográficas</Label>
+          <Label htmlFor="conclusion">Conclusão</Label>
           <FormattedTextArea
-            id="bibliography"
-            name="bibliography"
-            placeholder="Liste as referências bibliográficas utilizadas (máximo 5 linhas)"
-            value={formData.bibliography}
-            onChange={(e) => handleTextAreaChange(e, 5, 250)}
+            id="conclusion"
+            name="conclusion"
+            placeholder="Conclusões principais (6-8 linhas)"
+            value={formData.conclusion}
+            onChange={handleInputChange}
             height="h-32"
+            maxLines={8}
+            fontSize="text-xs"
+          />
+        </div>
+
+        <div>
+          <Label htmlFor="references">Referências</Label>
+          <FormattedTextArea
+            id="references"
+            name="references"
+            placeholder="Referências bibliográficas (4-6 linhas)"
+            value={formData.references}
+            onChange={handleInputChange}
+            height="h-24"
+            maxLines={6}
+            fontSize="text-[8px]"
           />
         </div>
       </div>

@@ -5,45 +5,27 @@ import { toast } from 'sonner';
 import BannerHeader from './BannerHeader';
 import BannerInputs from './BannerInputs';
 import { generateBannerDocx } from '@/utils/docxGenerator';
-import { MAX_CHARS_PER_PAGE, MAX_IMAGE_SIZE_KB } from '@/utils/docxStyles';
-
-interface FormData {
-  title: string;
-  introduction: string;
-  objectives: string;
-  methods: string;
-  expectedResults: string;
-  bibliography: string;
-  images: File[];
-  imageCaptions: string[];
-  logo?: File;
-}
+import { MAX_IMAGE_SIZE_KB } from '@/utils/docxStyles';
+import { BannerFormData } from '@/models/formData';
 
 const BannerForm = () => {
-  const [formData, setFormData] = useState<FormData>({
+  const [formData, setFormData] = useState<BannerFormData>({
     title: '',
+    authors: '',
+    institution: '',
+    email: '',
     introduction: '',
-    objectives: '',
-    methods: '',
-    expectedResults: '',
-    bibliography: '',
+    methodology: '',
+    resultsAndDiscussion: '',
+    conclusion: '',
+    references: '',
     images: [],
     imageCaptions: [],
     logo: undefined,
   });
 
-  const [title, setTitle] = useState<string>('');
   const [imageUrls, setImageUrls] = useState<string[]>([]);
   const formRef = useRef<HTMLDivElement>(null);
-
-  const handleTitleChange = (newTitle: string) => {
-    setTitle(newTitle);
-    setFormData((prev) => ({ ...prev, title: newTitle }));
-  };
-
-  const validateContentLength = (content: string) => {
-    return content.length <= MAX_CHARS_PER_PAGE;
-  };
 
   const validateImageSize = (file: File) => {
     return file.size <= MAX_IMAGE_SIZE_KB * 1024;
@@ -53,10 +35,18 @@ const BannerForm = () => {
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
     const { name, value } = e.target;
-    
-    // Validação específica para métodos e bibliografia
-    if ((name === 'methods' || name === 'bibliography') && !validateContentLength(value)) {
-      toast.error(`O texto em ${name === 'methods' ? 'Materiais e Métodos' : 'Referências Bibliográficas'} excede o limite permitido para uma página.`);
+    const maxLengths: { [key: string]: number } = {
+      title: 120,
+      authors: 150,
+      introduction: 500,
+      methodology: 400,
+      resultsAndDiscussion: 600,
+      conclusion: 400,
+      references: 300,
+    };
+
+    if (value.length > maxLengths[name]) {
+      toast.error(`O texto em ${name} excede o limite permitido.`);
       return;
     }
 
@@ -70,7 +60,6 @@ const BannerForm = () => {
       return;
     }
 
-    // Validar tamanho das imagens
     for (const file of files) {
       if (!validateImageSize(file)) {
         toast.error(`A imagem ${file.name} é muito grande. O tamanho máximo permitido é ${MAX_IMAGE_SIZE_KB}KB.`);
@@ -108,10 +97,7 @@ const BannerForm = () => {
 
   const downloadAsDocx = async () => {
     try {
-      console.log('Iniciando geração do DOCX...', formData);
       const blob = await generateBannerDocx(formData);
-      console.log('DOCX gerado com sucesso');
-      
       const url = window.URL.createObjectURL(blob);
       const link = document.createElement('a');
       link.href = url;
@@ -131,12 +117,12 @@ const BannerForm = () => {
     <div className="container mx-auto px-4 py-8 max-w-4xl">
       <Card className="p-6 space-y-8" ref={formRef}>
         <BannerHeader 
-          title={title} 
-          setTitle={handleTitleChange} 
+          title={formData.title}
+          setTitle={(title) => setFormData(prev => ({ ...prev, title }))}
           onLogoUpload={handleLogoUpload}
         />
         <BannerInputs 
-          formData={formData} 
+          formData={formData}
           handleInputChange={handleInputChange}
           handleImageUpload={handleImageUpload}
           imageUrls={imageUrls}

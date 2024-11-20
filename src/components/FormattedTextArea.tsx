@@ -10,6 +10,8 @@ interface FormattedTextAreaProps {
   value: string;
   onChange: (e: React.ChangeEvent<HTMLTextAreaElement>) => void;
   height: string;
+  maxLines: number;
+  fontSize?: string;
 }
 
 const FormattedTextArea = ({
@@ -18,7 +20,9 @@ const FormattedTextArea = ({
   placeholder,
   value,
   onChange,
-  height
+  height,
+  maxLines,
+  fontSize = 'text-sm'
 }: FormattedTextAreaProps) => {
   const applyFormatting = (format: 'bold' | 'italic' | 'underline') => {
     const textarea = document.getElementById(id) as HTMLTextAreaElement;
@@ -42,6 +46,12 @@ const FormattedTextArea = ({
     }
 
     const newValue = textarea.value.substring(0, start) + formattedText + textarea.value.substring(end);
+    const lines = newValue.split('\n');
+    
+    if (lines.length > maxLines) {
+      return;
+    }
+    
     const event = {
       target: {
         name: textarea.name,
@@ -49,6 +59,14 @@ const FormattedTextArea = ({
       }
     } as React.ChangeEvent<HTMLTextAreaElement>;
     onChange(event);
+  };
+
+  const handleTextareaChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    const lines = e.target.value.split('\n');
+    if (lines.length > maxLines) {
+      return;
+    }
+    onChange(e);
   };
 
   return (
@@ -84,8 +102,8 @@ const FormattedTextArea = ({
         name={name}
         placeholder={placeholder}
         value={value}
-        onChange={onChange}
-        className={`mt-0 rounded-t-none ${height} whitespace-pre-line`}
+        onChange={handleTextareaChange}
+        className={`mt-0 rounded-t-none ${height} ${fontSize} whitespace-pre-line`}
       />
     </div>
   );

@@ -20,20 +20,9 @@ import {
   PAGE_MARGINS,
   PARAGRAPH_SPACING,
 } from './docxStyles';
+import { BannerFormData } from '@/models/formData';
 
-interface FormDataWithImages {
-  title: string;
-  introduction: string;
-  objectives: string;
-  methods: string;
-  expectedResults: string;
-  bibliography: string;
-  images: File[];
-  imageCaptions?: string[];
-  logo?: File;
-}
-
-export const generateBannerDocx = async (formData: FormDataWithImages) => {
+export const generateBannerDocx = async (formData: BannerFormData) => {
   try {
     const imageBase64Promises = formData.images.map(convertImageToBase64);
     const imageBase64Results = await Promise.all(imageBase64Promises);
@@ -46,7 +35,7 @@ export const generateBannerDocx = async (formData: FormDataWithImages) => {
     }) : undefined;
 
     const methodsParagraphs = [];
-    const methodsContent = formData.methods.split('[IMG]');
+    const methodsContent = formData.methodology.split('[IMG]');
     methodsContent.forEach((text, index) => {
       methodsParagraphs.push(new Paragraph({
         children: parseFormattedText(text),
@@ -126,7 +115,7 @@ export const generateBannerDocx = async (formData: FormDataWithImages) => {
                         spacing: { before: 400, after: 100 },
                       }),
                       new Paragraph({
-                        children: parseFormattedText(formData.expectedResults),
+                        children: parseFormattedText(formData.resultsAndDiscussion),
                         spacing: { before: 0, after: 200 },
                       }),
                       new Paragraph({
@@ -134,7 +123,7 @@ export const generateBannerDocx = async (formData: FormDataWithImages) => {
                         spacing: { before: 0, after: 100 },
                       }),
                       new Paragraph({
-                        children: parseFormattedText(formData.bibliography),
+                        children: parseFormattedText(formData.references),
                         spacing: { before: 0, after: 0 },
                       }),
                     ],

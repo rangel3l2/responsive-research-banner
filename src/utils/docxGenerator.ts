@@ -85,7 +85,15 @@ export const generateBannerDocx = async (formData: BannerFormData) => {
                         children: [new TextRun({ text: "Materiais e Métodos", bold: true })],
                         spacing: { before: 0, after: 100 },
                       }),
-                      ...methodologyParagraphs
+                      ...methodologyParagraphs,
+                      new Paragraph({
+                        children: [new TextRun({ text: "Resultados e Discussão", bold: true })],
+                        spacing: { before: 200, after: 100 },
+                      }),
+                      new Paragraph({
+                        children: parseFormattedText(formData.resultsAndDiscussion),
+                        spacing: { before: 0, after: 200 },
+                      })
                     ],
                     width: {
                       size: 4500,
@@ -97,11 +105,11 @@ export const generateBannerDocx = async (formData: BannerFormData) => {
                   new TableCell({
                     children: [
                       new Paragraph({
-                        children: [new TextRun({ text: "Resultados e Discussão", bold: true })],
-                        spacing: { before: 400, after: 100 },
+                        children: [new TextRun({ text: "Conclusão", bold: true })],
+                        spacing: { before: 0, after: 100 },
                       }),
                       new Paragraph({
-                        children: parseFormattedText(formData.resultsAndDiscussion),
+                        children: parseFormattedText(formData.conclusion),
                         spacing: { before: 0, after: 200 },
                       }),
                       new Paragraph({

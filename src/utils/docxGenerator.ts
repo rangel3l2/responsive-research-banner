@@ -34,13 +34,19 @@ export const generateBannerDocx = async (formData: BannerFormData) => {
     }) : undefined;
 
     // Pre-process methodology content
-    const methodsContent = formData.methodology.split('[IMG]');
-    const methodologyParagraphs = methodsContent.map(text => 
+    const methodologyParagraphs = formData.methodology.split('[IMG]').map(text => 
       new Paragraph({
         children: parseFormattedText(text),
         spacing: { before: 0, after: 0 },
+        alignment: AlignmentType.JUSTIFIED,
       })
     );
+
+    // Split results and discussion text for two columns
+    const resultsText = formData.resultsAndDiscussion;
+    const approximateMiddle = Math.ceil(resultsText.length / 2);
+    const firstHalf = resultsText.substring(0, approximateMiddle);
+    const secondHalf = resultsText.substring(approximateMiddle);
 
     const doc = new Document({
       sections: [{
@@ -76,23 +82,28 @@ export const generateBannerDocx = async (formData: BannerFormData) => {
                       new Paragraph({
                         children: [new TextRun({ text: "Introdução", bold: true })],
                         spacing: { before: 0, after: 100 },
+                        alignment: AlignmentType.JUSTIFIED,
                       }),
                       new Paragraph({
                         children: parseFormattedText(formData.introduction),
                         spacing: { before: 0, after: 200 },
+                        alignment: AlignmentType.JUSTIFIED,
                       }),
                       new Paragraph({
                         children: [new TextRun({ text: "Materiais e Métodos", bold: true })],
                         spacing: { before: 0, after: 100 },
+                        alignment: AlignmentType.JUSTIFIED,
                       }),
                       ...methodologyParagraphs,
                       new Paragraph({
                         children: [new TextRun({ text: "Resultados e Discussão", bold: true })],
                         spacing: { before: 200, after: 100 },
+                        alignment: AlignmentType.JUSTIFIED,
                       }),
                       new Paragraph({
-                        children: parseFormattedText(formData.resultsAndDiscussion),
+                        children: parseFormattedText(firstHalf),
                         spacing: { before: 0, after: 200 },
+                        alignment: AlignmentType.JUSTIFIED,
                       })
                     ],
                     width: {
@@ -105,20 +116,29 @@ export const generateBannerDocx = async (formData: BannerFormData) => {
                   new TableCell({
                     children: [
                       new Paragraph({
+                        children: parseFormattedText(secondHalf),
+                        spacing: { before: 0, after: 200 },
+                        alignment: AlignmentType.JUSTIFIED,
+                      }),
+                      new Paragraph({
                         children: [new TextRun({ text: "Conclusão", bold: true })],
-                        spacing: { before: 0, after: 100 },
+                        spacing: { before: 200, after: 100 },
+                        alignment: AlignmentType.JUSTIFIED,
                       }),
                       new Paragraph({
                         children: parseFormattedText(formData.conclusion),
                         spacing: { before: 0, after: 200 },
+                        alignment: AlignmentType.JUSTIFIED,
                       }),
                       new Paragraph({
                         children: [new TextRun({ text: "Referências Bibliográficas", bold: true })],
                         spacing: { before: 0, after: 100 },
+                        alignment: AlignmentType.JUSTIFIED,
                       }),
                       new Paragraph({
                         children: parseFormattedText(formData.references),
                         spacing: { before: 0, after: 0 },
+                        alignment: AlignmentType.JUSTIFIED,
                       })
                     ],
                     width: {

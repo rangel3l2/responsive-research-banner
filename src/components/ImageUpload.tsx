@@ -3,6 +3,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
+import { Image } from "lucide-react";
 
 interface ImageUploadProps {
   handleImageUpload: (e: React.ChangeEvent<HTMLInputElement>) => void;
@@ -26,22 +27,33 @@ const ImageUpload = ({
       <div className="flex items-center gap-4">
         <div className="flex-1">
           <Label>Imagens (máximo {maxImages})</Label>
-          <Input
-            type="file"
-            accept="image/*"
-            onChange={handleImageUpload}
-            className="mt-1"
-            disabled={imageUrls?.length >= maxImages}
-          />
+          <div className="flex items-center gap-2 mt-1">
+            <div className="relative">
+              <Input
+                type="file"
+                accept="image/*"
+                onChange={handleImageUpload}
+                className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                disabled={imageUrls?.length >= maxImages}
+              />
+              <Button
+                type="button"
+                variant="outline"
+                className="relative"
+                disabled={imageUrls?.length >= maxImages}
+              >
+                <Image className="w-4 h-4" />
+              </Button>
+            </div>
+            <Button 
+              type="button" 
+              onClick={onImageInsert}
+              variant="outline"
+            >
+              Inserir Imagem no Texto
+            </Button>
+          </div>
         </div>
-        <Button 
-          type="button" 
-          onClick={onImageInsert}
-          variant="outline"
-          className="mt-6"
-        >
-          Inserir Imagem no Texto
-        </Button>
       </div>
       <div className="grid grid-cols-2 gap-4 mt-4">
         {imageUrls?.map((url, index) => (

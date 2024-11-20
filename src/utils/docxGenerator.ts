@@ -10,7 +10,6 @@ import {
   TextRun,
   WidthType,
   TableLayoutType,
-  convertInchesToTwip,
 } from 'docx';
 import { convertImageToBase64, createImageRunOptions } from './imageUtils';
 import { parseFormattedText } from './docxTextParser';
@@ -41,22 +40,6 @@ export const generateBannerDocx = async (formData: BannerFormData) => {
         children: parseFormattedText(text),
         spacing: { before: 0, after: 0 },
       }));
-      
-      if (index < methodsContent.length - 1 && imageBase64Results[index]) {
-        methodsParagraphs.push(new Paragraph({
-          children: [new ImageRun(createImageRunOptions(imageBase64Results[index], 300, 200))],
-          spacing: { before: 100, after: 100 },
-          alignment: AlignmentType.CENTER,
-        }));
-        
-        if (formData.imageCaptions?.[index]) {
-          methodsParagraphs.push(new Paragraph({
-            children: parseFormattedText(formData.imageCaptions[index] || ''),
-            alignment: AlignmentType.CENTER,
-            spacing: { before: 0, after: 200 },
-          }));
-        }
-      }
     });
 
     const doc = new Document({
@@ -88,14 +71,6 @@ export const generateBannerDocx = async (formData: BannerFormData) => {
                         spacing: { before: 0, after: 200 },
                       }),
                       new Paragraph({
-                        children: [new TextRun({ text: "Objetivos", bold: true })],
-                        spacing: { before: 0, after: 100 },
-                      }),
-                      new Paragraph({
-                        children: parseFormattedText(formData.objectives),
-                        spacing: { before: 0, after: 200 },
-                      }),
-                      new Paragraph({
                         children: [new TextRun({ text: "Materiais e Métodos", bold: true })],
                         spacing: { before: 0, after: 100 },
                       }),
@@ -111,7 +86,7 @@ export const generateBannerDocx = async (formData: BannerFormData) => {
                   new TableCell({
                     children: [
                       new Paragraph({
-                        children: [new TextRun({ text: "Resultados Esperados", bold: true })],
+                        children: [new TextRun({ text: "Resultados e Discussão", bold: true })],
                         spacing: { before: 400, after: 100 },
                       }),
                       new Paragraph({

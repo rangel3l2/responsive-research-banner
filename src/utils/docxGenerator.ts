@@ -33,6 +33,15 @@ export const generateBannerDocx = async (formData: BannerFormData) => {
       alignment: AlignmentType.CENTER,
     }) : undefined;
 
+    // Pre-process methodology content
+    const methodsContent = formData.methodology.split('[IMG]');
+    const methodologyParagraphs = methodsContent.map(text => 
+      new Paragraph({
+        children: parseFormattedText(text),
+        spacing: { before: 0, after: 0 },
+      })
+    );
+
     const doc = new Document({
       sections: [{
         properties: {
@@ -76,13 +85,7 @@ export const generateBannerDocx = async (formData: BannerFormData) => {
                         children: [new TextRun({ text: "Materiais e Métodos", bold: true })],
                         spacing: { before: 0, after: 100 },
                       }),
-                      const methodsContent = formData.methodology.split('[IMG]');
-                      methodsContent.forEach((text) => {
-                        children.push(new Paragraph({
-                          children: parseFormattedText(text),
-                          spacing: { before: 0, after: 0 },
-                        }));
-                      }),
+                      ...methodologyParagraphs
                     ],
                     width: {
                       size: 4500,
@@ -108,7 +111,7 @@ export const generateBannerDocx = async (formData: BannerFormData) => {
                       new Paragraph({
                         children: parseFormattedText(formData.references),
                         spacing: { before: 0, after: 0 },
-                      }),
+                      })
                     ],
                     width: {
                       size: 4500,
@@ -116,9 +119,9 @@ export const generateBannerDocx = async (formData: BannerFormData) => {
                     },
                     margins: { ...CELL_MARGINS, left: 100 },
                     borders: NO_BORDERS,
-                  }),
-                ],
-              }),
+                  })
+                ]
+              })
             ],
             width: {
               size: 9000,
@@ -127,8 +130,8 @@ export const generateBannerDocx = async (formData: BannerFormData) => {
             borders: NO_BORDERS,
             columnWidths: [4500, 4500],
             layout: TableLayoutType.FIXED,
-          }),
-        ],
+          })
+        ]
       }],
       styles: {
         paragraphStyles: [
@@ -151,10 +154,10 @@ export const generateBannerDocx = async (formData: BannerFormData) => {
             run: {
               size: 24,
               font: "Times New Roman",
-            },
-          },
-        ],
-      },
+            }
+          }
+        ]
+      }
     });
 
     return await Packer.toBlob(doc);

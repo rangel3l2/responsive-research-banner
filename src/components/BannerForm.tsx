@@ -119,6 +119,10 @@ const BannerForm = () => {
         <BannerHeader 
           title={formData.title}
           setTitle={(title) => setFormData(prev => ({ ...prev, title }))}
+          authors={formData.authors}
+          setAuthors={(authors) => setFormData(prev => ({ ...prev, authors }))}
+          institution={formData.institution}
+          setInstitution={(institution) => setFormData(prev => ({ ...prev, institution }))}
           onLogoUpload={handleLogoUpload}
         />
         <BannerInputs 

@@ -33,15 +33,6 @@ export const generateBannerDocx = async (formData: BannerFormData) => {
       alignment: AlignmentType.CENTER,
     }) : undefined;
 
-    const methodsParagraphs = [];
-    const methodsContent = formData.methodology.split('[IMG]');
-    methodsContent.forEach((text, index) => {
-      methodsParagraphs.push(new Paragraph({
-        children: parseFormattedText(text),
-        spacing: { before: 0, after: 0 },
-      }));
-    });
-
     const doc = new Document({
       sections: [{
         properties: {
@@ -54,7 +45,18 @@ export const generateBannerDocx = async (formData: BannerFormData) => {
           new Paragraph({
             children: parseFormattedText(formData.title),
             alignment: AlignmentType.CENTER,
-            spacing: { before: 0, after: 200 },
+            spacing: { before: 0, after: 240 },
+            style: 'Title'
+          }),
+          new Paragraph({
+            children: parseFormattedText(formData.authors),
+            alignment: AlignmentType.CENTER,
+            spacing: { before: 0, after: 120 },
+          }),
+          new Paragraph({
+            children: parseFormattedText(formData.institution),
+            alignment: AlignmentType.CENTER,
+            spacing: { before: 0, after: 240 },
           }),
           new Table({
             rows: [
@@ -74,7 +76,13 @@ export const generateBannerDocx = async (formData: BannerFormData) => {
                         children: [new TextRun({ text: "Materiais e Métodos", bold: true })],
                         spacing: { before: 0, after: 100 },
                       }),
-                      ...methodsParagraphs,
+                      const methodsContent = formData.methodology.split('[IMG]');
+                      methodsContent.forEach((text) => {
+                        children.push(new Paragraph({
+                          children: parseFormattedText(text),
+                          spacing: { before: 0, after: 0 },
+                        }));
+                      }),
                     ],
                     width: {
                       size: 4500,
@@ -124,6 +132,19 @@ export const generateBannerDocx = async (formData: BannerFormData) => {
       }],
       styles: {
         paragraphStyles: [
+          {
+            id: "Title",
+            name: "Title",
+            run: {
+              size: 48,
+              bold: true,
+              font: "Times New Roman",
+            },
+            paragraph: {
+              spacing: { before: 0, after: 240 },
+              alignment: AlignmentType.CENTER,
+            }
+          },
           {
             id: "Normal",
             name: "Normal",

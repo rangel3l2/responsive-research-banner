@@ -23,16 +23,11 @@ import { parseFormattedText } from './docxTextParser';
 
 export const generateBannerDocx = async (formData: BannerFormData) => {
   try {
-    // Split results and discussion text at word boundary
     const resultsText = formData.resultsAndDiscussion;
     const approximateMiddle = Math.ceil(resultsText.length / 2);
     const [firstHalf, secondHalf] = splitTextAtWordBoundary(resultsText, approximateMiddle);
 
-    // Create logo header
     const logoHeader = await createLogoHeader(formData.logo, '/escola-estadual-logo.png');
-
-    // Create image paragraphs for results section
-    const imageParagraphs = await createImageParagraphs(formData.images, formData.imageCaptions);
 
     const doc = new Document({
       sections: [{
@@ -43,10 +38,7 @@ export const generateBannerDocx = async (formData: BannerFormData) => {
         },
         headers: {
           default: new Header({
-            children: logoHeader.children,
-            options: {
-              suppressFirstHeaderFooter: false
-            }
+            children: logoHeader.children
           })
         },
         children: [
@@ -78,6 +70,11 @@ export const generateBannerDocx = async (formData: BannerFormData) => {
                         alignment: AlignmentType.JUSTIFIED,
                       }),
                       new Paragraph({
+                        children: parseFormattedText(formData.objective),
+                        spacing: { before: 0, after: 100 },
+                        alignment: AlignmentType.JUSTIFIED,
+                      }),
+                      new Paragraph({
                         children: parseFormattedText(formData.methodology),
                         spacing: { before: 0, after: 100 },
                         alignment: AlignmentType.JUSTIFIED,
@@ -102,7 +99,7 @@ export const generateBannerDocx = async (formData: BannerFormData) => {
                         spacing: { before: 0, after: 200 },
                         alignment: AlignmentType.JUSTIFIED,
                       }),
-                      ...imageParagraphs,
+                      ...await createImageParagraphs(formData.images, formData.imageCaptions),
                       new Paragraph({
                         children: parseFormattedText(formData.conclusion),
                         spacing: { before: 0, after: 200 },

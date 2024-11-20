@@ -52,13 +52,28 @@ const BannerInputs = ({
           <FormattedTextArea
             id="introduction"
             name="introduction"
-            placeholder="Contextualize o problema e apresente o objetivo da pesquisa. Use parágrafos curtos ou tópicos (8-10 linhas)"
+            placeholder="Contextualize o problema da pesquisa. Use parágrafos curtos ou tópicos (8-10 linhas)"
             value={formData.introduction}
             onChange={handleInputChange}
             height="h-40"
             maxLines={10}
             fontSize="text-xs"
             className={errors.introduction ? "bg-red-50" : ""}
+          />
+        </div>
+
+        <div>
+          <Label htmlFor="objective">Objetivo</Label>
+          <FormattedTextArea
+            id="objective"
+            name="objective"
+            placeholder="Descreva o objetivo principal da pesquisa de forma clara e direta. Limite-se a 1-2 linhas, usando frases curtas e objetivas."
+            value={formData.objective}
+            onChange={handleInputChange}
+            height="h-16"
+            maxLines={2}
+            fontSize="text-xs"
+            className={errors.objective ? "bg-red-50" : ""}
           />
         </div>
 

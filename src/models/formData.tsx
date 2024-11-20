@@ -4,6 +4,7 @@ export interface BannerFormData {
   institution: string;
   email?: string;
   introduction: string;
+  objective: string;
   methodology: string;
   resultsAndDiscussion: string;
   conclusion: string;

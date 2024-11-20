@@ -25,24 +25,23 @@ const FormattedTextArea: React.FC<FormattedTextAreaProps> = ({
   fontSize,
   className = "",
 }) => {
-  const [selectionStart, setSelectionStart] = useState<number>(0);
-  const [selectionEnd, setSelectionEnd] = useState<number>(0);
-
   const handleSelect = (e: React.SyntheticEvent<HTMLTextAreaElement>) => {
     const textarea = e.target as HTMLTextAreaElement;
-    setSelectionStart(textarea.selectionStart);
-    setSelectionEnd(textarea.selectionEnd);
-  };
-
-  const insertFormatting = (format: string) => {
-    const textarea = document.getElementById(id) as HTMLTextAreaElement;
-    if (!textarea) return;
-
     const start = textarea.selectionStart;
     const end = textarea.selectionEnd;
-    const selectedText = value.substring(start, end);
+    
+    if (start !== end) {
+      insertFormatting(textarea, start, end);
+    }
+  };
 
-    let formattedText = '';
+  const insertFormatting = (textarea: HTMLTextAreaElement, start: number, end: number) => {
+    const selectedText = value.substring(start, end);
+    let formattedText = selectedText;
+
+    const format = textarea.dataset.format;
+    if (!format) return;
+
     switch (format) {
       case 'bold':
         formattedText = `**${selectedText}**`;
@@ -59,8 +58,6 @@ const FormattedTextArea: React.FC<FormattedTextAreaProps> = ({
           .map(line => `• ${line}`)
           .join('\n');
         break;
-      default:
-        formattedText = selectedText;
     }
 
     const newValue = value.substring(0, start) + formattedText + value.substring(end);
@@ -74,44 +71,57 @@ const FormattedTextArea: React.FC<FormattedTextAreaProps> = ({
     onChange(event);
   };
 
+  const handleFormatClick = (format: string) => {
+    const textarea = document.getElementById(id) as HTMLTextAreaElement;
+    if (!textarea) return;
+    
+    textarea.dataset.format = format;
+    const start = textarea.selectionStart;
+    const end = textarea.selectionEnd;
+    
+    if (start !== end) {
+      insertFormatting(textarea, start, end);
+    }
+  };
+
   return (
-    <div className="space-y-2">
-      <div className="flex gap-2 mb-2">
+    <div className="space-y-1">
+      <div className="flex justify-center gap-1 mb-1">
         <Button
           type="button"
-          variant="outline"
-          size="icon"
-          onClick={() => insertFormatting('bold')}
-          className="h-8 w-8"
+          variant="ghost"
+          size="sm"
+          onClick={() => handleFormatClick('bold')}
+          className="h-7 w-7 p-1 hover:bg-gray-100"
         >
-          <Bold className="h-4 w-4" />
+          <Bold className="h-3.5 w-3.5" />
         </Button>
         <Button
           type="button"
-          variant="outline"
-          size="icon"
-          onClick={() => insertFormatting('italic')}
-          className="h-8 w-8"
+          variant="ghost"
+          size="sm"
+          onClick={() => handleFormatClick('italic')}
+          className="h-7 w-7 p-1 hover:bg-gray-100"
         >
-          <Italic className="h-4 w-4" />
+          <Italic className="h-3.5 w-3.5" />
         </Button>
         <Button
           type="button"
-          variant="outline"
-          size="icon"
-          onClick={() => insertFormatting('underline')}
-          className="h-8 w-8"
+          variant="ghost"
+          size="sm"
+          onClick={() => handleFormatClick('underline')}
+          className="h-7 w-7 p-1 hover:bg-gray-100"
         >
-          <Underline className="h-4 w-4" />
+          <Underline className="h-3.5 w-3.5" />
         </Button>
         <Button
           type="button"
-          variant="outline"
-          size="icon"
-          onClick={() => insertFormatting('list')}
-          className="h-8 w-8"
+          variant="ghost"
+          size="sm"
+          onClick={() => handleFormatClick('list')}
+          className="h-7 w-7 p-1 hover:bg-gray-100"
         >
-          <List className="h-4 w-4" />
+          <List className="h-3.5 w-3.5" />
         </Button>
       </div>
       <textarea

@@ -1,4 +1,4 @@
-import React, { ChangeEvent, useState } from 'react';
+import React, { ChangeEvent, useState, useRef } from 'react';
 import { Bold, Italic, Underline, List } from 'lucide-react';
 import FormattingButton from './formatting/FormattingButton';
 import ColorPicker from './formatting/ColorPicker';
@@ -26,80 +26,84 @@ const FormattedTextArea: React.FC<FormattedTextAreaProps> = ({
   fontSize,
   className = "",
 }) => {
-  const [currentColor, setCurrentColor] = useState('#000000');
   const [activeFormats, setActiveFormats] = useState<Set<string>>(new Set());
+  const [currentColor, setCurrentColor] = useState('#000000');
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
 
-  const handleFormatClick = (format: string) => {
-    const textarea = document.getElementById(id) as HTMLTextAreaElement;
+  const applyFormatting = (format: string) => {
+    const textarea = textareaRef.current;
     if (!textarea) return;
 
     const start = textarea.selectionStart;
     const end = textarea.selectionEnd;
     const selectedText = value.substring(start, end);
-
     let formattedText = selectedText;
     const newActiveFormats = new Set(activeFormats);
 
+    // Toggle format state
     if (activeFormats.has(format)) {
       newActiveFormats.delete(format);
     } else {
       newActiveFormats.add(format);
     }
 
-    if (start === end) {
-      setActiveFormats(newActiveFormats);
-      return;
-    }
-
-    switch (format) {
-      case 'bold':
-        formattedText = `**${selectedText}**`;
-        break;
-      case 'italic':
-        formattedText = `_${selectedText}_`;
-        break;
-      case 'underline':
-        formattedText = `__${selectedText}__`;
-        break;
-      case 'list':
-        formattedText = selectedText
-          .split('\n')
-          .map(line => `• ${line}`)
-          .join('\n');
-        break;
-      case 'color':
-        formattedText = `{color:${currentColor}}${selectedText}{/color}`;
-        break;
-    }
-
-    const newValue = value.substring(0, start) + formattedText + value.substring(end);
-    const event = {
-      target: {
-        name,
-        value: newValue
+    // If text is selected, apply formatting
+    if (start !== end) {
+      switch (format) {
+        case 'bold':
+          formattedText = `**${selectedText}**`;
+          break;
+        case 'italic':
+          formattedText = `_${selectedText}_`;
+          break;
+        case 'underline':
+          formattedText = `__${selectedText}__`;
+          break;
+        case 'list':
+          formattedText = selectedText
+            .split('\n')
+            .map(line => `• ${line}`)
+            .join('\n');
+          break;
+        case 'color':
+          formattedText = `{color:${currentColor}}${selectedText}{/color}`;
+          break;
       }
-    } as ChangeEvent<HTMLTextAreaElement>;
-    
-    onChange(event);
-    setActiveFormats(newActiveFormats);
-  };
 
-  const handleColorSelect = (color: string) => {
-    setCurrentColor(color);
-    handleFormatClick('color');
+      const newValue = value.substring(0, start) + formattedText + value.substring(end);
+      const event = {
+        target: {
+          name,
+          value: newValue
+        }
+      } as ChangeEvent<HTMLTextAreaElement>;
+      
+      onChange(event);
+      
+      // Restore selection
+      setTimeout(() => {
+        textarea.focus();
+        textarea.setSelectionRange(start, start + formattedText.length);
+      }, 0);
+    }
+
+    setActiveFormats(newActiveFormats);
   };
 
   const handleInput = (e: ChangeEvent<HTMLTextAreaElement>) => {
     let newText = e.target.value;
+    const lastChar = newText[newText.length - 1];
     
-    if (activeFormats.size > 0) {
-      const lastChar = newText[newText.length - 1];
-      if (lastChar && lastChar !== '\n') {
-        if (activeFormats.has('bold')) newText = `**${lastChar}**`;
-        if (activeFormats.has('italic')) newText = `_${lastChar}_`;
-        if (activeFormats.has('underline')) newText = `__${lastChar}__`;
-        if (activeFormats.has('color')) newText = `{color:${currentColor}}${lastChar}{/color}`;
-      }
+    // Apply active formats to new text
+    if (lastChar && lastChar !== '\n' && activeFormats.size > 0) {
+      let formattedChar = lastChar;
+      
+      if (activeFormats.has('bold')) formattedChar = `**${formattedChar}**`;
+      if (activeFormats.has('italic')) formattedChar = `_${formattedChar}_`;
+      if (activeFormats.has('underline')) formattedChar = `__${formattedChar}__`;
+      if (activeFormats.has('color')) formattedChar = `{color:${currentColor}}${formattedChar}{/color}`;
+      
+      newText = newText.slice(0, -1) + formattedChar;
     }
 
     const event = {
@@ -112,32 +116,37 @@ const FormattedTextArea: React.FC<FormattedTextAreaProps> = ({
     onChange(event);
   };
 
+  const handleColorSelect = (color: string) => {
+    setCurrentColor(color);
+    applyFormatting('color');
+  };
+
   return (
     <div className="space-y-1">
-      <div className="flex justify-center gap-1 mb-1">
+      <div className="flex justify-start gap-1 mb-1 p-1 bg-gray-50 rounded-md border">
         <FormattingButton
-          onClick={() => handleFormatClick('bold')}
+          onClick={() => applyFormatting('bold')}
           isActive={activeFormats.has('bold')}
           title="Negrito"
         >
           <Bold className="h-3 w-3" />
         </FormattingButton>
         <FormattingButton
-          onClick={() => handleFormatClick('italic')}
+          onClick={() => applyFormatting('italic')}
           isActive={activeFormats.has('italic')}
           title="Itálico"
         >
           <Italic className="h-3 w-3" />
         </FormattingButton>
         <FormattingButton
-          onClick={() => handleFormatClick('underline')}
+          onClick={() => applyFormatting('underline')}
           isActive={activeFormats.has('underline')}
           title="Sublinhado"
         >
           <Underline className="h-3 w-3" />
         </FormattingButton>
         <FormattingButton
-          onClick={() => handleFormatClick('list')}
+          onClick={() => applyFormatting('list')}
           isActive={activeFormats.has('list')}
           title="Lista"
         >
@@ -150,6 +159,7 @@ const FormattedTextArea: React.FC<FormattedTextAreaProps> = ({
         />
       </div>
       <textarea
+        ref={textareaRef}
         id={id}
         name={name}
         placeholder={placeholder}

@@ -13,12 +13,12 @@ const FormattingButton = ({ onClick, isActive, title, children }: FormattingButt
   return (
     <Button
       type="button"
-      variant={isActive ? "default" : "ghost"}
+      variant="ghost"
       size="sm"
       onClick={onClick}
       className={cn(
-        "h-6 w-6 p-1",
-        isActive ? "bg-gray-200" : "hover:bg-gray-100"
+        "h-8 w-8 p-0",
+        isActive && "bg-accent text-accent-foreground hover:bg-accent hover:text-accent-foreground"
       )}
       title={title}
     >

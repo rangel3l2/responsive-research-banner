@@ -7,6 +7,7 @@ import {
   TableCell,
   AlignmentType,
   TableLayoutType,
+  WidthType,
 } from 'docx';
 import { BannerFormData } from '@/models/formData';
 import { splitTextAtWordBoundary } from './docxTextSplitter';
@@ -39,8 +40,10 @@ export const generateBannerDocx = async (formData: BannerFormData) => {
             margin: PAGE_MARGINS,
           },
         },
+        headers: {
+          default: logoHeader
+        },
         children: [
-          logoHeader,
           new Paragraph({
             children: parseFormattedText(formData.title),
             alignment: AlignmentType.CENTER,

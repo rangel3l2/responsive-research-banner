@@ -1,4 +1,4 @@
-import { ImageRun, Paragraph, AlignmentType } from 'docx';
+import { ImageRun, Paragraph, AlignmentType, TextRun } from 'docx';
 import { convertImageToBase64, createImageRunOptions } from './imageUtils';
 
 export const createImageParagraphs = async (images: File[], captions: string[]) => {
@@ -24,7 +24,7 @@ export const createImageParagraphs = async (images: File[], captions: string[]) 
       if (caption) {
         paragraphs.push(
           new Paragraph({
-            children: [{ text: caption }],
+            children: [new TextRun({ text: caption })],
             alignment: AlignmentType.CENTER,
             spacing: { before: 100, after: 200 },
           })
@@ -48,11 +48,15 @@ export const createLogoHeader = async (logo: File | undefined, defaultLogoPath: 
     logoBase64 = await convertImageToBase64(new File([blob], 'default-logo.png'));
   }
   
-  return new Paragraph({
+  return {
     children: [
-      new ImageRun(createImageRunOptions(logoBase64, 100, 100))
-    ],
-    alignment: AlignmentType.LEFT,
-    spacing: { after: 200 },
-  });
+      new Paragraph({
+        children: [
+          new ImageRun(createImageRunOptions(logoBase64, 100, 100))
+        ],
+        alignment: AlignmentType.LEFT,
+        spacing: { after: 200 },
+      })
+    ]
+  };
 };

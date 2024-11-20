@@ -1,4 +1,4 @@
-import React, { ChangeEvent, useState } from 'react';
+import React, { ChangeEvent, useState, useRef, useEffect } from 'react';
 import { Button } from './ui/button';
 import { Bold, Italic, Underline, List, Palette } from 'lucide-react';
 import {
@@ -31,6 +31,8 @@ const FormattedTextArea: React.FC<FormattedTextAreaProps> = ({
   className = "",
 }) => {
   const [currentColor, setCurrentColor] = useState('#000000');
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const [formattedHtml, setFormattedHtml] = useState('');
 
   const colors = [
     { name: 'Preto', hex: '#000000' },
@@ -39,6 +41,18 @@ const FormattedTextArea: React.FC<FormattedTextAreaProps> = ({
     { name: 'Vermelho', hex: '#dc2626' },
     { name: 'Roxo', hex: '#7e22ce' },
   ];
+
+  useEffect(() => {
+    // Convert markdown-like syntax to HTML for display
+    let html = value
+      .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+      .replace(/_(.*?)_/g, '<em>$1</em>')
+      .replace(/__(.+?)__/g, '<u>$1</u>')
+      .replace(/•\s(.*)/g, '<li>$1</li>')
+      .replace(/\{color:(#[0-9a-f]{6})\}(.*?)\{\/color\}/gi, '<span style="color: $1">$2</span>');
+
+    setFormattedHtml(html);
+  }, [value]);
 
   const handleSelect = (e: React.SyntheticEvent<HTMLTextAreaElement>) => {
     const textarea = e.target as HTMLTextAreaElement;
@@ -178,20 +192,33 @@ const FormattedTextArea: React.FC<FormattedTextAreaProps> = ({
           </DropdownMenuContent>
         </DropdownMenu>
       </div>
-      <textarea
-        id={id}
-        name={name}
-        placeholder={placeholder}
-        value={value}
-        onChange={onChange}
-        onSelect={handleSelect}
-        className={`w-full resize-none border rounded-md p-2 placeholder:text-gray-500 placeholder:text-sm ${height} ${fontSize} ${className}`}
-        style={{
-          lineHeight: '1.5',
-          maxHeight: `${maxLines * 1.5}em`,
-          minHeight: `${Math.min(4, maxLines) * 1.5}em`,
-        }}
-      />
+      <div className="relative">
+        <textarea
+          id={id}
+          name={name}
+          ref={textareaRef}
+          placeholder={placeholder}
+          value={value}
+          onChange={onChange}
+          onSelect={handleSelect}
+          className={`w-full resize-none border rounded-md p-2 placeholder:text-gray-500 placeholder:text-sm opacity-0 absolute inset-0 ${height} ${fontSize} ${className}`}
+          style={{
+            lineHeight: '1.5',
+            maxHeight: `${maxLines * 1.5}em`,
+            minHeight: `${Math.min(4, maxLines) * 1.5}em`,
+          }}
+        />
+        <div
+          className={`w-full border rounded-md p-2 ${height} ${fontSize} ${className}`}
+          style={{
+            lineHeight: '1.5',
+            maxHeight: `${maxLines * 1.5}em`,
+            minHeight: `${Math.min(4, maxLines) * 1.5}em`,
+            overflowY: 'auto',
+          }}
+          dangerouslySetInnerHTML={{ __html: formattedHtml || placeholder }}
+        />
+      </div>
     </div>
   );
 };

@@ -25,9 +25,9 @@ const BannerInputs = ({
             placeholder="Liste os autores principais (2-3 linhas). Ex: João Silva¹, Maria Souza², Carlos Oliveira³"
             value={formData.authors}
             onChange={handleInputChange}
-            height="h-20"
+            height="h-24"
             maxLines={3}
-            fontSize="text-xs"
+            fontSize="text-sm"
             className={errors.authors ? "bg-red-50" : ""}
           />
         </div>
@@ -40,9 +40,9 @@ const BannerInputs = ({
             placeholder="Nome da instituição e e-mail de contato (opcional) - 2 linhas máximo"
             value={formData.institution}
             onChange={handleInputChange}
-            height="h-16"
+            height="h-20"
             maxLines={2}
-            fontSize="text-xs"
+            fontSize="text-sm"
             className={errors.institution ? "bg-red-50" : ""}
           />
         </div>
@@ -57,7 +57,7 @@ const BannerInputs = ({
             onChange={handleInputChange}
             height="h-40"
             maxLines={10}
-            fontSize="text-xs"
+            fontSize="text-sm"
             className={errors.introduction ? "bg-red-50" : ""}
           />
         </div>
@@ -67,12 +67,12 @@ const BannerInputs = ({
           <FormattedTextArea
             id="objective"
             name="objective"
-            placeholder="Descreva o objetivo principal da pesquisa de forma clara e direta. Limite-se a 1-2 linhas, usando frases curtas e objetivas."
+            placeholder="Descreva o objetivo principal da pesquisa de forma clara e direta. Limite-se a 1-2 linhas, usando frases curtas e objetivas. O texto deve ser conciso e direto, evitando explicações extensas."
             value={formData.objective}
             onChange={handleInputChange}
-            height="h-16"
+            height="h-20"
             maxLines={2}
-            fontSize="text-xs"
+            fontSize="text-sm"
             className={errors.objective ? "bg-red-50" : ""}
           />
         </div>
@@ -87,7 +87,7 @@ const BannerInputs = ({
             onChange={handleInputChange}
             height="h-32"
             maxLines={8}
-            fontSize="text-xs"
+            fontSize="text-sm"
             className={errors.methodology ? "bg-red-50" : ""}
           />
         </div>
@@ -104,7 +104,7 @@ const BannerInputs = ({
             onChange={handleInputChange}
             height="h-48"
             maxLines={12}
-            fontSize="text-xs"
+            fontSize="text-sm"
             className={errors.resultsAndDiscussion ? "bg-red-50" : ""}
           />
           <ImageUpload
@@ -127,7 +127,7 @@ const BannerInputs = ({
             onChange={handleInputChange}
             height="h-32"
             maxLines={8}
-            fontSize="text-xs"
+            fontSize="text-sm"
             className={errors.conclusion ? "bg-red-50" : ""}
           />
         </div>
@@ -142,7 +142,7 @@ const BannerInputs = ({
             onChange={handleInputChange}
             height="h-24"
             maxLines={6}
-            fontSize="text-[8px]"
+            fontSize="text-sm"
             className={errors.references ? "bg-red-50" : ""}
           />
         </div>

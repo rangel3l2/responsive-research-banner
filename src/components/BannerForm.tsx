@@ -15,6 +15,7 @@ const BannerForm = () => {
     institution: '',
     email: '',
     introduction: '',
+    objective: '',
     methodology: '',
     resultsAndDiscussion: '',
     conclusion: '',

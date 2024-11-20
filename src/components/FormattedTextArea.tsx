@@ -1,6 +1,11 @@
 import React, { ChangeEvent, useState } from 'react';
 import { Button } from './ui/button';
-import { Bold, Italic, Underline, List } from 'lucide-react';
+import { Bold, Italic, Underline, List, Palette } from 'lucide-react';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 export interface FormattedTextAreaProps {
   id: string;
@@ -25,6 +30,16 @@ const FormattedTextArea: React.FC<FormattedTextAreaProps> = ({
   fontSize,
   className = "",
 }) => {
+  const [currentColor, setCurrentColor] = useState('#000000');
+
+  const colors = [
+    { name: 'Preto', hex: '#000000' },
+    { name: 'Azul', hex: '#2563eb' },
+    { name: 'Verde', hex: '#16a34a' },
+    { name: 'Vermelho', hex: '#dc2626' },
+    { name: 'Roxo', hex: '#7e22ce' },
+  ];
+
   const handleSelect = (e: React.SyntheticEvent<HTMLTextAreaElement>) => {
     const textarea = e.target as HTMLTextAreaElement;
     const start = textarea.selectionStart;
@@ -58,6 +73,9 @@ const FormattedTextArea: React.FC<FormattedTextAreaProps> = ({
           .map(line => `• ${line}`)
           .join('\n');
         break;
+      case 'color':
+        formattedText = `{color:${currentColor}}${selectedText}{/color}`;
+        break;
     }
 
     const newValue = value.substring(0, start) + formattedText + value.substring(end);
@@ -84,6 +102,11 @@ const FormattedTextArea: React.FC<FormattedTextAreaProps> = ({
     }
   };
 
+  const handleColorSelect = (color: string) => {
+    setCurrentColor(color);
+    handleFormatClick('color');
+  };
+
   return (
     <div className="space-y-1">
       <div className="flex justify-center gap-1 mb-1">
@@ -92,37 +115,68 @@ const FormattedTextArea: React.FC<FormattedTextAreaProps> = ({
           variant="ghost"
           size="sm"
           onClick={() => handleFormatClick('bold')}
-          className="h-7 w-7 p-1 hover:bg-gray-100"
+          className="h-6 w-6 p-1 hover:bg-gray-100"
+          title="Negrito"
         >
-          <Bold className="h-3.5 w-3.5" />
+          <Bold className="h-3 w-3" />
         </Button>
         <Button
           type="button"
           variant="ghost"
           size="sm"
           onClick={() => handleFormatClick('italic')}
-          className="h-7 w-7 p-1 hover:bg-gray-100"
+          className="h-6 w-6 p-1 hover:bg-gray-100"
+          title="Itálico"
         >
-          <Italic className="h-3.5 w-3.5" />
+          <Italic className="h-3 w-3" />
         </Button>
         <Button
           type="button"
           variant="ghost"
           size="sm"
           onClick={() => handleFormatClick('underline')}
-          className="h-7 w-7 p-1 hover:bg-gray-100"
+          className="h-6 w-6 p-1 hover:bg-gray-100"
+          title="Sublinhado"
         >
-          <Underline className="h-3.5 w-3.5" />
+          <Underline className="h-3 w-3" />
         </Button>
         <Button
           type="button"
           variant="ghost"
           size="sm"
           onClick={() => handleFormatClick('list')}
-          className="h-7 w-7 p-1 hover:bg-gray-100"
+          className="h-6 w-6 p-1 hover:bg-gray-100"
+          title="Lista"
         >
-          <List className="h-3.5 w-3.5" />
+          <List className="h-3 w-3" />
         </Button>
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              className="h-6 w-6 p-1 hover:bg-gray-100"
+              style={{ color: currentColor }}
+              title="Cor do texto"
+            >
+              <Palette className="h-3 w-3" />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent className="w-32 p-2">
+            <div className="grid grid-cols-5 gap-1">
+              {colors.map((color) => (
+                <button
+                  key={color.hex}
+                  onClick={() => handleColorSelect(color.hex)}
+                  className="w-5 h-5 rounded-full border border-gray-200 hover:scale-110 transition-transform"
+                  style={{ backgroundColor: color.hex }}
+                  title={color.name}
+                />
+              ))}
+            </div>
+          </DropdownMenuContent>
+        </DropdownMenu>
       </div>
       <textarea
         id={id}
@@ -131,10 +185,11 @@ const FormattedTextArea: React.FC<FormattedTextAreaProps> = ({
         value={value}
         onChange={onChange}
         onSelect={handleSelect}
-        className={`w-full resize-none border rounded-md p-2 ${height} ${fontSize} ${className}`}
+        className={`w-full resize-none border rounded-md p-2 placeholder:text-gray-500 placeholder:text-sm ${height} ${fontSize} ${className}`}
         style={{
           lineHeight: '1.5',
           maxHeight: `${maxLines * 1.5}em`,
+          minHeight: `${Math.min(4, maxLines) * 1.5}em`,
         }}
       />
     </div>

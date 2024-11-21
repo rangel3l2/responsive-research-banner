@@ -1,12 +1,8 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { toast } from 'sonner';
 import { BannerFormData } from '@/models/formData';
 import { MAX_IMAGE_SIZE_KB } from '@/utils/docxStyles';
 import { generateBannerDocx } from '@/utils/docxGenerator';
-import Cookies from 'js-cookie';
-
-const COOKIE_NAME = 'banner_form_data';
-const COOKIE_EXPIRY = 7; // days
 
 export const useBannerForm = () => {
   const [formData, setFormData] = useState<BannerFormData>({
@@ -27,59 +23,6 @@ export const useBannerForm = () => {
 
   const [errors, setErrors] = useState<{ [key: string]: boolean }>({});
   const [imageUrls, setImageUrls] = useState<string[]>([]);
-
-  useEffect(() => {
-    const savedData = Cookies.get(COOKIE_NAME);
-    if (savedData) {
-      try {
-        const parsedData = JSON.parse(savedData);
-        // Don't auto-load the data, just store it for later use
-        window.localStorage.setItem('savedFormData', savedData);
-      } catch (error) {
-        console.error('Error parsing saved data:', error);
-      }
-    }
-  }, []);
-
-  const loadSavedData = () => {
-    const savedData = window.localStorage.getItem('savedFormData');
-    if (savedData) {
-      try {
-        const parsedData = JSON.parse(savedData);
-        setFormData(parsedData);
-        toast.success('Dados da sessão anterior carregados com sucesso!');
-      } catch (error) {
-        toast.error('Erro ao carregar dados salvos');
-      }
-    }
-  };
-
-  const clearSavedData = () => {
-    window.localStorage.removeItem('savedFormData');
-    Cookies.remove(COOKIE_NAME);
-    setFormData({
-      title: '',
-      authors: '',
-      institution: '',
-      email: '',
-      introduction: '',
-      objective: '',
-      methodology: '',
-      resultsAndDiscussion: '',
-      conclusion: '',
-      references: '',
-      images: [],
-      imageCaptions: [],
-      logo: undefined,
-    });
-    setImageUrls([]);
-    toast.success('Formulário limpo com sucesso!');
-  };
-
-  // Save form data to cookie whenever it changes
-  useEffect(() => {
-    Cookies.set(COOKIE_NAME, JSON.stringify(formData), { expires: COOKIE_EXPIRY });
-  }, [formData]);
 
   const validateImageSize = (file: File) => {
     return file.size <= MAX_IMAGE_SIZE_KB * 1024;
@@ -159,22 +102,28 @@ export const useBannerForm = () => {
       return;
     }
 
+    const textArea = document.querySelector('textarea[name="resultsAndDiscussion"]') as HTMLTextAreaElement;
+    if (!textArea) {
+      toast.error('Campo de resultados e discussão não encontrado.');
+      return;
+    }
+
+    const cursorPosition = textArea.selectionStart;
+    const currentText = formData.resultsAndDiscussion;
     const imageIndex = imageUrls.length - 1;
-    const imgUrl = imageUrls[imageIndex];
-    const caption = formData.imageCaptions[imageIndex] || '';
     
-    const imgHtml = `
-      <div class="my-4 text-center">
-        <img src="${imgUrl}" alt="Imagem ${imageIndex + 1}" style="max-width: 100%; height: auto; margin: 0 auto;" />
-        ${caption ? `<p class="text-sm text-gray-600 mt-2">${caption}</p>` : ''}
-      </div>
-    `;
+    // Create an img element with the actual image URL
+    const imgElement = `<img src="${imageUrls[imageIndex]}" alt="Imagem ${imageIndex + 1}" style="max-width: 200px; display: block; margin: 10px 0;" />`;
     
-    setFormData(prev => ({
-      ...prev,
-      resultsAndDiscussion: prev.resultsAndDiscussion + imgHtml
-    }));
+    const newText = currentText.slice(0, cursorPosition) + imgElement + currentText.slice(cursorPosition);
     
+    setFormData(prev => ({ ...prev, resultsAndDiscussion: newText }));
+    
+    setTimeout(() => {
+      textArea.focus();
+      textArea.setSelectionRange(cursorPosition + imgElement.length, cursorPosition + imgElement.length);
+    }, 0);
+
     toast.success('Imagem inserida no texto!');
   };
 
@@ -231,8 +180,6 @@ export const useBannerForm = () => {
     handleLogoUpload,
     handleImageInsert,
     downloadAsDocx,
-    setFormData,
-    loadSavedData,
-    clearSavedData
+    setFormData
   };
 };

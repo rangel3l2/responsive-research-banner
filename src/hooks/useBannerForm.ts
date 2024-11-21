@@ -62,6 +62,11 @@ export const useBannerForm = (): UseBannerFormReturn => {
   ) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
+    setSaveStatus({
+      isSaving: false,
+      isError: false,
+      lastSaved: null,
+    });
     if (errors[name]) {
       setErrors((prev) => ({ ...prev, [name]: false }));
     }
@@ -141,6 +146,11 @@ export const useBannerForm = (): UseBannerFormReturn => {
     setFormData(getInitialFormData());
     setImageUrls([]);
     setErrors({});
+    setSaveStatus({
+      isSaving: false,
+      isError: false,
+      lastSaved: null,
+    });
   };
 
   const downloadAsDocx = async () => {

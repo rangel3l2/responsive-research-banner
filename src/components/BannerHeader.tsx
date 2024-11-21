@@ -1,9 +1,10 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Edit } from "lucide-react";
+import { Edit, Upload } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import FormattedTextArea from './FormattedTextArea';
+import { toast } from 'sonner';
 
 interface BannerHeaderProps {
   title: string;
@@ -24,10 +25,21 @@ const BannerHeader: React.FC<BannerHeaderProps> = ({
   setInstitution,
   onLogoUpload 
 }) => {
+  const [logoPreview, setLogoPreview] = useState<string | null>(null);
+
   const handleLogoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      onLogoUpload(file);
+      if (file.type.startsWith('image/')) {
+        const reader = new FileReader();
+        reader.onload = () => {
+          setLogoPreview(reader.result as string);
+        };
+        reader.readAsDataURL(file);
+        onLogoUpload(file);
+      } else {
+        toast.error("Por favor, selecione apenas arquivos de imagem.");
+      }
     }
   };
 
@@ -35,11 +47,17 @@ const BannerHeader: React.FC<BannerHeaderProps> = ({
     <div className="space-y-6 mb-8">
       <div className="flex items-start gap-4">
         <div className="w-[10%] relative">
-          <img 
-            src="/escola-estadual-logo.png"
-            alt="Logo"
-            className="w-full object-contain"
-          />
+          {logoPreview ? (
+            <img 
+              src={logoPreview}
+              alt="Logo"
+              className="w-full object-contain"
+            />
+          ) : (
+            <div className="w-full aspect-square bg-gray-100 flex items-center justify-center border border-dashed border-gray-300 rounded-lg">
+              <Upload className="h-6 w-6 text-gray-400" />
+            </div>
+          )}
           <div className="mt-2 relative">
             <Input
               id="logo-upload"

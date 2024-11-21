@@ -109,11 +109,16 @@ const BannerForm = () => {
       if (!formData[field as keyof BannerFormData]) {
         newErrors[field] = true;
         isValid = false;
+
+        // Show specific toast message for title
+        if (field === 'title') {
+          toast.error("O título é obrigatório");
+        }
       }
     });
 
     setErrors(newErrors);
-    if (!isValid) {
+    if (!isValid && !newErrors.title) {
       toast.error("Por favor, preencha todos os campos obrigatórios destacados em vermelho.");
     }
     return isValid;
@@ -141,11 +146,22 @@ const BannerForm = () => {
 
   const handleImageInsert = () => {
     if (formData.images.length > 0) {
-      const imageTag = `[IMG${formData.images.length}]`;
-      const currentText = formData.resultsAndDiscussion;
-      const newText = currentText + '\n' + imageTag;
-      setFormData(prev => ({ ...prev, resultsAndDiscussion: newText }));
-      toast.success('Imagem inserida no texto com sucesso!');
+      const textArea = document.querySelector('textarea[name="resultsAndDiscussion"]') as HTMLTextAreaElement;
+      if (textArea) {
+        const cursorPosition = textArea.selectionStart;
+        const currentText = formData.resultsAndDiscussion;
+        const imageTag = `[IMG${formData.images.length}]`;
+        const newText = currentText.slice(0, cursorPosition) + imageTag + currentText.slice(cursorPosition);
+        
+        setFormData(prev => ({ ...prev, resultsAndDiscussion: newText }));
+        toast.success('Imagem inserida no texto com sucesso!');
+        
+        // Reset cursor position after text update
+        setTimeout(() => {
+          textArea.focus();
+          textArea.setSelectionRange(cursorPosition + imageTag.length, cursorPosition + imageTag.length);
+        }, 0);
+      }
     } else {
       toast.error('Nenhuma imagem disponível para inserir.');
     }
@@ -162,6 +178,7 @@ const BannerForm = () => {
           institution={formData.institution}
           setInstitution={(institution) => setFormData(prev => ({ ...prev, institution }))}
           onLogoUpload={handleLogoUpload}
+          errors={errors}
         />
         <BannerInputs 
           formData={formData}

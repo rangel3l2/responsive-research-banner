@@ -14,6 +14,7 @@ interface BannerHeaderProps {
   institution: string;
   setInstitution: (institution: string) => void;
   onLogoUpload: (file: File) => void;
+  errors?: { [key: string]: boolean };
 }
 
 const BannerHeader: React.FC<BannerHeaderProps> = ({ 
@@ -23,7 +24,8 @@ const BannerHeader: React.FC<BannerHeaderProps> = ({
   setAuthors,
   institution,
   setInstitution,
-  onLogoUpload 
+  onLogoUpload,
+  errors = {}
 }) => {
   const [logoPreview, setLogoPreview] = useState<string | null>(null);
 
@@ -82,9 +84,11 @@ const BannerHeader: React.FC<BannerHeaderProps> = ({
             value={title}
             onChange={(e) => setTitle(e.target.value)}
             placeholder="Digite o título da sua pesquisa (máximo 2 linhas)"
-            className="w-full text-2xl font-bold border-none outline-none focus:ring-0 text-center mb-4"
+            className={`w-full text-2xl font-bold border-none outline-none focus:ring-0 text-center mb-4 ${
+              errors.title || !title ? 'bg-red-50' : 'bg-transparent'
+            }`}
             style={{ 
-              backgroundColor: 'transparent',
+              backgroundColor: errors.title || !title ? 'rgb(254 242 242)' : 'transparent',
               lineHeight: '1.2',
               minHeight: '2.4em',
             }}

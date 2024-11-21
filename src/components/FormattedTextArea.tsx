@@ -33,6 +33,7 @@ const FormattedTextArea: React.FC<FormattedTextAreaProps> = ({
     const hasSelection = start !== end;
 
     if (hasSelection) {
+      // Handle selected text formatting
       const newRange = {
         start,
         end,
@@ -68,6 +69,7 @@ const FormattedTextArea: React.FC<FormattedTextAreaProps> = ({
       }
     }
 
+    // Toggle format in active formats for new text
     const newActiveFormats = new Set(activeFormats);
     if (activeFormats.has(format)) {
       newActiveFormats.delete(format);
@@ -153,6 +155,29 @@ const FormattedTextArea: React.FC<FormattedTextAreaProps> = ({
     return styles;
   };
 
+  const handleTextChange = (e: ChangeEvent<HTMLTextAreaElement>) => {
+    const newValue = e.target.value;
+    const textarea = textareaRef.current;
+    
+    if (textarea) {
+      const cursorPosition = textarea.selectionStart;
+      
+      // Apply active formats to newly typed text
+      if (activeFormats.size > 0) {
+        const newRange = {
+          start: cursorPosition - 1,
+          end: cursorPosition,
+          formats: new Set(activeFormats),
+          color: activeFormats.has('color') ? currentColor : undefined
+        };
+        
+        setFormattedRanges(prev => [...prev, newRange]);
+      }
+    }
+    
+    onChange(e);
+  };
+
   return (
     <div className="space-y-1">
       <FormattingToolbar
@@ -166,11 +191,12 @@ const FormattedTextArea: React.FC<FormattedTextAreaProps> = ({
         onListClick={handleListFormat}
       />
       <TextArea
+        ref={textareaRef}
         id={id}
         name={name}
         placeholder={placeholder}
         value={value}
-        onChange={onChange}
+        onChange={handleTextChange}
         onKeyDown={handleKeyDown}
         height={height}
         maxLines={maxLines}

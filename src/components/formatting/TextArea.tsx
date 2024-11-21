@@ -1,4 +1,4 @@
-import React, { ChangeEvent, KeyboardEvent, useRef } from 'react';
+import React, { ChangeEvent, KeyboardEvent, forwardRef } from 'react';
 
 interface TextAreaProps {
   id: string;
@@ -14,7 +14,7 @@ interface TextAreaProps {
   style?: React.CSSProperties;
 }
 
-const TextArea: React.FC<TextAreaProps> = ({
+const TextArea = forwardRef<HTMLTextAreaElement, TextAreaProps>(({
   id,
   name,
   placeholder,
@@ -26,12 +26,10 @@ const TextArea: React.FC<TextAreaProps> = ({
   fontSize,
   className = "",
   style
-}) => {
-  const textareaRef = useRef<HTMLTextAreaElement>(null);
-
+}, ref) => {
   return (
     <textarea
-      ref={textareaRef}
+      ref={ref}
       id={id}
       name={name}
       placeholder={placeholder}
@@ -47,6 +45,8 @@ const TextArea: React.FC<TextAreaProps> = ({
       }}
     />
   );
-};
+});
+
+TextArea.displayName = 'TextArea';
 
 export default TextArea;

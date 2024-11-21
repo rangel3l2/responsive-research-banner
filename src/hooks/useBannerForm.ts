@@ -77,6 +77,7 @@ export const useBannerForm = () => {
 
     const newUrls = files.map(file => URL.createObjectURL(file));
     setImageUrls((prev) => [...prev, ...newUrls]);
+    toast.success('Imagem carregada com sucesso!');
   };
 
   const handleCaptionChange = (index: number, caption: string) => {
@@ -118,6 +119,36 @@ export const useBannerForm = () => {
     return isValid;
   };
 
+  const handleImageInsert = () => {
+    if (formData.images.length === 0) {
+      toast.error('Primeiro faça o upload de uma imagem.');
+      return;
+    }
+
+    const textArea = document.querySelector('textarea[name="resultsAndDiscussion"]') as HTMLTextAreaElement;
+    if (!textArea) {
+      toast.error('Campo de resultados e discussão não encontrado.');
+      return;
+    }
+
+    const cursorPosition = textArea.selectionStart;
+    const currentText = formData.resultsAndDiscussion;
+    const imageIndex = formData.images.length;
+    const imageTag = `[IMG${imageIndex}]`;
+    
+    const newText = currentText.slice(0, cursorPosition) + imageTag + currentText.slice(cursorPosition);
+    
+    setFormData(prev => ({ ...prev, resultsAndDiscussion: newText }));
+    
+    // Restore cursor position after text update
+    setTimeout(() => {
+      textArea.focus();
+      textArea.setSelectionRange(cursorPosition + imageTag.length, cursorPosition + imageTag.length);
+    }, 0);
+
+    toast.success('Tag de imagem inserida no texto!');
+  };
+
   const downloadAsDocx = async () => {
     if (!validateForm()) return;
 
@@ -135,28 +166,6 @@ export const useBannerForm = () => {
     } catch (error) {
       console.error('Erro ao gerar DOCX:', error);
       toast.error("Erro ao gerar o banner. Por favor, verifique os dados e tente novamente.");
-    }
-  };
-
-  const handleImageInsert = () => {
-    if (formData.images.length > 0) {
-      const textArea = document.querySelector('textarea[name="resultsAndDiscussion"]') as HTMLTextAreaElement;
-      if (textArea) {
-        const cursorPosition = textArea.selectionStart;
-        const currentText = formData.resultsAndDiscussion;
-        const imageTag = `[IMG${formData.images.length}]`;
-        const newText = currentText.slice(0, cursorPosition) + imageTag + currentText.slice(cursorPosition);
-        
-        setFormData(prev => ({ ...prev, resultsAndDiscussion: newText }));
-        toast.success('Imagem inserida no texto com sucesso!');
-        
-        setTimeout(() => {
-          textArea.focus();
-          textArea.setSelectionRange(cursorPosition + imageTag.length, cursorPosition + imageTag.length);
-        }, 0);
-      }
-    } else {
-      toast.error('Nenhuma imagem disponível para inserir.');
     }
   };
 

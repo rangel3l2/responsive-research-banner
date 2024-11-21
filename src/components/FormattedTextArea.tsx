@@ -1,11 +1,8 @@
 import React from 'react';
-import FormattingToolbar from './formatting/FormattingToolbar';
-import TextArea from './formatting/TextArea';
-import { FormattedTextAreaProps } from './formatting/types';
-import { useFormatting } from './formatting/useFormatting';
-import { useKeyboardShortcuts } from './formatting/useKeyboardShortcuts';
+import { Textarea } from "@/components/ui/textarea";
+import { FormattedTextAreaProps } from '@/models/formData';
 
-const FormattedTextArea: React.FC<FormattedTextAreaProps> = ({
+const FormattedTextArea = ({
   id,
   name,
   placeholder,
@@ -15,94 +12,36 @@ const FormattedTextArea: React.FC<FormattedTextAreaProps> = ({
   maxLines,
   fontSize,
   className = "",
-}) => {
-  const {
-    activeFormats,
-    currentColor,
-    textareaRef,
-    formattedRanges,
-    setCurrentColor,
-    applyFormatToSelection,
-    handleTextChange
-  } = useFormatting(onChange);
-
-  const { handleKeyDown } = useKeyboardShortcuts(applyFormatToSelection);
-
-  const getStylesForPosition = (position: number) => {
-    const styles: React.CSSProperties = {};
-    
-    formattedRanges.forEach(range => {
-      if (position >= range.start && position < range.end) {
-        if (range.formats.has('bold')) styles.fontWeight = 'bold';
-        if (range.formats.has('italic')) styles.fontStyle = 'italic';
-        if (range.formats.has('underline')) styles.textDecoration = 'underline';
-        if (range.formats.has('color') && range.color) styles.color = range.color;
-      }
-    });
-    
-    return styles;
-  };
-
-  const handleListFormat = () => {
-    const textarea = textareaRef.current;
-    if (!textarea) return;
-
-    const start = textarea.selectionStart;
-    const text = textarea.value;
-    const lines = text.split('\n');
-    let currentLineStart = 0;
-    let currentLineIndex = 0;
-
-    for (let i = 0; i < lines.length; i++) {
-      if (currentLineStart + lines[i].length >= start) {
-        currentLineIndex = i;
-        break;
-      }
-      currentLineStart += lines[i].length + 1;
-    }
-
-    const currentLine = lines[currentLineIndex];
-    if (currentLine.startsWith('• ')) {
-      lines[currentLineIndex] = currentLine.substring(2);
-    } else {
-      lines[currentLineIndex] = '• ' + currentLine;
-    }
-
-    const newText = lines.join('\n');
-    const newEvent = {
-      target: {
-        name: textarea.name,
-        value: newText
-      }
-    } as React.ChangeEvent<HTMLTextAreaElement>;
-    
-    onChange(newEvent);
+}: FormattedTextAreaProps) => {
+  const handlePaste = (e: React.ClipboardEvent<HTMLTextAreaElement>) => {
+    e.preventDefault();
+    const text = e.clipboardData.getData('text/plain');
+    document.execCommand('insertText', false, text);
   };
 
   return (
-    <div className="space-y-1">
-      <FormattingToolbar
-        activeFormats={activeFormats}
-        currentColor={currentColor}
-        onFormatClick={applyFormatToSelection}
-        onColorSelect={setCurrentColor}
-        onListClick={handleListFormat}
-      />
-      <TextArea
-        ref={textareaRef}
-        id={id}
-        name={name}
-        placeholder={placeholder}
-        value={value}
-        onChange={handleTextChange}
-        onKeyDown={handleKeyDown}
-        height={height}
-        maxLines={maxLines}
-        fontSize={fontSize}
-        className={`${className} ${!value && 'bg-red-50'}`}
-        style={getStylesForPosition(textareaRef.current?.selectionStart || 0)}
-      />
-    </div>
+    <div 
+      className={`prose max-w-none ${fontSize}`}
+      dangerouslySetInnerHTML={{ __html: value }}
+      style={{ 
+        minHeight: height, 
+        border: '1px solid #e2e8f0',
+        borderRadius: '0.375rem',
+        padding: '0.5rem',
+        backgroundColor: 'white' 
+      }}
+      contentEditable
+      onInput={(e) => {
+        const target = e.target as HTMLDivElement;
+        onChange({ 
+          target: { 
+            name, 
+            value: target.innerHTML 
+          } 
+        } as any);
+      }}
+      onPaste={handlePaste}
+    />
   );
 };
 

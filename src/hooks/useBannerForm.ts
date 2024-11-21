@@ -96,6 +96,37 @@ export const useBannerForm = () => {
     setFormData((prev) => ({ ...prev, logo: file }));
   };
 
+  const handleImageInsert = () => {
+    if (formData.images.length === 0) {
+      toast.error('Primeiro faça o upload de uma imagem.');
+      return;
+    }
+
+    const textArea = document.querySelector('textarea[name="resultsAndDiscussion"]') as HTMLTextAreaElement;
+    if (!textArea) {
+      toast.error('Campo de resultados e discussão não encontrado.');
+      return;
+    }
+
+    const cursorPosition = textArea.selectionStart;
+    const currentText = formData.resultsAndDiscussion;
+    const imageIndex = imageUrls.length - 1;
+    
+    // Create an img element with the actual image URL
+    const imgElement = `<img src="${imageUrls[imageIndex]}" alt="Imagem ${imageIndex + 1}" style="max-width: 200px; display: block; margin: 10px 0;" />`;
+    
+    const newText = currentText.slice(0, cursorPosition) + imgElement + currentText.slice(cursorPosition);
+    
+    setFormData(prev => ({ ...prev, resultsAndDiscussion: newText }));
+    
+    setTimeout(() => {
+      textArea.focus();
+      textArea.setSelectionRange(cursorPosition + imgElement.length, cursorPosition + imgElement.length);
+    }, 0);
+
+    toast.success('Imagem inserida no texto!');
+  };
+
   const validateForm = () => {
     const requiredFields = ['title', 'authors', 'institution', 'introduction', 'methodology', 'resultsAndDiscussion', 'conclusion', 'references'];
     const newErrors: { [key: string]: boolean } = {};
@@ -117,36 +148,6 @@ export const useBannerForm = () => {
       toast.error("Por favor, preencha todos os campos obrigatórios destacados em vermelho.");
     }
     return isValid;
-  };
-
-  const handleImageInsert = () => {
-    if (formData.images.length === 0) {
-      toast.error('Primeiro faça o upload de uma imagem.');
-      return;
-    }
-
-    const textArea = document.querySelector('textarea[name="resultsAndDiscussion"]') as HTMLTextAreaElement;
-    if (!textArea) {
-      toast.error('Campo de resultados e discussão não encontrado.');
-      return;
-    }
-
-    const cursorPosition = textArea.selectionStart;
-    const currentText = formData.resultsAndDiscussion;
-    const imageIndex = formData.images.length;
-    const imageTag = `[IMG${imageIndex}]`;
-    
-    const newText = currentText.slice(0, cursorPosition) + imageTag + currentText.slice(cursorPosition);
-    
-    setFormData(prev => ({ ...prev, resultsAndDiscussion: newText }));
-    
-    // Restore cursor position after text update
-    setTimeout(() => {
-      textArea.focus();
-      textArea.setSelectionRange(cursorPosition + imageTag.length, cursorPosition + imageTag.length);
-    }, 0);
-
-    toast.success('Tag de imagem inserida no texto!');
   };
 
   const downloadAsDocx = async () => {

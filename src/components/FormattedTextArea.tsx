@@ -111,8 +111,8 @@ const FormattedTextArea: React.FC<FormattedTextAreaProps> = ({
               <div className="w-4 h-4 rounded-full border-2 border-gray-300 border-t-transparent animate-spin" />
             ) : saveStatus.isError ? (
               <X className="w-4 h-4 text-red-500" />
-            ) : saveStatus.lastSaved && (
-              <Check className="w-4 h-4 text-gray-400" />
+            ) : (
+              <Check className={`w-4 h-4 ${saveStatus.lastSaved ? 'text-green-500' : 'text-gray-300'}`} />
             )}
           </div>
         )}

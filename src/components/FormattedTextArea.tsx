@@ -29,8 +29,17 @@ const FormattedTextArea: React.FC<FormattedTextAreaProps> = ({
   const [activeFormats, setActiveFormats] = useState<Set<string>>(new Set());
   const [currentColor, setCurrentColor] = useState('#000000');
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const [selectionStart, setSelectionStart] = useState<number | null>(null);
+  const [selectionEnd, setSelectionEnd] = useState<number | null>(null);
 
   const toggleFormat = (format: string) => {
+    const textarea = textareaRef.current;
+    if (!textarea) return;
+
+    const start = textarea.selectionStart;
+    const end = textarea.selectionEnd;
+    const hasSelection = start !== end;
+
     const newActiveFormats = new Set(activeFormats);
     if (activeFormats.has(format)) {
       newActiveFormats.delete(format);
@@ -38,11 +47,16 @@ const FormattedTextArea: React.FC<FormattedTextAreaProps> = ({
       newActiveFormats.add(format);
     }
     setActiveFormats(newActiveFormats);
-    textareaRef.current?.focus();
+
+    if (hasSelection) {
+      setSelectionStart(start);
+      setSelectionEnd(end);
+    }
+
+    textarea.focus();
   };
 
   const handleKeyDown = (e: KeyboardEvent<HTMLTextAreaElement>) => {
-    // Windows: Ctrl, Mac: Command (Meta)
     const modifier = e.ctrlKey || e.metaKey;
     
     if (modifier) {
@@ -64,12 +78,21 @@ const FormattedTextArea: React.FC<FormattedTextAreaProps> = ({
   };
 
   const getStyles = () => {
-    const styles: React.CSSProperties = {
-      fontWeight: activeFormats.has('bold') ? 'bold' : 'normal',
-      fontStyle: activeFormats.has('italic') ? 'italic' : 'normal',
-      textDecoration: activeFormats.has('underline') ? 'underline' : 'none',
-      color: activeFormats.has('color') ? currentColor : 'inherit',
-    };
+    const styles: React.CSSProperties = {};
+    
+    if (textareaRef.current) {
+      const start = textareaRef.current.selectionStart;
+      const end = textareaRef.current.selectionEnd;
+      const hasSelection = start !== end;
+
+      if (hasSelection || (selectionStart !== null && selectionEnd !== null)) {
+        if (activeFormats.has('bold')) styles.fontWeight = 'bold';
+        if (activeFormats.has('italic')) styles.fontStyle = 'italic';
+        if (activeFormats.has('underline')) styles.textDecoration = 'underline';
+        if (activeFormats.has('color')) styles.color = currentColor;
+      }
+    }
+    
     return styles;
   };
 
@@ -78,30 +101,12 @@ const FormattedTextArea: React.FC<FormattedTextAreaProps> = ({
     const start = textarea.selectionStart;
     const end = textarea.selectionEnd;
     
-    // Se houver texto selecionado, aplicamos a formatação apenas ao texto selecionado
     if (start !== end) {
-      const selectedText = textarea.value.substring(start, end);
-      const formattedText = selectedText;
-      const newValue = textarea.value.substring(0, start) + formattedText + textarea.value.substring(end);
-      
-      const event = {
-        target: {
-          name: textarea.name,
-          value: newValue
-        }
-      } as ChangeEvent<HTMLTextAreaElement>;
-      
-      onChange(event);
-      
-      // Restaura a seleção
-      setTimeout(() => {
-        textarea.focus();
-        textarea.setSelectionRange(start, start + formattedText.length);
-      }, 0);
-    } else {
-      // Se não houver texto selecionado, apenas atualiza o valor
-      onChange(e);
+      setSelectionStart(start);
+      setSelectionEnd(end);
     }
+    
+    onChange(e);
   };
 
   const handleColorSelect = (color: string) => {

@@ -1,7 +1,9 @@
-import React, { ChangeEvent, useState, useRef, KeyboardEvent } from 'react';
+import React from 'react';
 import FormattingToolbar from './formatting/FormattingToolbar';
 import TextArea from './formatting/TextArea';
-import { FormattedTextAreaProps } from '@/models/formData';
+import { FormattedTextAreaProps } from './formatting/types';
+import { useFormatting } from './formatting/useFormatting';
+import { useKeyboardShortcuts } from './formatting/useKeyboardShortcuts';
 
 const FormattedTextArea: React.FC<FormattedTextAreaProps> = ({
   id,
@@ -14,131 +16,17 @@ const FormattedTextArea: React.FC<FormattedTextAreaProps> = ({
   fontSize,
   className = "",
 }) => {
-  const [activeFormats, setActiveFormats] = useState<Set<string>>(new Set());
-  const [currentColor, setCurrentColor] = useState('#000000');
-  const textareaRef = useRef<HTMLTextAreaElement>(null);
-  const [formattedRanges, setFormattedRanges] = useState<Array<{
-    start: number;
-    end: number;
-    formats: Set<string>;
-    color?: string;
-  }>>([]);
+  const {
+    activeFormats,
+    currentColor,
+    textareaRef,
+    formattedRanges,
+    setCurrentColor,
+    applyFormatToSelection,
+    handleTextChange
+  } = useFormatting(onChange);
 
-  const applyFormatToSelection = (format: string) => {
-    const textarea = textareaRef.current;
-    if (!textarea) return;
-
-    const start = textarea.selectionStart;
-    const end = textarea.selectionEnd;
-    const hasSelection = start !== end;
-
-    if (hasSelection) {
-      // Handle selected text formatting
-      const newRange = {
-        start,
-        end,
-        formats: new Set([format]),
-        color: format === 'color' ? currentColor : undefined
-      };
-
-      const existingRangeIndex = formattedRanges.findIndex(
-        range => range.start === start && range.end === end
-      );
-
-      if (existingRangeIndex !== -1) {
-        const existingRange = formattedRanges[existingRangeIndex];
-        if (existingRange.formats.has(format)) {
-          existingRange.formats.delete(format);
-          if (format === 'color') {
-            delete existingRange.color;
-          }
-        } else {
-          existingRange.formats.add(format);
-          if (format === 'color') {
-            existingRange.color = currentColor;
-          }
-        }
-
-        if (existingRange.formats.size === 0) {
-          setFormattedRanges(ranges => ranges.filter((_, i) => i !== existingRangeIndex));
-        } else {
-          setFormattedRanges([...formattedRanges]);
-        }
-      } else {
-        setFormattedRanges([...formattedRanges, newRange]);
-      }
-    }
-
-    // Toggle format in active formats for new text
-    const newActiveFormats = new Set(activeFormats);
-    if (activeFormats.has(format)) {
-      newActiveFormats.delete(format);
-    } else {
-      newActiveFormats.add(format);
-    }
-    setActiveFormats(newActiveFormats);
-
-    textarea.focus();
-  };
-
-  const handleKeyDown = (e: KeyboardEvent<HTMLTextAreaElement>) => {
-    const modifier = e.ctrlKey || e.metaKey;
-    
-    if (modifier) {
-      switch (e.key.toLowerCase()) {
-        case 'b':
-          e.preventDefault();
-          applyFormatToSelection('bold');
-          break;
-        case 'i':
-          e.preventDefault();
-          applyFormatToSelection('italic');
-          break;
-        case 'u':
-          e.preventDefault();
-          applyFormatToSelection('underline');
-          break;
-      }
-    }
-  };
-
-  const handleListFormat = () => {
-    const textarea = textareaRef.current;
-    if (!textarea) return;
-
-    const start = textarea.selectionStart;
-    const text = textarea.value;
-    const lines = text.split('\n');
-    let currentLineStart = 0;
-    let currentLineIndex = 0;
-
-    // Find the current line
-    for (let i = 0; i < lines.length; i++) {
-      if (currentLineStart + lines[i].length >= start) {
-        currentLineIndex = i;
-        break;
-      }
-      currentLineStart += lines[i].length + 1;
-    }
-
-    // Add or remove bullet point
-    const currentLine = lines[currentLineIndex];
-    if (currentLine.startsWith('• ')) {
-      lines[currentLineIndex] = currentLine.substring(2);
-    } else {
-      lines[currentLineIndex] = '• ' + currentLine;
-    }
-
-    const newText = lines.join('\n');
-    const newEvent = {
-      target: {
-        name: textarea.name,
-        value: newText
-      }
-    } as ChangeEvent<HTMLTextAreaElement>;
-    
-    onChange(newEvent);
-  };
+  const { handleKeyDown } = useKeyboardShortcuts(applyFormatToSelection);
 
   const getStylesForPosition = (position: number) => {
     const styles: React.CSSProperties = {};
@@ -155,27 +43,40 @@ const FormattedTextArea: React.FC<FormattedTextAreaProps> = ({
     return styles;
   };
 
-  const handleTextChange = (e: ChangeEvent<HTMLTextAreaElement>) => {
-    const newValue = e.target.value;
+  const handleListFormat = () => {
     const textarea = textareaRef.current;
-    
-    if (textarea) {
-      const cursorPosition = textarea.selectionStart;
-      
-      // Apply active formats to newly typed text
-      if (activeFormats.size > 0) {
-        const newRange = {
-          start: cursorPosition - 1,
-          end: cursorPosition,
-          formats: new Set(activeFormats),
-          color: activeFormats.has('color') ? currentColor : undefined
-        };
-        
-        setFormattedRanges(prev => [...prev, newRange]);
+    if (!textarea) return;
+
+    const start = textarea.selectionStart;
+    const text = textarea.value;
+    const lines = text.split('\n');
+    let currentLineStart = 0;
+    let currentLineIndex = 0;
+
+    for (let i = 0; i < lines.length; i++) {
+      if (currentLineStart + lines[i].length >= start) {
+        currentLineIndex = i;
+        break;
       }
+      currentLineStart += lines[i].length + 1;
     }
+
+    const currentLine = lines[currentLineIndex];
+    if (currentLine.startsWith('• ')) {
+      lines[currentLineIndex] = currentLine.substring(2);
+    } else {
+      lines[currentLineIndex] = '• ' + currentLine;
+    }
+
+    const newText = lines.join('\n');
+    const newEvent = {
+      target: {
+        name: textarea.name,
+        value: newText
+      }
+    } as React.ChangeEvent<HTMLTextAreaElement>;
     
-    onChange(e);
+    onChange(newEvent);
   };
 
   return (
@@ -184,10 +85,7 @@ const FormattedTextArea: React.FC<FormattedTextAreaProps> = ({
         activeFormats={activeFormats}
         currentColor={currentColor}
         onFormatClick={applyFormatToSelection}
-        onColorSelect={(color) => {
-          setCurrentColor(color);
-          applyFormatToSelection('color');
-        }}
+        onColorSelect={setCurrentColor}
         onListClick={handleListFormat}
       />
       <TextArea
@@ -201,7 +99,7 @@ const FormattedTextArea: React.FC<FormattedTextAreaProps> = ({
         height={height}
         maxLines={maxLines}
         fontSize={fontSize}
-        className={className}
+        className={`${className} ${!value && 'bg-red-50'}`}
         style={getStylesForPosition(textareaRef.current?.selectionStart || 0)}
       />
     </div>

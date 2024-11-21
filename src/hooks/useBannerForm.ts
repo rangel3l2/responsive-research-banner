@@ -35,6 +35,15 @@ export const useBannerForm = (): UseBannerFormReturn => {
   const { validateForm } = useFormValidation();
 
   const handleSave = useCallback(() => {
+    if (!Object.values(formData).some(value => value !== '' && value !== null && (!Array.isArray(value) || value.length > 0))) {
+      setSaveStatus({
+        isSaving: false,
+        isError: false,
+        lastSaved: null,
+      });
+      return;
+    }
+
     setSaveStatus(prev => ({ ...prev, isSaving: true }));
     try {
       saveFormToCookies(formData);
@@ -139,6 +148,11 @@ export const useBannerForm = (): UseBannerFormReturn => {
         images: prev.images,
         imageCaptions: prev.imageCaptions,
       }));
+      setSaveStatus({
+        isSaving: false,
+        isError: false,
+        lastSaved: new Date(),
+      });
     }
   };
 

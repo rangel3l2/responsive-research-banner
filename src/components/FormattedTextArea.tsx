@@ -1,4 +1,4 @@
-import React, { ChangeEvent, useState, useRef } from 'react';
+import React, { ChangeEvent, useState, useRef, useEffect, KeyboardEvent } from 'react';
 import { Bold, Italic, Underline, List } from 'lucide-react';
 import FormattingButton from './formatting/FormattingButton';
 import ColorPicker from './formatting/ColorPicker';
@@ -30,15 +30,7 @@ const FormattedTextArea: React.FC<FormattedTextAreaProps> = ({
   const [currentColor, setCurrentColor] = useState('#000000');
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
-  const applyFormatting = (format: string) => {
-    const textarea = textareaRef.current;
-    if (!textarea) return;
-
-    const start = textarea.selectionStart;
-    const end = textarea.selectionEnd;
-    const selectedText = value.substring(start, end);
-    
-    // Toggle format state
+  const toggleFormat = (format: string) => {
     const newActiveFormats = new Set(activeFormats);
     if (activeFormats.has(format)) {
       newActiveFormats.delete(format);
@@ -46,25 +38,28 @@ const FormattedTextArea: React.FC<FormattedTextAreaProps> = ({
       newActiveFormats.add(format);
     }
     setActiveFormats(newActiveFormats);
+    textareaRef.current?.focus();
+  };
 
-    // If text is selected, apply formatting
-    if (start !== end) {
-      const formattedText = selectedText;
-      const newValue = value.substring(0, start) + formattedText + value.substring(end);
-      const event = {
-        target: {
-          name,
-          value: newValue
-        }
-      } as ChangeEvent<HTMLTextAreaElement>;
-      
-      onChange(event);
-      
-      // Restore selection
-      setTimeout(() => {
-        textarea.focus();
-        textarea.setSelectionRange(start, start + formattedText.length);
-      }, 0);
+  const handleKeyDown = (e: KeyboardEvent<HTMLTextAreaElement>) => {
+    // Windows: Ctrl, Mac: Command (Meta)
+    const modifier = e.ctrlKey || e.metaKey;
+    
+    if (modifier) {
+      switch (e.key.toLowerCase()) {
+        case 'b':
+          e.preventDefault();
+          toggleFormat('bold');
+          break;
+        case 'i':
+          e.preventDefault();
+          toggleFormat('italic');
+          break;
+        case 'u':
+          e.preventDefault();
+          toggleFormat('underline');
+          break;
+      }
     }
   };
 
@@ -79,40 +74,67 @@ const FormattedTextArea: React.FC<FormattedTextAreaProps> = ({
   };
 
   const handleInput = (e: ChangeEvent<HTMLTextAreaElement>) => {
-    onChange(e);
+    const textarea = e.target;
+    const start = textarea.selectionStart;
+    const end = textarea.selectionEnd;
+    
+    // Se houver texto selecionado, aplicamos a formatação apenas ao texto selecionado
+    if (start !== end) {
+      const selectedText = textarea.value.substring(start, end);
+      const formattedText = selectedText;
+      const newValue = textarea.value.substring(0, start) + formattedText + textarea.value.substring(end);
+      
+      const event = {
+        target: {
+          name: textarea.name,
+          value: newValue
+        }
+      } as ChangeEvent<HTMLTextAreaElement>;
+      
+      onChange(event);
+      
+      // Restaura a seleção
+      setTimeout(() => {
+        textarea.focus();
+        textarea.setSelectionRange(start, start + formattedText.length);
+      }, 0);
+    } else {
+      // Se não houver texto selecionado, apenas atualiza o valor
+      onChange(e);
+    }
   };
 
   const handleColorSelect = (color: string) => {
     setCurrentColor(color);
-    applyFormatting('color');
+    toggleFormat('color');
   };
 
   return (
     <div className="space-y-1">
       <div className="flex justify-start gap-1 mb-1 p-1 bg-gray-50 rounded-md border">
         <FormattingButton
-          onClick={() => applyFormatting('bold')}
+          onClick={() => toggleFormat('bold')}
           isActive={activeFormats.has('bold')}
-          title="Negrito"
+          title="Negrito (Ctrl/Cmd + B)"
         >
           <Bold className="h-3 w-3" />
         </FormattingButton>
         <FormattingButton
-          onClick={() => applyFormatting('italic')}
+          onClick={() => toggleFormat('italic')}
           isActive={activeFormats.has('italic')}
-          title="Itálico"
+          title="Itálico (Ctrl/Cmd + I)"
         >
           <Italic className="h-3 w-3" />
         </FormattingButton>
         <FormattingButton
-          onClick={() => applyFormatting('underline')}
+          onClick={() => toggleFormat('underline')}
           isActive={activeFormats.has('underline')}
-          title="Sublinhado"
+          title="Sublinhado (Ctrl/Cmd + U)"
         >
           <Underline className="h-3 w-3" />
         </FormattingButton>
         <FormattingButton
-          onClick={() => applyFormatting('list')}
+          onClick={() => toggleFormat('list')}
           isActive={activeFormats.has('list')}
           title="Lista"
         >
@@ -131,6 +153,7 @@ const FormattedTextArea: React.FC<FormattedTextAreaProps> = ({
         placeholder={placeholder}
         value={value}
         onChange={handleInput}
+        onKeyDown={handleKeyDown}
         className={`w-full resize-none border rounded-md p-2 placeholder:text-gray-500 placeholder:text-sm ${height} ${fontSize} ${className}`}
         style={{
           ...getStyles(),

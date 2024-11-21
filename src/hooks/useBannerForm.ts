@@ -3,26 +3,64 @@ import { toast } from 'sonner';
 import { BannerFormData } from '@/models/formData';
 import { MAX_IMAGE_SIZE_KB } from '@/utils/docxStyles';
 import { generateBannerDocx } from '@/utils/docxGenerator';
+import Cookies from 'js-cookie';
+
+const COOKIE_KEY = 'banner_form_data';
+
+const getInitialFormData = (): BannerFormData => ({
+  title: '',
+  authors: '',
+  institution: '',
+  email: '',
+  introduction: '',
+  objective: '',
+  methodology: '',
+  resultsAndDiscussion: '',
+  conclusion: '',
+  references: '',
+  images: [],
+  imageCaptions: [],
+});
 
 export const useBannerForm = () => {
-  const [formData, setFormData] = useState<BannerFormData>({
-    title: '',
-    authors: '',
-    institution: '',
-    email: '',
-    introduction: '',
-    objective: '',
-    methodology: '',
-    resultsAndDiscussion: '',
-    conclusion: '',
-    references: '',
-    images: [],
-    imageCaptions: [],
-    logo: undefined,
-  });
-
+  const [formData, setFormData] = useState<BannerFormData>(getInitialFormData());
   const [errors, setErrors] = useState<{ [key: string]: boolean }>({});
   const [imageUrls, setImageUrls] = useState<string[]>([]);
+
+  const saveFormToCookies = () => {
+    const dataToSave = {
+      ...formData,
+      images: [], // We don't save images in cookies
+    };
+    Cookies.set(COOKIE_KEY, JSON.stringify(dataToSave), { expires: 7 }); // Expires in 7 days
+    toast.success('Dados salvos com sucesso!');
+  };
+
+  const loadFormFromCookies = () => {
+    const savedData = Cookies.get(COOKIE_KEY);
+    if (savedData) {
+      try {
+        const parsedData = JSON.parse(savedData);
+        setFormData(prev => ({
+          ...parsedData,
+          images: prev.images, // Keep current images
+          imageCaptions: prev.imageCaptions,
+        }));
+        toast.success('Dados carregados com sucesso!');
+      } catch (error) {
+        toast.error('Erro ao carregar dados salvos');
+      }
+    } else {
+      toast.error('Nenhum dado salvo encontrado');
+    }
+  };
+
+  const resetForm = () => {
+    setFormData(getInitialFormData());
+    setImageUrls([]);
+    setErrors({});
+    toast.success('Formulário reiniciado');
+  };
 
   const validateImageSize = (file: File) => {
     return file.size <= MAX_IMAGE_SIZE_KB * 1024;
@@ -51,6 +89,9 @@ export const useBannerForm = () => {
     if (errors[name]) {
       setErrors((prev) => ({ ...prev, [name]: false }));
     }
+
+    // Save to cookies after each change
+    saveFormToCookies();
   };
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -96,29 +137,6 @@ export const useBannerForm = () => {
     setFormData((prev) => ({ ...prev, logo: file }));
   };
 
-  const validateForm = () => {
-    const requiredFields = ['title', 'authors', 'institution', 'introduction', 'methodology', 'resultsAndDiscussion', 'conclusion', 'references'];
-    const newErrors: { [key: string]: boolean } = {};
-    let isValid = true;
-
-    requiredFields.forEach(field => {
-      if (!formData[field as keyof BannerFormData]) {
-        newErrors[field] = true;
-        isValid = false;
-
-        if (field === 'title') {
-          toast.error("O título é obrigatório");
-        }
-      }
-    });
-
-    setErrors(newErrors);
-    if (!isValid && !newErrors.title) {
-      toast.error("Por favor, preencha todos os campos obrigatórios destacados em vermelho.");
-    }
-    return isValid;
-  };
-
   const handleImageInsert = () => {
     if (formData.images.length === 0) {
       toast.error('Primeiro faça o upload de uma imagem.');
@@ -140,13 +158,35 @@ export const useBannerForm = () => {
     
     setFormData(prev => ({ ...prev, resultsAndDiscussion: newText }));
     
-    // Restore cursor position after text update
     setTimeout(() => {
       textArea.focus();
       textArea.setSelectionRange(cursorPosition + imageTag.length, cursorPosition + imageTag.length);
     }, 0);
 
     toast.success('Tag de imagem inserida no texto!');
+  };
+
+  const validateForm = () => {
+    const requiredFields = ['title', 'authors', 'institution', 'introduction', 'methodology', 'resultsAndDiscussion', 'conclusion', 'references'];
+    const newErrors: { [key: string]: boolean } = {};
+    let isValid = true;
+
+    requiredFields.forEach(field => {
+      if (!formData[field as keyof BannerFormData]) {
+        newErrors[field] = true;
+        isValid = false;
+
+        if (field === 'title') {
+          toast.error("O título é obrigatório");
+        }
+      }
+    });
+
+    setErrors(newErrors);
+    if (!isValid && !newErrors.title) {
+      toast.error("Por favor, preencha todos os campos obrigatórios destacados em vermelho.");
+    }
+    return isValid;
   };
 
   const downloadAsDocx = async () => {
@@ -179,6 +219,8 @@ export const useBannerForm = () => {
     handleLogoUpload,
     handleImageInsert,
     downloadAsDocx,
-    setFormData
+    setFormData,
+    loadFormFromCookies,
+    resetForm,
   };
 };

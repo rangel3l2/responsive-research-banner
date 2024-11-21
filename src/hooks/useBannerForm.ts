@@ -1,11 +1,10 @@
-import { useState } from 'react';
-import { toast } from 'sonner';
+import { useState, useCallback, useEffect } from 'react';
 import { BannerFormData } from '@/models/formData';
-import { MAX_IMAGE_SIZE_KB } from '@/utils/docxStyles';
 import { generateBannerDocx } from '@/utils/docxGenerator';
-import Cookies from 'js-cookie';
-
-const COOKIE_KEY = 'banner_form_data';
+import { useCookieStorage } from './banner/useCookieStorage';
+import { useFormValidation } from './banner/useFormValidation';
+import { SaveStatus, UseBannerFormReturn } from './banner/types';
+import { MAX_IMAGE_SIZE_KB } from '@/utils/docxStyles';
 
 const getInitialFormData = (): BannerFormData => ({
   title: '',
@@ -22,107 +21,79 @@ const getInitialFormData = (): BannerFormData => ({
   imageCaptions: [],
 });
 
-export const useBannerForm = () => {
+export const useBannerForm = (): UseBannerFormReturn => {
   const [formData, setFormData] = useState<BannerFormData>(getInitialFormData());
   const [errors, setErrors] = useState<{ [key: string]: boolean }>({});
   const [imageUrls, setImageUrls] = useState<string[]>([]);
+  const [saveStatus, setSaveStatus] = useState<SaveStatus>({
+    isSaving: false,
+    isError: false,
+    lastSaved: null,
+  });
 
-  const saveFormToCookies = () => {
-    const dataToSave = {
-      ...formData,
-      images: [], // We don't save images in cookies
-    };
-    Cookies.set(COOKIE_KEY, JSON.stringify(dataToSave), { expires: 7 }); // Expires in 7 days
-    toast.success('Dados salvos com sucesso!');
-  };
+  const { saveFormToCookies, loadFormFromCookies } = useCookieStorage();
+  const { validateForm } = useFormValidation();
 
-  const loadFormFromCookies = () => {
-    const savedData = Cookies.get(COOKIE_KEY);
-    if (savedData) {
-      try {
-        const parsedData = JSON.parse(savedData);
-        setFormData(prev => ({
-          ...parsedData,
-          images: prev.images, // Keep current images
-          imageCaptions: prev.imageCaptions,
-        }));
-        toast.success('Dados carregados com sucesso!');
-      } catch (error) {
-        toast.error('Erro ao carregar dados salvos');
-      }
-    } else {
-      toast.error('Nenhum dado salvo encontrado');
+  const handleSave = useCallback(() => {
+    setSaveStatus(prev => ({ ...prev, isSaving: true }));
+    try {
+      saveFormToCookies(formData);
+      setSaveStatus({
+        isSaving: false,
+        isError: false,
+        lastSaved: new Date(),
+      });
+    } catch (error) {
+      setSaveStatus({
+        isSaving: false,
+        isError: true,
+        lastSaved: null,
+      });
     }
-  };
+  }, [formData]);
 
-  const resetForm = () => {
-    setFormData(getInitialFormData());
-    setImageUrls([]);
-    setErrors({});
-    toast.success('Formulário reiniciado');
-  };
-
-  const validateImageSize = (file: File) => {
-    return file.size <= MAX_IMAGE_SIZE_KB * 1024;
-  };
+  useEffect(() => {
+    const saveTimeout = setTimeout(handleSave, 1000);
+    return () => clearTimeout(saveTimeout);
+  }, [formData, handleSave]);
 
   const handleInputChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
     const { name, value } = e.target;
-    const maxLengths: { [key: string]: number } = {
-      title: 120,
-      authors: 150,
-      introduction: 500,
-      methodology: 400,
-      resultsAndDiscussion: 600,
-      conclusion: 400,
-      references: 300,
-    };
-
-    if (value.length > maxLengths[name]) {
-      toast.error(`O texto em ${name} excede o limite permitido.`);
-      return;
-    }
-
     setFormData((prev) => ({ ...prev, [name]: value }));
     if (errors[name]) {
       setErrors((prev) => ({ ...prev, [name]: false }));
     }
-
-    // Save to cookies after each change
-    saveFormToCookies();
   };
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || []);
     if (files.length + formData.images.length > 2) {
-      toast.error("Máximo de 2 imagens permitido");
       return;
     }
 
-    for (const file of files) {
-      if (!validateImageSize(file)) {
-        toast.error(`A imagem ${file.name} é muito grande. O tamanho máximo permitido é ${MAX_IMAGE_SIZE_KB}KB.`);
+    files.forEach(file => {
+      if (file.size > MAX_IMAGE_SIZE_KB * 1024) {
         return;
       }
-    }
+    });
 
     const newImages = [...formData.images, ...files];
     const newCaptions = [...formData.imageCaptions, ...Array(files.length).fill('')];
-    setFormData((prev) => ({ 
-      ...prev, 
+    
+    setFormData(prev => ({
+      ...prev,
       images: newImages,
       imageCaptions: newCaptions,
     }));
 
     const newUrls = files.map(file => URL.createObjectURL(file));
-    setImageUrls((prev) => [...prev, ...newUrls]);
-    toast.success('Imagem carregada com sucesso!');
+    setImageUrls(prev => [...prev, ...newUrls]);
   };
 
   const handleCaptionChange = (index: number, caption: string) => {
-    setFormData((prev) => {
+    setFormData(prev => {
       const newCaptions = [...prev.imageCaptions];
       newCaptions[index] = caption;
       return { ...prev, imageCaptions: newCaptions };
@@ -130,67 +101,53 @@ export const useBannerForm = () => {
   };
 
   const handleLogoUpload = (file: File) => {
-    if (!validateImageSize(file)) {
-      toast.error(`O logo é muito grande. O tamanho máximo permitido é ${MAX_IMAGE_SIZE_KB}KB.`);
-      return;
+    if (file.size <= MAX_IMAGE_SIZE_KB * 1024) {
+      setFormData(prev => ({ ...prev, logo: file }));
     }
-    setFormData((prev) => ({ ...prev, logo: file }));
   };
 
   const handleImageInsert = () => {
-    if (formData.images.length === 0) {
-      toast.error('Primeiro faça o upload de uma imagem.');
-      return;
-    }
+    if (formData.images.length === 0) return;
 
-    const textArea = document.querySelector('textarea[name="resultsAndDiscussion"]') as HTMLTextAreaElement;
-    if (!textArea) {
-      toast.error('Campo de resultados e discussão não encontrado.');
-      return;
-    }
+    const textArea = document.querySelector(
+      'textarea[name="resultsAndDiscussion"]'
+    ) as HTMLTextAreaElement;
+    if (!textArea) return;
 
     const cursorPosition = textArea.selectionStart;
     const currentText = formData.resultsAndDiscussion;
     const imageIndex = formData.images.length;
     const imageTag = `[IMG${imageIndex}]`;
     
-    const newText = currentText.slice(0, cursorPosition) + imageTag + currentText.slice(cursorPosition);
+    const newText = currentText.slice(0, cursorPosition) + 
+                   imageTag + 
+                   currentText.slice(cursorPosition);
     
     setFormData(prev => ({ ...prev, resultsAndDiscussion: newText }));
-    
-    setTimeout(() => {
-      textArea.focus();
-      textArea.setSelectionRange(cursorPosition + imageTag.length, cursorPosition + imageTag.length);
-    }, 0);
-
-    toast.success('Tag de imagem inserida no texto!');
   };
 
-  const validateForm = () => {
-    const requiredFields = ['title', 'authors', 'institution', 'introduction', 'methodology', 'resultsAndDiscussion', 'conclusion', 'references'];
-    const newErrors: { [key: string]: boolean } = {};
-    let isValid = true;
-
-    requiredFields.forEach(field => {
-      if (!formData[field as keyof BannerFormData]) {
-        newErrors[field] = true;
-        isValid = false;
-
-        if (field === 'title') {
-          toast.error("O título é obrigatório");
-        }
-      }
-    });
-
-    setErrors(newErrors);
-    if (!isValid && !newErrors.title) {
-      toast.error("Por favor, preencha todos os campos obrigatórios destacados em vermelho.");
+  const loadSavedForm = () => {
+    const savedData = loadFormFromCookies();
+    if (savedData) {
+      setFormData(prev => ({
+        ...savedData,
+        images: prev.images,
+        imageCaptions: prev.imageCaptions,
+      }));
     }
-    return isValid;
+  };
+
+  const resetForm = () => {
+    setFormData(getInitialFormData());
+    setImageUrls([]);
+    setErrors({});
   };
 
   const downloadAsDocx = async () => {
-    if (!validateForm()) return;
+    const { isValid, errors: newErrors } = validateForm(formData);
+    setErrors(newErrors);
+    
+    if (!isValid) return;
 
     try {
       const blob = await generateBannerDocx(formData);
@@ -202,10 +159,8 @@ export const useBannerForm = () => {
       link.click();
       document.body.removeChild(link);
       window.URL.revokeObjectURL(url);
-      toast.success("Banner científico gerado com sucesso!");
     } catch (error) {
-      console.error('Erro ao gerar DOCX:', error);
-      toast.error("Erro ao gerar o banner. Por favor, verifique os dados e tente novamente.");
+      console.error('Error generating DOCX:', error);
     }
   };
 
@@ -213,6 +168,7 @@ export const useBannerForm = () => {
     formData,
     errors,
     imageUrls,
+    saveStatus,
     handleInputChange,
     handleImageUpload,
     handleCaptionChange,
@@ -220,7 +176,7 @@ export const useBannerForm = () => {
     handleImageInsert,
     downloadAsDocx,
     setFormData,
-    loadFormFromCookies,
+    loadFormFromCookies: loadSavedForm,
     resetForm,
   };
 };

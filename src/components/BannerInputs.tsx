@@ -12,7 +12,8 @@ const BannerInputs = ({
   imageCaptions,
   onCaptionChange,
   onImageInsert,
-  errors
+  errors,
+  saveStatus
 }: BannerInputsProps) => {
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
@@ -29,6 +30,7 @@ const BannerInputs = ({
             maxLines={3}
             fontSize="text-sm"
             className={errors.authors ? "bg-red-50" : ""}
+            saveStatus={saveStatus}
           />
         </div>
 
@@ -44,6 +46,7 @@ const BannerInputs = ({
             maxLines={2}
             fontSize="text-sm"
             className={errors.institution ? "bg-red-50" : ""}
+            saveStatus={saveStatus}
           />
         </div>
 
@@ -59,6 +62,7 @@ const BannerInputs = ({
             maxLines={10}
             fontSize="text-sm"
             className={errors.introduction ? "bg-red-50" : ""}
+            saveStatus={saveStatus}
           />
         </div>
 
@@ -74,6 +78,7 @@ const BannerInputs = ({
             maxLines={2}
             fontSize="text-sm"
             className={errors.objective ? "bg-red-50" : ""}
+            saveStatus={saveStatus}
           />
         </div>
 
@@ -89,6 +94,7 @@ const BannerInputs = ({
             maxLines={8}
             fontSize="text-sm"
             className={errors.methodology ? "bg-red-50" : ""}
+            saveStatus={saveStatus}
           />
         </div>
       </div>
@@ -106,6 +112,7 @@ const BannerInputs = ({
             maxLines={12}
             fontSize="text-sm"
             className={errors.resultsAndDiscussion ? "bg-red-50" : ""}
+            saveStatus={saveStatus}
           />
           <ImageUpload
             handleImageUpload={handleImageUpload}
@@ -129,6 +136,7 @@ const BannerInputs = ({
             maxLines={8}
             fontSize="text-sm"
             className={errors.conclusion ? "bg-red-50" : ""}
+            saveStatus={saveStatus}
           />
         </div>
 
@@ -144,6 +152,7 @@ const BannerInputs = ({
             maxLines={6}
             fontSize="text-sm"
             className={errors.references ? "bg-red-50" : ""}
+            saveStatus={saveStatus}
           />
         </div>
       </div>

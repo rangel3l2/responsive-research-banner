@@ -4,6 +4,7 @@ import TextArea from './formatting/TextArea';
 import { FormattedTextAreaProps } from './formatting/types';
 import { useFormatting } from './formatting/useFormatting';
 import { useKeyboardShortcuts } from './formatting/useKeyboardShortcuts';
+import { Check, X } from 'lucide-react';
 
 const FormattedTextArea: React.FC<FormattedTextAreaProps> = ({
   id,
@@ -15,6 +16,7 @@ const FormattedTextArea: React.FC<FormattedTextAreaProps> = ({
   maxLines,
   fontSize,
   className = "",
+  saveStatus,
 }) => {
   const {
     activeFormats,
@@ -88,20 +90,33 @@ const FormattedTextArea: React.FC<FormattedTextAreaProps> = ({
         onColorSelect={setCurrentColor}
         onListClick={handleListFormat}
       />
-      <TextArea
-        ref={textareaRef}
-        id={id}
-        name={name}
-        placeholder={placeholder}
-        value={value}
-        onChange={handleTextChange}
-        onKeyDown={handleKeyDown}
-        height={height}
-        maxLines={maxLines}
-        fontSize={fontSize}
-        className={`${className} ${!value && 'bg-red-50'}`}
-        style={getStylesForPosition(textareaRef.current?.selectionStart || 0)}
-      />
+      <div className="relative">
+        <TextArea
+          ref={textareaRef}
+          id={id}
+          name={name}
+          placeholder={placeholder}
+          value={value}
+          onChange={handleTextChange}
+          onKeyDown={handleKeyDown}
+          height={height}
+          maxLines={maxLines}
+          fontSize={fontSize}
+          className={`${className} ${!value && 'bg-red-50'}`}
+          style={getStylesForPosition(textareaRef.current?.selectionStart || 0)}
+        />
+        {saveStatus && (
+          <div className="absolute right-2 bottom-2">
+            {saveStatus.isSaving ? (
+              <div className="w-3 h-3 rounded-full border-2 border-gray-300 border-t-transparent animate-spin" />
+            ) : saveStatus.isError ? (
+              <X className="w-4 h-4 text-red-500" />
+            ) : saveStatus.lastSaved && (
+              <Check className="w-4 h-4 text-gray-400" />
+            )}
+          </div>
+        )}
+      </div>
     </div>
   );
 };

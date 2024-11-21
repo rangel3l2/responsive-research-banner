@@ -1,9 +1,4 @@
-export interface FormattedRange {
-  start: number;
-  end: number;
-  formats: Set<string>;
-  color?: string;
-}
+import { SaveStatus } from '@/hooks/banner/types';
 
 export interface FormattedTextAreaProps {
   id: string;
@@ -15,4 +10,5 @@ export interface FormattedTextAreaProps {
   maxLines: number;
   fontSize: string;
   className?: string;
+  saveStatus?: SaveStatus;
 }

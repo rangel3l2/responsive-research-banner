@@ -102,7 +102,7 @@ const FormattedTextArea: React.FC<FormattedTextAreaProps> = ({
           height={height}
           maxLines={maxLines}
           fontSize={fontSize}
-          className={`${className} ${!value && 'bg-red-50'}`}
+          className={className}
           style={getStylesForPosition(textareaRef.current?.selectionStart || 0)}
         />
         {saveStatus && (

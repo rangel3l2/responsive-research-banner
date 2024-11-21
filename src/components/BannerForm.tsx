@@ -10,6 +10,7 @@ const BannerForm = () => {
     formData,
     errors,
     imageUrls,
+    saveStatus,
     handleInputChange,
     handleImageUpload,
     handleCaptionChange,
@@ -53,6 +54,7 @@ const BannerForm = () => {
           onCaptionChange={handleCaptionChange}
           onImageInsert={handleImageInsert}
           errors={errors}
+          saveStatus={saveStatus}
         />
         <div className="flex justify-end space-x-4">
           <Button onClick={downloadAsDocx} variant="outline">

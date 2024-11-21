@@ -106,9 +106,9 @@ const FormattedTextArea: React.FC<FormattedTextAreaProps> = ({
           style={getStylesForPosition(textareaRef.current?.selectionStart || 0)}
         />
         {saveStatus && (
-          <div className="absolute right-2 bottom-2">
+          <div className="absolute right-2 bottom-2 flex items-center">
             {saveStatus.isSaving ? (
-              <div className="w-3 h-3 rounded-full border-2 border-gray-300 border-t-transparent animate-spin" />
+              <div className="w-4 h-4 rounded-full border-2 border-gray-300 border-t-transparent animate-spin" />
             ) : saveStatus.isError ? (
               <X className="w-4 h-4 text-red-500" />
             ) : saveStatus.lastSaved && (

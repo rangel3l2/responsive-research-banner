@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useRef } from 'react';
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
@@ -22,6 +22,12 @@ const ImageUpload = ({
   onCaptionChange,
   onImageInsert,
 }: ImageUploadProps) => {
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const handleButtonClick = () => {
+    fileInputRef.current?.click();
+  };
+
   return (
     <div className="mt-4">
       <div className="flex items-center gap-4">
@@ -30,16 +36,17 @@ const ImageUpload = ({
           <div className="flex items-center gap-2 mt-1">
             <div className="relative">
               <Input
+                ref={fileInputRef}
                 type="file"
                 accept="image/*"
                 onChange={handleImageUpload}
-                className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                className="hidden"
                 disabled={imageUrls?.length >= maxImages}
               />
               <Button
                 type="button"
                 variant="outline"
-                className="relative"
+                onClick={handleButtonClick}
                 disabled={imageUrls?.length >= maxImages}
               >
                 <Image className="w-4 h-4" />

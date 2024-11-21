@@ -18,7 +18,7 @@ const BannerInputs = ({
     <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
       <div className="space-y-4">
         <div>
-          <Label htmlFor="authors">Autores</Label>
+          <Label htmlFor="authors" className="font-semibold">Autores</Label>
           <FormattedTextArea
             id="authors"
             name="authors"
@@ -33,7 +33,7 @@ const BannerInputs = ({
         </div>
 
         <div>
-          <Label htmlFor="institution">Instituição</Label>
+          <Label htmlFor="institution" className="font-semibold">Instituição</Label>
           <FormattedTextArea
             id="institution"
             name="institution"
@@ -48,7 +48,7 @@ const BannerInputs = ({
         </div>
 
         <div>
-          <Label htmlFor="introduction">Introdução</Label>
+          <Label htmlFor="introduction" className="font-semibold">Introdução</Label>
           <FormattedTextArea
             id="introduction"
             name="introduction"
@@ -63,11 +63,11 @@ const BannerInputs = ({
         </div>
 
         <div>
-          <Label htmlFor="objective">Objetivo</Label>
+          <Label htmlFor="objective" className="font-semibold">Objetivo</Label>
           <FormattedTextArea
             id="objective"
             name="objective"
-            placeholder="Descreva o objetivo principal da pesquisa de forma clara e direta. Limite-se a 1-2 linhas, usando frases curtas e objetivas. O texto deve ser conciso e direto, evitando explicações extensas."
+            placeholder="Descreva o objetivo principal da pesquisa de forma clara e direta. Limite-se a 1-2 linhas, usando frases curtas e objetivas."
             value={formData.objective}
             onChange={handleInputChange}
             height="h-20"
@@ -78,7 +78,7 @@ const BannerInputs = ({
         </div>
 
         <div>
-          <Label htmlFor="methodology">Metodologia</Label>
+          <Label htmlFor="methodology" className="font-semibold">Metodologia</Label>
           <FormattedTextArea
             id="methodology"
             name="methodology"
@@ -95,7 +95,7 @@ const BannerInputs = ({
 
       <div className="space-y-4">
         <div>
-          <Label htmlFor="resultsAndDiscussion">Resultados e Discussão</Label>
+          <Label htmlFor="resultsAndDiscussion" className="font-semibold">Resultados e Discussão</Label>
           <FormattedTextArea
             id="resultsAndDiscussion"
             name="resultsAndDiscussion"
@@ -118,7 +118,7 @@ const BannerInputs = ({
         </div>
 
         <div>
-          <Label htmlFor="conclusion">Conclusão</Label>
+          <Label htmlFor="conclusion" className="font-semibold">Conclusão</Label>
           <FormattedTextArea
             id="conclusion"
             name="conclusion"
@@ -133,7 +133,7 @@ const BannerInputs = ({
         </div>
 
         <div>
-          <Label htmlFor="references">Referências</Label>
+          <Label htmlFor="references" className="font-semibold">Referências</Label>
           <FormattedTextArea
             id="references"
             name="references"

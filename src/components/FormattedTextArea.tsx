@@ -37,39 +37,19 @@ const FormattedTextArea: React.FC<FormattedTextAreaProps> = ({
     const start = textarea.selectionStart;
     const end = textarea.selectionEnd;
     const selectedText = value.substring(start, end);
-    let formattedText = selectedText;
-    const newActiveFormats = new Set(activeFormats);
-
+    
     // Toggle format state
+    const newActiveFormats = new Set(activeFormats);
     if (activeFormats.has(format)) {
       newActiveFormats.delete(format);
     } else {
       newActiveFormats.add(format);
     }
+    setActiveFormats(newActiveFormats);
 
     // If text is selected, apply formatting
     if (start !== end) {
-      switch (format) {
-        case 'bold':
-          formattedText = `**${selectedText}**`;
-          break;
-        case 'italic':
-          formattedText = `_${selectedText}_`;
-          break;
-        case 'underline':
-          formattedText = `__${selectedText}__`;
-          break;
-        case 'list':
-          formattedText = selectedText
-            .split('\n')
-            .map(line => `• ${line}`)
-            .join('\n');
-          break;
-        case 'color':
-          formattedText = `{color:${currentColor}}${selectedText}{/color}`;
-          break;
-      }
-
+      const formattedText = selectedText;
       const newValue = value.substring(0, start) + formattedText + value.substring(end);
       const event = {
         target: {
@@ -86,34 +66,20 @@ const FormattedTextArea: React.FC<FormattedTextAreaProps> = ({
         textarea.setSelectionRange(start, start + formattedText.length);
       }, 0);
     }
+  };
 
-    setActiveFormats(newActiveFormats);
+  const getStyles = () => {
+    const styles: React.CSSProperties = {
+      fontWeight: activeFormats.has('bold') ? 'bold' : 'normal',
+      fontStyle: activeFormats.has('italic') ? 'italic' : 'normal',
+      textDecoration: activeFormats.has('underline') ? 'underline' : 'none',
+      color: activeFormats.has('color') ? currentColor : 'inherit',
+    };
+    return styles;
   };
 
   const handleInput = (e: ChangeEvent<HTMLTextAreaElement>) => {
-    let newText = e.target.value;
-    const lastChar = newText[newText.length - 1];
-    
-    // Apply active formats to new text
-    if (lastChar && lastChar !== '\n' && activeFormats.size > 0) {
-      let formattedChar = lastChar;
-      
-      if (activeFormats.has('bold')) formattedChar = `**${formattedChar}**`;
-      if (activeFormats.has('italic')) formattedChar = `_${formattedChar}_`;
-      if (activeFormats.has('underline')) formattedChar = `__${formattedChar}__`;
-      if (activeFormats.has('color')) formattedChar = `{color:${currentColor}}${formattedChar}{/color}`;
-      
-      newText = newText.slice(0, -1) + formattedChar;
-    }
-
-    const event = {
-      target: {
-        name,
-        value: newText
-      }
-    } as ChangeEvent<HTMLTextAreaElement>;
-    
-    onChange(event);
+    onChange(e);
   };
 
   const handleColorSelect = (color: string) => {
@@ -167,6 +133,7 @@ const FormattedTextArea: React.FC<FormattedTextAreaProps> = ({
         onChange={handleInput}
         className={`w-full resize-none border rounded-md p-2 placeholder:text-gray-500 placeholder:text-sm ${height} ${fontSize} ${className}`}
         style={{
+          ...getStyles(),
           lineHeight: '1.5',
           maxHeight: `${maxLines * 1.5}em`,
           minHeight: `${Math.min(4, maxLines) * 1.5}em`,

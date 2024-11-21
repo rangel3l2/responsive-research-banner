@@ -6,46 +6,70 @@ export const parseFormattedText = (text: string): TextRun[] => {
   let currentText = '';
   let i = 0;
 
+  const currentFormatting = {
+    bold: false,
+    italic: false,
+    underline: false,
+    color: undefined as string | undefined,
+  };
+
   while (i < text.length) {
-    if (text[i] === '*' && text[i + 1] === '*') {
-      if (currentText) {
-        parts.push(new TextRun({ text: currentText, size: DEFAULT_FONT_SIZE, font: DEFAULT_FONT }));
-        currentText = '';
-      }
-      i += 2;
-      let boldText = '';
-      while (i < text.length && !(text[i] === '*' && text[i + 1] === '*')) {
-        boldText += text[i];
-        i++;
-      }
-      parts.push(new TextRun({ text: boldText, bold: true, size: DEFAULT_FONT_SIZE, font: DEFAULT_FONT }));
-      i += 2;
-    } else if (text[i] === '_' && text[i + 1] !== '_') {
-      if (currentText) {
-        parts.push(new TextRun({ text: currentText, size: DEFAULT_FONT_SIZE, font: DEFAULT_FONT }));
-        currentText = '';
-      }
-      i++;
-      let italicText = '';
-      while (i < text.length && text[i] !== '_') {
-        italicText += text[i];
-        i++;
-      }
-      parts.push(new TextRun({ text: italicText, italics: true, size: DEFAULT_FONT_SIZE, font: DEFAULT_FONT }));
-      i++;
-    } else if (text[i] === '_' && text[i + 1] === '_') {
-      if (currentText) {
-        parts.push(new TextRun({ text: currentText, size: DEFAULT_FONT_SIZE, font: DEFAULT_FONT }));
-        currentText = '';
-      }
-      i += 2;
-      let underlinedText = '';
-      while (i < text.length && !(text[i] === '_' && text[i + 1] === '_')) {
-        underlinedText += text[i];
-        i++;
-      }
-      parts.push(new TextRun({ text: underlinedText, underline: {}, size: DEFAULT_FONT_SIZE, font: DEFAULT_FONT }));
-      i += 2;
+    // Criar TextRun com a formatação atual
+    const createTextRun = (text: string) => {
+      if (!text) return null;
+      return new TextRun({
+        text,
+        bold: currentFormatting.bold,
+        italics: currentFormatting.italic,
+        underline: currentFormatting.underline ? {} : undefined,
+        color: currentFormatting.color,
+        size: DEFAULT_FONT_SIZE,
+        font: DEFAULT_FONT,
+      });
+    };
+
+    // Processar o texto e manter a formatação
+    if (text[i] === '{' && text.substring(i, i + 6) === '{bold}') {
+      if (currentText) parts.push(createTextRun(currentText)!);
+      currentText = '';
+      currentFormatting.bold = true;
+      i += 6;
+    } else if (text[i] === '{' && text.substring(i, i + 8) === '{/bold}') {
+      if (currentText) parts.push(createTextRun(currentText)!);
+      currentText = '';
+      currentFormatting.bold = false;
+      i += 8;
+    } else if (text[i] === '{' && text.substring(i, i + 8) === '{italic}') {
+      if (currentText) parts.push(createTextRun(currentText)!);
+      currentText = '';
+      currentFormatting.italic = true;
+      i += 8;
+    } else if (text[i] === '{' && text.substring(i, i + 10) === '{/italic}') {
+      if (currentText) parts.push(createTextRun(currentText)!);
+      currentText = '';
+      currentFormatting.italic = false;
+      i += 10;
+    } else if (text[i] === '{' && text.substring(i, i + 11) === '{underline}') {
+      if (currentText) parts.push(createTextRun(currentText)!);
+      currentText = '';
+      currentFormatting.underline = true;
+      i += 11;
+    } else if (text[i] === '{' && text.substring(i, i + 13) === '{/underline}') {
+      if (currentText) parts.push(createTextRun(currentText)!);
+      currentText = '';
+      currentFormatting.underline = false;
+      i += 13;
+    } else if (text[i] === '{' && text.substring(i, i + 7) === '{color:') {
+      if (currentText) parts.push(createTextRun(currentText)!);
+      currentText = '';
+      const colorEnd = text.indexOf('}', i + 7);
+      currentFormatting.color = text.substring(i + 7, colorEnd);
+      i = colorEnd + 1;
+    } else if (text[i] === '{' && text.substring(i, i + 8) === '{/color}') {
+      if (currentText) parts.push(createTextRun(currentText)!);
+      currentText = '';
+      currentFormatting.color = undefined;
+      i += 8;
     } else {
       currentText += text[i];
       i++;
@@ -53,7 +77,7 @@ export const parseFormattedText = (text: string): TextRun[] => {
   }
 
   if (currentText) {
-    parts.push(new TextRun({ text: currentText, size: DEFAULT_FONT_SIZE, font: DEFAULT_FONT }));
+    parts.push(createTextRun(currentText)!);
   }
 
   return parts;

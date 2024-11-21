@@ -12,3 +12,10 @@ export interface FormattedTextAreaProps {
   className?: string;
   saveStatus?: SaveStatus;
 }
+
+export interface FormattedRange {
+  start: number;
+  end: number;
+  formats: Set<string>;
+  color?: string;
+}

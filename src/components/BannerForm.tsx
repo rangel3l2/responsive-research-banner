@@ -16,13 +16,23 @@ const BannerForm = () => {
     handleLogoUpload,
     handleImageInsert,
     downloadAsDocx,
-    setFormData
+    setFormData,
+    loadSavedData,
+    clearSavedData
   } = useBannerForm();
   
   const formRef = useRef<HTMLDivElement>(null);
 
   return (
     <div className="container mx-auto px-4 py-8 max-w-4xl">
+      <div className="mb-4 flex justify-end space-x-4">
+        <Button onClick={loadSavedData} variant="outline">
+          Carregar Dados Salvos
+        </Button>
+        <Button onClick={clearSavedData} variant="outline">
+          Começar do Zero
+        </Button>
+      </div>
       <Card className="p-6 space-y-8" ref={formRef}>
         <BannerHeader 
           title={formData.title}

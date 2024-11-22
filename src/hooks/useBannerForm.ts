@@ -3,8 +3,9 @@ import { BannerFormData } from '@/models/formData';
 import { generateBannerDocx } from '@/utils/docxGenerator';
 import { useCookieStorage } from './banner/useCookieStorage';
 import { useFormValidation } from './banner/useFormValidation';
-import { SaveStatus, UseBannerFormReturn } from './banner/types';
-import { MAX_IMAGE_SIZE_KB } from '@/utils/docxStyles';
+import { SaveStatus } from './banner/types';
+import { useFormActions } from './banner/useFormActions';
+import { useImageHandling } from './banner/useImageHandling';
 
 const getInitialFormData = (): BannerFormData => ({
   title: '',
@@ -21,7 +22,7 @@ const getInitialFormData = (): BannerFormData => ({
   imageCaptions: [],
 });
 
-export const useBannerForm = (): UseBannerFormReturn => {
+export const useBannerForm = () => {
   const [formData, setFormData] = useState<BannerFormData>(getInitialFormData());
   const [errors, setErrors] = useState<{ [key: string]: boolean }>({});
   const [imageUrls, setImageUrls] = useState<string[]>([]);
@@ -33,6 +34,21 @@ export const useBannerForm = (): UseBannerFormReturn => {
 
   const { saveFormToCookies, loadFormFromCookies } = useCookieStorage();
   const { validateForm } = useFormValidation();
+  
+  const { resetForm, handleInputChange } = useFormActions(
+    setFormData,
+    setImageUrls,
+    setErrors,
+    setSaveStatus,
+    getInitialFormData
+  );
+
+  const {
+    handleImageUpload,
+    handleCaptionChange,
+    handleLogoUpload,
+    handleImageInsert,
+  } = useImageHandling(setFormData, setImageUrls);
 
   const handleSave = useCallback(() => {
     if (!Object.values(formData).some(value => value !== '' && value !== null && (!Array.isArray(value) || value.length > 0))) {
@@ -59,112 +75,33 @@ export const useBannerForm = (): UseBannerFormReturn => {
         lastSaved: null,
       });
     }
-  }, [formData]);
+  }, [formData, saveFormToCookies]);
 
   useEffect(() => {
     const saveTimeout = setTimeout(handleSave, 1000);
     return () => clearTimeout(saveTimeout);
   }, [formData, handleSave]);
 
-  const handleInputChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
-  ) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
-    setSaveStatus({
-      isSaving: false,
-      isError: false,
-      lastSaved: null,
-    });
-    if (errors[name]) {
-      setErrors((prev) => ({ ...prev, [name]: false }));
-    }
-  };
-
-  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const files = Array.from(e.target.files || []);
-    if (files.length + formData.images.length > 2) {
-      return;
-    }
-
-    files.forEach(file => {
-      if (file.size > MAX_IMAGE_SIZE_KB * 1024) {
-        return;
-      }
-    });
-
-    const newImages = [...formData.images, ...files];
-    const newCaptions = [...formData.imageCaptions, ...Array(files.length).fill('')];
-    
-    setFormData(prev => ({
-      ...prev,
-      images: newImages,
-      imageCaptions: newCaptions,
-    }));
-
-    const newUrls = files.map(file => URL.createObjectURL(file));
-    setImageUrls(prev => [...prev, ...newUrls]);
-  };
-
-  const handleCaptionChange = (index: number, caption: string) => {
-    setFormData(prev => {
-      const newCaptions = [...prev.imageCaptions];
-      newCaptions[index] = caption;
-      return { ...prev, imageCaptions: newCaptions };
-    });
-  };
-
-  const handleLogoUpload = (file: File) => {
-    if (file.size <= MAX_IMAGE_SIZE_KB * 1024) {
-      setFormData(prev => ({ ...prev, logo: file }));
-    }
-  };
-
-  const handleImageInsert = () => {
-    if (formData.images.length === 0) return;
-
-    const textArea = document.querySelector(
-      'textarea[name="resultsAndDiscussion"]'
-    ) as HTMLTextAreaElement;
-    if (!textArea) return;
-
-    const cursorPosition = textArea.selectionStart;
-    const currentText = formData.resultsAndDiscussion;
-    const imageIndex = formData.images.length;
-    const imageTag = `[IMG${imageIndex}]`;
-    
-    const newText = currentText.slice(0, cursorPosition) + 
-                   imageTag + 
-                   currentText.slice(cursorPosition);
-    
-    setFormData(prev => ({ ...prev, resultsAndDiscussion: newText }));
-  };
-
   const loadSavedForm = () => {
     const savedData = loadFormFromCookies();
     if (savedData) {
-      setFormData(prev => ({
+      // Preserve current images and captions while loading other data
+      const currentImages = formData.images;
+      const currentCaptions = formData.imageCaptions;
+      const currentImageUrls = imageUrls;
+      
+      setFormData({
         ...savedData,
-        images: prev.images,
-        imageCaptions: prev.imageCaptions,
-      }));
+        images: currentImages,
+        imageCaptions: currentCaptions,
+      });
+      
       setSaveStatus({
         isSaving: false,
         isError: false,
         lastSaved: new Date(),
       });
     }
-  };
-
-  const resetForm = () => {
-    setFormData(getInitialFormData());
-    setImageUrls([]);
-    setErrors({});
-    setSaveStatus({
-      isSaving: false,
-      isError: false,
-      lastSaved: null,
-    });
   };
 
   const downloadAsDocx = async () => {

@@ -14,6 +14,7 @@ interface TextAreaProps {
   fontSize: string;
   className?: string;
   style?: React.CSSProperties;
+  disabled?: boolean;
 }
 
 const TextArea = forwardRef<HTMLTextAreaElement, TextAreaProps>(({
@@ -24,7 +25,8 @@ const TextArea = forwardRef<HTMLTextAreaElement, TextAreaProps>(({
   onChange,
   height,
   className = "",
-  style
+  style,
+  disabled
 }, ref) => {
   return (
     <div 
@@ -50,6 +52,7 @@ const TextArea = forwardRef<HTMLTextAreaElement, TextAreaProps>(({
             }
           });
         }}
+        disabled={disabled}
       />
     </div>
   );

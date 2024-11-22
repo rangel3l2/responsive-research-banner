@@ -66,8 +66,8 @@ export const generateBannerDocx = async (formData: BannerFormData) => {
                     children: [
                       new Paragraph({
                         text: "Introdução",
-                        bold: true,
                         spacing: { before: 0, after: 100 },
+                        run: { bold: true }
                       }),
                       new Paragraph({
                         children: parseFormattedText(formData.introduction),
@@ -76,8 +76,8 @@ export const generateBannerDocx = async (formData: BannerFormData) => {
                       }),
                       new Paragraph({
                         text: "Objetivo",
-                        bold: true,
                         spacing: { before: 0, after: 100 },
+                        run: { bold: true }
                       }),
                       new Paragraph({
                         children: parseFormattedText(formData.objective),
@@ -86,8 +86,8 @@ export const generateBannerDocx = async (formData: BannerFormData) => {
                       }),
                       new Paragraph({
                         text: "Metodologia",
-                        bold: true,
                         spacing: { before: 0, after: 100 },
+                        run: { bold: true }
                       }),
                       new Paragraph({
                         children: parseFormattedText(formData.methodology),
@@ -106,8 +106,8 @@ export const generateBannerDocx = async (formData: BannerFormData) => {
                     children: [
                       new Paragraph({
                         text: "Resultados e Discussão",
-                        bold: true,
                         spacing: { before: 0, after: 100 },
+                        run: { bold: true }
                       }),
                       new Paragraph({
                         children: parseFormattedText(firstHalf),
@@ -122,8 +122,8 @@ export const generateBannerDocx = async (formData: BannerFormData) => {
                       ...await createImageParagraphs(formData.images, formData.imageCaptions),
                       new Paragraph({
                         text: "Conclusão",
-                        bold: true,
                         spacing: { before: 0, after: 100 },
+                        run: { bold: true }
                       }),
                       new Paragraph({
                         children: parseFormattedText(formData.conclusion),

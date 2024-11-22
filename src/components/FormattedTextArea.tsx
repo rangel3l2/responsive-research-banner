@@ -83,6 +83,7 @@ const FormattedTextArea: React.FC<FormattedTextAreaProps> = ({
           disabled={isDisabled}
           onFocus={handleFocus}
           onBlur={handleBlur}
+          readOnly={isDisabled}
         />
         {saveStatus && (
           <div className="absolute right-2 bottom-2 flex items-center">

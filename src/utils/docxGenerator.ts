@@ -9,6 +9,7 @@ import {
   TableLayoutType,
   WidthType,
   Header,
+  TextRun
 } from 'docx';
 import { BannerFormData } from '@/models/formData';
 import { splitTextAtWordBoundary } from './docxTextSplitter';
@@ -18,8 +19,24 @@ import {
   NO_BORDERS, 
   PAGE_MARGINS,
   PARAGRAPH_SPACING,
+  DEFAULT_FONT,
+  DEFAULT_FONT_SIZE
 } from './docxStyles';
 import { parseFormattedText } from './docxTextParser';
+
+const createSectionTitle = (title: string): Paragraph => {
+  return new Paragraph({
+    children: [
+      new TextRun({
+        text: title,
+        bold: true,
+        size: DEFAULT_FONT_SIZE,
+        font: DEFAULT_FONT,
+      })
+    ],
+    spacing: { before: 240, after: 120 }
+  });
+};
 
 export const generateBannerDocx = async (formData: BannerFormData) => {
   try {
@@ -64,34 +81,22 @@ export const generateBannerDocx = async (formData: BannerFormData) => {
                 children: [
                   new TableCell({
                     children: [
-                      new Paragraph({
-                        text: "Introdução",
-                        spacing: { before: 0, after: 100 },
-                        run: { bold: true }
-                      }),
+                      createSectionTitle("Introdução"),
                       new Paragraph({
                         children: parseFormattedText(formData.introduction),
-                        spacing: { before: 0, after: 200 },
+                        spacing: PARAGRAPH_SPACING,
                         alignment: AlignmentType.JUSTIFIED,
                       }),
-                      new Paragraph({
-                        text: "Objetivo",
-                        spacing: { before: 0, after: 100 },
-                        run: { bold: true }
-                      }),
+                      createSectionTitle("Objetivo"),
                       new Paragraph({
                         children: parseFormattedText(formData.objective),
-                        spacing: { before: 0, after: 200 },
+                        spacing: PARAGRAPH_SPACING,
                         alignment: AlignmentType.JUSTIFIED,
                       }),
-                      new Paragraph({
-                        text: "Metodologia",
-                        spacing: { before: 0, after: 100 },
-                        run: { bold: true }
-                      }),
+                      createSectionTitle("Metodologia"),
                       new Paragraph({
                         children: parseFormattedText(formData.methodology),
-                        spacing: { before: 0, after: 200 },
+                        spacing: PARAGRAPH_SPACING,
                         alignment: AlignmentType.JUSTIFIED,
                       }),
                     ],
@@ -104,35 +109,28 @@ export const generateBannerDocx = async (formData: BannerFormData) => {
                   }),
                   new TableCell({
                     children: [
-                      new Paragraph({
-                        text: "Resultados e Discussão",
-                        spacing: { before: 0, after: 100 },
-                        run: { bold: true }
-                      }),
+                      createSectionTitle("Resultados e Discussão"),
                       new Paragraph({
                         children: parseFormattedText(firstHalf),
-                        spacing: { before: 0, after: 200 },
+                        spacing: PARAGRAPH_SPACING,
                         alignment: AlignmentType.JUSTIFIED,
                       }),
                       new Paragraph({
                         children: parseFormattedText(secondHalf),
-                        spacing: { before: 0, after: 200 },
+                        spacing: PARAGRAPH_SPACING,
                         alignment: AlignmentType.JUSTIFIED,
                       }),
-                      ...await createImageParagraphs(formData.images, formData.imageCaptions),
-                      new Paragraph({
-                        text: "Conclusão",
-                        spacing: { before: 0, after: 100 },
-                        run: { bold: true }
-                      }),
+                      ...(await createImageParagraphs(formData.images, formData.imageCaptions)),
+                      createSectionTitle("Conclusão"),
                       new Paragraph({
                         children: parseFormattedText(formData.conclusion),
-                        spacing: { before: 0, after: 200 },
+                        spacing: PARAGRAPH_SPACING,
                         alignment: AlignmentType.JUSTIFIED,
                       }),
+                      createSectionTitle("Referências"),
                       new Paragraph({
                         children: parseFormattedText(formData.references),
-                        spacing: { before: 0, after: 0 },
+                        spacing: PARAGRAPH_SPACING,
                         alignment: AlignmentType.JUSTIFIED,
                       })
                     ],
@@ -164,7 +162,7 @@ export const generateBannerDocx = async (formData: BannerFormData) => {
             run: {
               size: 48,
               bold: true,
-              font: "Times New Roman",
+              font: DEFAULT_FONT,
             },
             paragraph: {
               spacing: { before: 0, after: 240 },
@@ -175,8 +173,8 @@ export const generateBannerDocx = async (formData: BannerFormData) => {
             id: "Normal",
             name: "Normal",
             run: {
-              size: 24,
-              font: "Times New Roman",
+              size: DEFAULT_FONT_SIZE,
+              font: DEFAULT_FONT,
             }
           }
         ]

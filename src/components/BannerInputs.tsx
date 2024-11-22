@@ -18,7 +18,7 @@ const BannerInputs = ({
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
       <div className="space-y-8 flex flex-col">
-        <div className="space-y-2">
+        <div className="space-y-2 flex-grow">
           <Label htmlFor="introduction" className="font-semibold block">Introdução</Label>
           <FormattedTextArea
             id="introduction"
@@ -34,7 +34,7 @@ const BannerInputs = ({
           />
         </div>
 
-        <div className="space-y-2">
+        <div className="space-y-2 flex-grow">
           <Label htmlFor="objective" className="font-semibold block">Objetivo</Label>
           <FormattedTextArea
             id="objective"
@@ -50,7 +50,7 @@ const BannerInputs = ({
           />
         </div>
 
-        <div className="space-y-2">
+        <div className="space-y-2 flex-grow">
           <Label htmlFor="methodology" className="font-semibold block">Metodologia</Label>
           <FormattedTextArea
             id="methodology"
@@ -68,7 +68,7 @@ const BannerInputs = ({
       </div>
 
       <div className="space-y-8 flex flex-col">
-        <div className="space-y-2">
+        <div className="space-y-2 flex-grow">
           <Label htmlFor="resultsAndDiscussion" className="font-semibold block">Resultados e Discussão</Label>
           <FormattedTextArea
             id="resultsAndDiscussion"
@@ -94,7 +94,7 @@ const BannerInputs = ({
           </div>
         </div>
 
-        <div className="space-y-2">
+        <div className="space-y-2 flex-grow">
           <Label htmlFor="conclusion" className="font-semibold block">Conclusão</Label>
           <FormattedTextArea
             id="conclusion"
@@ -110,7 +110,7 @@ const BannerInputs = ({
           />
         </div>
 
-        <div className="space-y-2">
+        <div className="space-y-2 flex-grow">
           <Label htmlFor="references" className="font-semibold block">Referências</Label>
           <FormattedTextArea
             id="references"

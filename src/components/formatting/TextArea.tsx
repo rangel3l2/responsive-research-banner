@@ -15,6 +15,7 @@ interface TextAreaProps {
   className?: string;
   style?: React.CSSProperties;
   disabled?: boolean;
+  readOnly?: boolean;
   onFocus?: () => void;
   onBlur?: () => void;
 }
@@ -29,6 +30,7 @@ const TextArea = forwardRef<HTMLTextAreaElement, TextAreaProps>(({
   className = "",
   style,
   disabled,
+  readOnly,
   onFocus,
   onBlur
 }, ref) => {
@@ -56,7 +58,7 @@ const TextArea = forwardRef<HTMLTextAreaElement, TextAreaProps>(({
             }
           });
         }}
-        disabled={disabled}
+        disabled={disabled || readOnly}
         onFocus={(event, editor) => {
           onFocus?.();
         }}

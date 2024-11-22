@@ -61,7 +61,7 @@ const FormattedTextArea: React.FC<FormattedTextAreaProps> = ({
   };
 
   return (
-    <div className="relative flex flex-col w-full">
+    <div className="relative w-full">
       <div className="w-full">
         <TextArea
           id={id}
@@ -90,7 +90,7 @@ const FormattedTextArea: React.FC<FormattedTextAreaProps> = ({
         )}
       </div>
       {isFocused && (
-        <div className="w-full mt-1">
+        <div className="absolute bottom-0 left-0 right-0 px-4">
           <Progress 
             value={progress} 
             className={cn(

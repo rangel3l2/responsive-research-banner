@@ -16,10 +16,10 @@ const BannerInputs = ({
   saveStatus
 }: BannerInputsProps) => {
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-      <div className="space-y-4">
-        <div>
-          <Label htmlFor="authors" className="font-semibold">Autores</Label>
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
+      <div className="space-y-8">
+        <div className="space-y-2">
+          <Label htmlFor="authors" className="font-semibold block">Autores</Label>
           <FormattedTextArea
             id="authors"
             name="authors"
@@ -29,13 +29,13 @@ const BannerInputs = ({
             height="h-24"
             maxLines={3}
             fontSize="text-sm"
-            className={errors.authors ? "bg-red-50" : ""}
+            className={`${errors.authors ? "bg-red-50" : ""} mb-4`}
             saveStatus={saveStatus}
           />
         </div>
 
-        <div>
-          <Label htmlFor="institution" className="font-semibold">Instituição</Label>
+        <div className="space-y-2">
+          <Label htmlFor="institution" className="font-semibold block">Instituição</Label>
           <FormattedTextArea
             id="institution"
             name="institution"
@@ -45,13 +45,13 @@ const BannerInputs = ({
             height="h-20"
             maxLines={2}
             fontSize="text-sm"
-            className={errors.institution ? "bg-red-50" : ""}
+            className={`${errors.institution ? "bg-red-50" : ""} mb-4`}
             saveStatus={saveStatus}
           />
         </div>
 
-        <div>
-          <Label htmlFor="introduction" className="font-semibold">Introdução</Label>
+        <div className="space-y-2">
+          <Label htmlFor="introduction" className="font-semibold block">Introdução</Label>
           <FormattedTextArea
             id="introduction"
             name="introduction"
@@ -61,13 +61,13 @@ const BannerInputs = ({
             height="h-40"
             maxLines={10}
             fontSize="text-sm"
-            className={errors.introduction ? "bg-red-50" : ""}
+            className={`${errors.introduction ? "bg-red-50" : ""} mb-4`}
             saveStatus={saveStatus}
           />
         </div>
 
-        <div>
-          <Label htmlFor="objective" className="font-semibold">Objetivo</Label>
+        <div className="space-y-2">
+          <Label htmlFor="objective" className="font-semibold block">Objetivo</Label>
           <FormattedTextArea
             id="objective"
             name="objective"
@@ -77,13 +77,13 @@ const BannerInputs = ({
             height="h-20"
             maxLines={2}
             fontSize="text-sm"
-            className={errors.objective ? "bg-red-50" : ""}
+            className={`${errors.objective ? "bg-red-50" : ""} mb-4`}
             saveStatus={saveStatus}
           />
         </div>
 
-        <div>
-          <Label htmlFor="methodology" className="font-semibold">Metodologia</Label>
+        <div className="space-y-2">
+          <Label htmlFor="methodology" className="font-semibold block">Metodologia</Label>
           <FormattedTextArea
             id="methodology"
             name="methodology"
@@ -93,15 +93,15 @@ const BannerInputs = ({
             height="h-32"
             maxLines={8}
             fontSize="text-sm"
-            className={errors.methodology ? "bg-red-50" : ""}
+            className={`${errors.methodology ? "bg-red-50" : ""} mb-4`}
             saveStatus={saveStatus}
           />
         </div>
       </div>
 
-      <div className="space-y-4">
-        <div>
-          <Label htmlFor="resultsAndDiscussion" className="font-semibold">Resultados e Discussão</Label>
+      <div className="space-y-8">
+        <div className="space-y-2">
+          <Label htmlFor="resultsAndDiscussion" className="font-semibold block">Resultados e Discussão</Label>
           <FormattedTextArea
             id="resultsAndDiscussion"
             name="resultsAndDiscussion"
@@ -111,21 +111,23 @@ const BannerInputs = ({
             height="h-48"
             maxLines={12}
             fontSize="text-sm"
-            className={errors.resultsAndDiscussion ? "bg-red-50" : ""}
+            className={`${errors.resultsAndDiscussion ? "bg-red-50" : ""} mb-4`}
             saveStatus={saveStatus}
           />
-          <ImageUpload
-            handleImageUpload={handleImageUpload}
-            imageUrls={imageUrls}
-            maxImages={2}
-            imageCaptions={imageCaptions}
-            onCaptionChange={onCaptionChange}
-            onImageInsert={onImageInsert}
-          />
+          <div className="mt-6">
+            <ImageUpload
+              handleImageUpload={handleImageUpload}
+              imageUrls={imageUrls}
+              maxImages={2}
+              imageCaptions={imageCaptions}
+              onCaptionChange={onCaptionChange}
+              onImageInsert={onImageInsert}
+            />
+          </div>
         </div>
 
-        <div>
-          <Label htmlFor="conclusion" className="font-semibold">Conclusão</Label>
+        <div className="space-y-2">
+          <Label htmlFor="conclusion" className="font-semibold block">Conclusão</Label>
           <FormattedTextArea
             id="conclusion"
             name="conclusion"
@@ -135,13 +137,13 @@ const BannerInputs = ({
             height="h-32"
             maxLines={8}
             fontSize="text-sm"
-            className={errors.conclusion ? "bg-red-50" : ""}
+            className={`${errors.conclusion ? "bg-red-50" : ""} mb-4`}
             saveStatus={saveStatus}
           />
         </div>
 
-        <div>
-          <Label htmlFor="references" className="font-semibold">Referências</Label>
+        <div className="space-y-2">
+          <Label htmlFor="references" className="font-semibold block">Referências</Label>
           <FormattedTextArea
             id="references"
             name="references"
@@ -151,7 +153,7 @@ const BannerInputs = ({
             height="h-24"
             maxLines={6}
             fontSize="text-sm"
-            className={errors.references ? "bg-red-50" : ""}
+            className={`${errors.references ? "bg-red-50" : ""} mb-4`}
             saveStatus={saveStatus}
           />
         </div>

@@ -52,8 +52,8 @@ const FormattedTextArea: React.FC<FormattedTextAreaProps> = ({
   };
 
   return (
-    <div className="space-y-1">
-      <div className="relative">
+    <div className="relative flex flex-col w-full">
+      <div className="w-full">
         <TextArea
           id={id}
           name={name}
@@ -78,7 +78,7 @@ const FormattedTextArea: React.FC<FormattedTextAreaProps> = ({
           </div>
         )}
       </div>
-      <div className="mt-1">
+      <div className="w-full mt-1">
         <Progress 
           value={progress} 
           className={cn(

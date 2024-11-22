@@ -1,9 +1,10 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import TextArea from './formatting/TextArea';
 import { FormattedTextAreaProps } from './formatting/types';
 import { Check, X } from 'lucide-react';
 import { useToast } from "@/hooks/use-toast";
 import { MAX_CHARS_PER_PAGE } from '@/utils/docxStyles';
+import { Progress } from "@/components/ui/progress";
 
 const FormattedTextArea: React.FC<FormattedTextAreaProps> = ({
   id,
@@ -18,6 +19,22 @@ const FormattedTextArea: React.FC<FormattedTextAreaProps> = ({
   saveStatus,
 }) => {
   const { toast } = useToast();
+  const [isFocused, setIsFocused] = useState(false);
+  const [progress, setProgress] = useState(0);
+
+  const getProgressColor = (progress: number) => {
+    if (progress < 60) return "bg-green-500";
+    if (progress < 80) return "bg-yellow-500";
+    return "bg-red-500";
+  };
+
+  useEffect(() => {
+    const plainText = value.replace(/<[^>]*>/g, '');
+    const maxLength = name === 'resultsAndDiscussion' ? MAX_CHARS_PER_PAGE : 
+      maxLines ? maxLines * 80 : MAX_CHARS_PER_PAGE; // Assuming average of 80 chars per line
+    const currentProgress = (plainText.length / maxLength) * 100;
+    setProgress(Math.min(currentProgress, 100));
+  }, [value, name, maxLines]);
 
   const handleChange = (e: any) => {
     const plainText = e.target.value.replace(/<[^>]*>/g, '');
@@ -34,6 +51,9 @@ const FormattedTextArea: React.FC<FormattedTextAreaProps> = ({
     onChange(e);
   };
 
+  const handleFocus = () => setIsFocused(true);
+  const handleBlur = () => setIsFocused(false);
+
   return (
     <div className="space-y-1">
       <div className="relative">
@@ -48,6 +68,8 @@ const FormattedTextArea: React.FC<FormattedTextAreaProps> = ({
           fontSize={fontSize}
           className={className}
           disabled={name === 'resultsAndDiscussion' && value.replace(/<[^>]*>/g, '').length >= MAX_CHARS_PER_PAGE}
+          onFocus={handleFocus}
+          onBlur={handleBlur}
         />
         {saveStatus && (
           <div className="absolute right-2 bottom-2 flex items-center">
@@ -61,6 +83,15 @@ const FormattedTextArea: React.FC<FormattedTextAreaProps> = ({
           </div>
         )}
       </div>
+      {isFocused && (
+        <div className="mt-1">
+          <Progress 
+            value={progress} 
+            className="h-2 transition-all"
+            indicatorClassName={`${getProgressColor(progress)} transition-colors duration-300`}
+          />
+        </div>
+      )}
     </div>
   );
 };

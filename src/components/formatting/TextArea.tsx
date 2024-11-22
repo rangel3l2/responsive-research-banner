@@ -15,6 +15,8 @@ interface TextAreaProps {
   className?: string;
   style?: React.CSSProperties;
   disabled?: boolean;
+  onFocus?: () => void;
+  onBlur?: () => void;
 }
 
 const TextArea = forwardRef<HTMLTextAreaElement, TextAreaProps>(({
@@ -26,7 +28,9 @@ const TextArea = forwardRef<HTMLTextAreaElement, TextAreaProps>(({
   height,
   className = "",
   style,
-  disabled
+  disabled,
+  onFocus,
+  onBlur
 }, ref) => {
   return (
     <div 
@@ -53,6 +57,12 @@ const TextArea = forwardRef<HTMLTextAreaElement, TextAreaProps>(({
           });
         }}
         disabled={disabled}
+        onFocus={(event, editor) => {
+          onFocus?.();
+        }}
+        onBlur={(event, editor) => {
+          onBlur?.();
+        }}
       />
     </div>
   );

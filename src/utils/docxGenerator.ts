@@ -42,7 +42,7 @@ const createSectionTitle = (title: string): Paragraph => {
 export const generateBannerDocx = async (formData: BannerFormData) => {
   try {
     const resultsText = formData.resultsAndDiscussion;
-    const approximateMiddle = Math.ceil(MAX_CHARS_PER_PAGE / 2);
+    const approximateMiddle = Math.ceil(resultsText.length * 0.4); // Adjust to 40% for first column
     const [firstHalf, secondHalf] = splitTextAtWordBoundary(resultsText, approximateMiddle);
 
     const logoHeader = await createLogoHeader(formData.logo, '/escola-estadual-logo.png');

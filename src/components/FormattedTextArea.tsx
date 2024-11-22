@@ -1,7 +1,9 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import TextArea from './formatting/TextArea';
 import { FormattedTextAreaProps } from './formatting/types';
 import { Check, X } from 'lucide-react';
+import { useToast } from "@/hooks/use-toast";
+import { MAX_CHARS_PER_PAGE } from '@/utils/docxStyles';
 
 const FormattedTextArea: React.FC<FormattedTextAreaProps> = ({
   id,
@@ -15,6 +17,23 @@ const FormattedTextArea: React.FC<FormattedTextAreaProps> = ({
   className = "",
   saveStatus,
 }) => {
+  const { toast } = useToast();
+
+  const handleChange = (e: any) => {
+    const plainText = e.target.value.replace(/<[^>]*>/g, '');
+    
+    if (name === 'resultsAndDiscussion' && plainText.length > MAX_CHARS_PER_PAGE) {
+      toast({
+        title: "Limite de conteúdo atingido",
+        description: "O conteúdo excede o tamanho máximo permitido para uma página.",
+        variant: "destructive",
+      });
+      return;
+    }
+    
+    onChange(e);
+  };
+
   return (
     <div className="space-y-1">
       <div className="relative">
@@ -23,11 +42,12 @@ const FormattedTextArea: React.FC<FormattedTextAreaProps> = ({
           name={name}
           placeholder={placeholder}
           value={value}
-          onChange={onChange}
+          onChange={handleChange}
           height={height}
           maxLines={maxLines}
           fontSize={fontSize}
           className={className}
+          disabled={name === 'resultsAndDiscussion' && value.replace(/<[^>]*>/g, '').length >= MAX_CHARS_PER_PAGE}
         />
         {saveStatus && (
           <div className="absolute right-2 bottom-2 flex items-center">

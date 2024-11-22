@@ -20,7 +20,8 @@ import {
   PAGE_MARGINS,
   PARAGRAPH_SPACING,
   DEFAULT_FONT,
-  DEFAULT_FONT_SIZE
+  DEFAULT_FONT_SIZE,
+  MAX_CHARS_PER_PAGE
 } from './docxStyles';
 import { parseFormattedText } from './docxTextParser';
 
@@ -41,7 +42,7 @@ const createSectionTitle = (title: string): Paragraph => {
 export const generateBannerDocx = async (formData: BannerFormData) => {
   try {
     const resultsText = formData.resultsAndDiscussion;
-    const approximateMiddle = Math.ceil(resultsText.length / 2);
+    const approximateMiddle = Math.ceil(MAX_CHARS_PER_PAGE / 2);
     const [firstHalf, secondHalf] = splitTextAtWordBoundary(resultsText, approximateMiddle);
 
     const logoHeader = await createLogoHeader(formData.logo, '/escola-estadual-logo.png');
@@ -99,6 +100,12 @@ export const generateBannerDocx = async (formData: BannerFormData) => {
                         spacing: PARAGRAPH_SPACING,
                         alignment: AlignmentType.JUSTIFIED,
                       }),
+                      createSectionTitle("Resultados e Discussão"),
+                      new Paragraph({
+                        children: parseFormattedText(firstHalf),
+                        spacing: PARAGRAPH_SPACING,
+                        alignment: AlignmentType.JUSTIFIED,
+                      }),
                     ],
                     width: {
                       size: 4500,
@@ -109,12 +116,6 @@ export const generateBannerDocx = async (formData: BannerFormData) => {
                   }),
                   new TableCell({
                     children: [
-                      createSectionTitle("Resultados e Discussão"),
-                      new Paragraph({
-                        children: parseFormattedText(firstHalf),
-                        spacing: PARAGRAPH_SPACING,
-                        alignment: AlignmentType.JUSTIFIED,
-                      }),
                       new Paragraph({
                         children: parseFormattedText(secondHalf),
                         spacing: PARAGRAPH_SPACING,

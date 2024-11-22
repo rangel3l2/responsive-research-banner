@@ -34,18 +34,20 @@ const FormattedTextArea: React.FC<FormattedTextAreaProps> = ({
     return maxLines * 80; // Aproximadamente 80 caracteres por linha
   };
 
+  const plainText = value.replace(/<[^>]*>/g, '');
+  const isDisabled = plainText.length >= getMaxLength();
+
   useEffect(() => {
-    const plainText = value.replace(/<[^>]*>/g, '');
     const maxLength = getMaxLength();
     const currentProgress = (plainText.length / maxLength) * 100;
     setProgress(Math.min(currentProgress, 100));
-  }, [value, name, maxLines]);
+  }, [value, name, maxLines, plainText]);
 
   const handleChange = (e: any) => {
-    const plainText = e.target.value.replace(/<[^>]*>/g, '');
+    const newPlainText = e.target.value.replace(/<[^>]*>/g, '');
     const maxLength = getMaxLength();
     
-    if (plainText.length > maxLength) {
+    if (newPlainText.length > maxLength) {
       toast({
         title: "Limite de conteúdo atingido",
         description: `O conteúdo excede o tamanho máximo permitido de ${maxLines} linhas.`,
@@ -78,7 +80,7 @@ const FormattedTextArea: React.FC<FormattedTextAreaProps> = ({
           maxLines={maxLines}
           fontSize={fontSize}
           className={className}
-          disabled={plainText => plainText.length >= getMaxLength()}
+          disabled={isDisabled}
           onFocus={handleFocus}
           onBlur={handleBlur}
         />

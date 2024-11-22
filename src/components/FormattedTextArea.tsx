@@ -29,21 +29,26 @@ const FormattedTextArea: React.FC<FormattedTextAreaProps> = ({
     return "bg-red-500";
   };
 
+  const getMaxLength = () => {
+    if (name === 'resultsAndDiscussion') return MAX_CHARS_PER_PAGE;
+    return maxLines * 80; // Aproximadamente 80 caracteres por linha
+  };
+
   useEffect(() => {
     const plainText = value.replace(/<[^>]*>/g, '');
-    const maxLength = name === 'resultsAndDiscussion' ? MAX_CHARS_PER_PAGE : 
-      maxLines ? maxLines * 80 : MAX_CHARS_PER_PAGE;
+    const maxLength = getMaxLength();
     const currentProgress = (plainText.length / maxLength) * 100;
     setProgress(Math.min(currentProgress, 100));
   }, [value, name, maxLines]);
 
   const handleChange = (e: any) => {
     const plainText = e.target.value.replace(/<[^>]*>/g, '');
+    const maxLength = getMaxLength();
     
-    if (name === 'resultsAndDiscussion' && plainText.length > MAX_CHARS_PER_PAGE) {
+    if (plainText.length > maxLength) {
       toast({
         title: "Limite de conteúdo atingido",
-        description: "O conteúdo excede o tamanho máximo permitido para uma página.",
+        description: `O conteúdo excede o tamanho máximo permitido de ${maxLines} linhas.`,
         variant: "destructive",
       });
       return;
@@ -73,7 +78,7 @@ const FormattedTextArea: React.FC<FormattedTextAreaProps> = ({
           maxLines={maxLines}
           fontSize={fontSize}
           className={className}
-          disabled={name === 'resultsAndDiscussion' && value.replace(/<[^>]*>/g, '').length >= MAX_CHARS_PER_PAGE}
+          disabled={plainText => plainText.length >= getMaxLength()}
           onFocus={handleFocus}
           onBlur={handleBlur}
         />

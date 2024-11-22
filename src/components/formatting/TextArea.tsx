@@ -40,7 +40,6 @@ const TextArea = forwardRef<HTMLTextAreaElement, TextAreaProps>(({
         config={{
           placeholder: placeholder,
           toolbar: ['bold', 'italic', 'underline', 'bulletedList', 'numberedList', '|', 'undo', 'redo'],
-          height: height,
         }}
         onChange={(event, editor) => {
           const data = editor.getData();

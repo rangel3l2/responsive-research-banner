@@ -90,7 +90,7 @@ const FormattedTextArea: React.FC<FormattedTextAreaProps> = ({
         )}
       </div>
       {isFocused && (
-        <div className="absolute bottom-0 left-0 right-0 px-4">
+        <div className="absolute -bottom-2 left-0 right-0 px-4">
           <Progress 
             value={progress} 
             className={cn(

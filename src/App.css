@@ -40,3 +40,16 @@
 .read-the-docs {
   color: #888;
 }
+
+.ck-editor__editable {
+  min-height: 150px !important;
+}
+
+.ck-editor__editable_inline {
+  padding: 0 1rem !important;
+}
+
+.ck.ck-editor__editable > .ck-placeholder::before {
+  color: #6b7280;
+  font-size: 0.875rem;
+}

@@ -1,12 +1,14 @@
-import React, { ChangeEvent, KeyboardEvent, forwardRef } from 'react';
+import React, { forwardRef } from 'react';
+import { CKEditor } from '@ckeditor/ckeditor5-react';
+import ClassicEditor from '@ckeditor/ckeditor5-build-classic';
 
 interface TextAreaProps {
   id: string;
   name: string;
   placeholder: string;
   value: string;
-  onChange: (e: ChangeEvent<HTMLTextAreaElement>) => void;
-  onKeyDown: (e: KeyboardEvent<HTMLTextAreaElement>) => void;
+  onChange: (e: any) => void;
+  onKeyDown?: (e: any) => void;
   height: string;
   maxLines: number;
   fontSize: string;
@@ -20,30 +22,37 @@ const TextArea = forwardRef<HTMLTextAreaElement, TextAreaProps>(({
   placeholder,
   value,
   onChange,
-  onKeyDown,
   height,
-  maxLines,
-  fontSize,
   className = "",
   style
 }, ref) => {
   return (
-    <textarea
-      ref={ref}
-      id={id}
-      name={name}
-      placeholder={placeholder}
-      value={value}
-      onChange={onChange}
-      onKeyDown={onKeyDown}
-      className={`w-full resize-none border rounded-md p-2 placeholder:text-gray-500 placeholder:text-sm ${height} ${fontSize} ${className}`}
+    <div 
+      className={`w-full ${height} ${className}`}
       style={{
         ...style,
-        lineHeight: '1.5',
-        maxHeight: `${maxLines * 1.5}em`,
-        minHeight: `${Math.min(4, maxLines) * 1.5}em`,
+        minHeight: '150px'
       }}
-    />
+    >
+      <CKEditor
+        editor={ClassicEditor}
+        data={value}
+        config={{
+          placeholder: placeholder,
+          toolbar: ['bold', 'italic', 'underline', 'bulletedList', 'numberedList', '|', 'undo', 'redo'],
+          height: height,
+        }}
+        onChange={(event, editor) => {
+          const data = editor.getData();
+          onChange({
+            target: {
+              name: name,
+              value: data
+            }
+          });
+        }}
+      />
+    </div>
   );
 });
 

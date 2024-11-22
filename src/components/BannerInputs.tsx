@@ -17,39 +17,7 @@ const BannerInputs = ({
 }: BannerInputsProps) => {
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
-      <div className="space-y-8">
-        <div className="space-y-2">
-          <Label htmlFor="authors" className="font-semibold block">Autores</Label>
-          <FormattedTextArea
-            id="authors"
-            name="authors"
-            placeholder="Liste os autores principais (2-3 linhas). Ex: João Silva¹, Maria Souza², Carlos Oliveira³"
-            value={formData.authors}
-            onChange={handleInputChange}
-            height="h-24"
-            maxLines={3}
-            fontSize="text-sm"
-            className={`${errors.authors ? "bg-red-50" : ""} mb-4`}
-            saveStatus={saveStatus}
-          />
-        </div>
-
-        <div className="space-y-2">
-          <Label htmlFor="institution" className="font-semibold block">Instituição</Label>
-          <FormattedTextArea
-            id="institution"
-            name="institution"
-            placeholder="Nome da instituição e e-mail de contato (opcional) - 2 linhas máximo"
-            value={formData.institution}
-            onChange={handleInputChange}
-            height="h-20"
-            maxLines={2}
-            fontSize="text-sm"
-            className={`${errors.institution ? "bg-red-50" : ""} mb-4`}
-            saveStatus={saveStatus}
-          />
-        </div>
-
+      <div className="space-y-8 flex flex-col">
         <div className="space-y-2">
           <Label htmlFor="introduction" className="font-semibold block">Introdução</Label>
           <FormattedTextArea
@@ -99,7 +67,7 @@ const BannerInputs = ({
         </div>
       </div>
 
-      <div className="space-y-8">
+      <div className="space-y-8 flex flex-col">
         <div className="space-y-2">
           <Label htmlFor="resultsAndDiscussion" className="font-semibold block">Resultados e Discussão</Label>
           <FormattedTextArea
@@ -114,7 +82,7 @@ const BannerInputs = ({
             className={`${errors.resultsAndDiscussion ? "bg-red-50" : ""} mb-4`}
             saveStatus={saveStatus}
           />
-          <div className="mt-6">
+          <div className="mt-4">
             <ImageUpload
               handleImageUpload={handleImageUpload}
               imageUrls={imageUrls}

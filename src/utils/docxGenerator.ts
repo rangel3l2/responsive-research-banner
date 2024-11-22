@@ -65,22 +65,32 @@ export const generateBannerDocx = async (formData: BannerFormData) => {
                   new TableCell({
                     children: [
                       new Paragraph({
-                        children: parseFormattedText(formData.introduction),
+                        text: "Introdução",
+                        bold: true,
                         spacing: { before: 0, after: 100 },
+                      }),
+                      new Paragraph({
+                        children: parseFormattedText(formData.introduction),
+                        spacing: { before: 0, after: 200 },
                         alignment: AlignmentType.JUSTIFIED,
+                      }),
+                      new Paragraph({
+                        text: "Objetivo",
+                        bold: true,
+                        spacing: { before: 0, after: 100 },
                       }),
                       new Paragraph({
                         children: parseFormattedText(formData.objective),
-                        spacing: { before: 0, after: 100 },
+                        spacing: { before: 0, after: 200 },
                         alignment: AlignmentType.JUSTIFIED,
+                      }),
+                      new Paragraph({
+                        text: "Metodologia",
+                        bold: true,
+                        spacing: { before: 0, after: 100 },
                       }),
                       new Paragraph({
                         children: parseFormattedText(formData.methodology),
-                        spacing: { before: 0, after: 100 },
-                        alignment: AlignmentType.JUSTIFIED,
-                      }),
-                      new Paragraph({
-                        children: parseFormattedText(firstHalf),
                         spacing: { before: 0, after: 200 },
                         alignment: AlignmentType.JUSTIFIED,
                       }),
@@ -95,11 +105,26 @@ export const generateBannerDocx = async (formData: BannerFormData) => {
                   new TableCell({
                     children: [
                       new Paragraph({
+                        text: "Resultados e Discussão",
+                        bold: true,
+                        spacing: { before: 0, after: 100 },
+                      }),
+                      new Paragraph({
+                        children: parseFormattedText(firstHalf),
+                        spacing: { before: 0, after: 200 },
+                        alignment: AlignmentType.JUSTIFIED,
+                      }),
+                      new Paragraph({
                         children: parseFormattedText(secondHalf),
                         spacing: { before: 0, after: 200 },
                         alignment: AlignmentType.JUSTIFIED,
                       }),
                       ...await createImageParagraphs(formData.images, formData.imageCaptions),
+                      new Paragraph({
+                        text: "Conclusão",
+                        bold: true,
+                        spacing: { before: 0, after: 100 },
+                      }),
                       new Paragraph({
                         children: parseFormattedText(formData.conclusion),
                         spacing: { before: 0, after: 200 },

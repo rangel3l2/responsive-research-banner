@@ -48,7 +48,7 @@ export const useBannerForm = () => {
     handleCaptionChange,
     handleLogoUpload,
     handleImageInsert,
-  } = useImageHandling(setFormData, setImageUrls);
+  } = useImageHandling(formData, setFormData, setImageUrls);
 
   const handleSave = useCallback(() => {
     if (!Object.values(formData).some(value => value !== '' && value !== null && (!Array.isArray(value) || value.length > 0))) {

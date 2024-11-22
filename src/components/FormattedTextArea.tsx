@@ -21,6 +21,7 @@ const FormattedTextArea: React.FC<FormattedTextAreaProps> = ({
 }) => {
   const { toast } = useToast();
   const [progress, setProgress] = useState(0);
+  const [isFocused, setIsFocused] = useState(false);
 
   const getProgressColor = (progress: number) => {
     if (progress < 60) return "bg-green-500";
@@ -31,7 +32,7 @@ const FormattedTextArea: React.FC<FormattedTextAreaProps> = ({
   useEffect(() => {
     const plainText = value.replace(/<[^>]*>/g, '');
     const maxLength = name === 'resultsAndDiscussion' ? MAX_CHARS_PER_PAGE : 
-      maxLines ? maxLines * 80 : MAX_CHARS_PER_PAGE; // Assuming average of 80 chars per line
+      maxLines ? maxLines * 80 : MAX_CHARS_PER_PAGE;
     const currentProgress = (plainText.length / maxLength) * 100;
     setProgress(Math.min(currentProgress, 100));
   }, [value, name, maxLines]);
@@ -51,6 +52,14 @@ const FormattedTextArea: React.FC<FormattedTextAreaProps> = ({
     onChange(e);
   };
 
+  const handleFocus = () => {
+    setIsFocused(true);
+  };
+
+  const handleBlur = () => {
+    setIsFocused(false);
+  };
+
   return (
     <div className="relative flex flex-col w-full">
       <div className="w-full">
@@ -65,6 +74,8 @@ const FormattedTextArea: React.FC<FormattedTextAreaProps> = ({
           fontSize={fontSize}
           className={className}
           disabled={name === 'resultsAndDiscussion' && value.replace(/<[^>]*>/g, '').length >= MAX_CHARS_PER_PAGE}
+          onFocus={handleFocus}
+          onBlur={handleBlur}
         />
         {saveStatus && (
           <div className="absolute right-2 bottom-2 flex items-center">
@@ -78,15 +89,17 @@ const FormattedTextArea: React.FC<FormattedTextAreaProps> = ({
           </div>
         )}
       </div>
-      <div className="w-full mt-1">
-        <Progress 
-          value={progress} 
-          className={cn(
-            "h-2 transition-all",
-            getProgressColor(progress)
-          )}
-        />
-      </div>
+      {isFocused && (
+        <div className="w-full mt-1">
+          <Progress 
+            value={progress} 
+            className={cn(
+              "h-2 transition-all",
+              getProgressColor(progress)
+            )}
+          />
+        </div>
+      )}
     </div>
   );
 };

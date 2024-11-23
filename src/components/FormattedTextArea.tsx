@@ -74,15 +74,9 @@ const FormattedTextArea: React.FC<FormattedTextAreaProps> = ({
   };
 
   return (
-    <Card className="w-full" style={{ 
-      width: 'auto',
-      height: 'auto',
-      display: 'block',
-      maxWidth: '100%',
-      overflow: 'hidden'
-    }}>
-      <CardContent className="p-4">
-        <ScrollArea className="relative w-full" style={{ maxHeight: height }}>
+    <Card className="w-full border border-gray-200 rounded-md shadow-sm">
+      <CardContent className="p-0">
+        <ScrollArea className="relative w-full rounded-md" style={{ maxHeight: height }}>
           <TextArea
             id={id}
             name={name}
@@ -97,13 +91,16 @@ const FormattedTextArea: React.FC<FormattedTextAreaProps> = ({
             readOnly={isDisabled}
             style={{
               width: '100%',
-              maxWidth: 'calc(100% - 32px)',
-              overflow: 'visible',
+              maxWidth: '100%',
+              overflow: 'hidden',
               wordWrap: 'break-word',
               whiteSpace: 'pre-wrap',
               lineHeight: '1.5',
-              padding: '0.75rem',
-              marginRight: '32px'
+              padding: '0.75rem 1rem',
+              border: 'none',
+              outline: 'none',
+              resize: 'none',
+              backgroundColor: 'transparent'
             }}
           />
           {saveStatus && (
@@ -119,7 +116,7 @@ const FormattedTextArea: React.FC<FormattedTextAreaProps> = ({
           )}
         </ScrollArea>
         {isTyping && (
-          <div className="w-full mt-2">
+          <div className="w-full px-4 pb-2">
             <Progress 
               value={progress} 
               className={cn(

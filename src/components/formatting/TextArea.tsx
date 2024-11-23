@@ -48,6 +48,19 @@ const TextArea = forwardRef<HTMLTextAreaElement, TextAreaProps>(({
         config={{
           placeholder: placeholder,
           toolbar: ['bold', 'italic', 'bulletedList', 'numberedList', '|', 'undo', 'redo'],
+          removePlugins: ['MediaEmbed', 'Table'],
+          fontSize: {
+            options: [
+              'default',
+              9,
+              11,
+              13,
+              'default',
+              17,
+              19,
+              21
+            ]
+          }
         }}
         onChange={(event, editor) => {
           const data = editor.getData();

@@ -73,7 +73,13 @@ const FormattedTextArea: React.FC<FormattedTextAreaProps> = ({
   };
 
   return (
-    <Card className="w-full">
+    <Card className="w-full" style={{ 
+      width: 'auto',
+      height: 'auto',
+      display: 'block',
+      maxWidth: '100%',
+      overflow: 'hidden'
+    }}>
       <CardContent className="p-4">
         <div className="relative w-full">
           <TextArea
@@ -85,9 +91,14 @@ const FormattedTextArea: React.FC<FormattedTextAreaProps> = ({
             height={height}
             maxLines={maxLines}
             fontSize={fontSize}
-            className={className}
+            className={`${className} max-w-full`}
             disabled={isDisabled}
             readOnly={isDisabled}
+            style={{
+              width: '100%',
+              maxWidth: '100%',
+              overflow: 'auto'
+            }}
           />
           {saveStatus && (
             <div className="absolute right-2 bottom-2 flex items-center">

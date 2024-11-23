@@ -18,6 +18,7 @@ const getInitialFormData = (): BannerFormData => ({
   resultsAndDiscussion: '',
   conclusion: '',
   references: '',
+  acknowledgments: '',
   images: [],
   imageCaptions: [],
 });

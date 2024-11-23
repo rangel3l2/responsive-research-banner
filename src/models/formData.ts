@@ -1,5 +1,3 @@
-import { SaveStatus } from '@/hooks/banner/types';
-
 export interface BannerFormData {
   title: string;
   authors: string;
@@ -11,6 +9,7 @@ export interface BannerFormData {
   resultsAndDiscussion: string;
   conclusion: string;
   references: string;
+  acknowledgments?: string;
   images: File[];
   imageCaptions: string[];
   logo?: File;

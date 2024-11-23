@@ -110,6 +110,25 @@ const BannerInputs = ({
           />
         </div>
 
+        {/* Optional Acknowledgments section - only shows if it has content */}
+        {(formData.acknowledgments || '').trim() !== '' && (
+          <div className="space-y-2 flex-grow">
+            <Label htmlFor="acknowledgments" className="font-semibold block">Agradecimentos</Label>
+            <FormattedTextArea
+              id="acknowledgments"
+              name="acknowledgments"
+              placeholder="Adicione seus agradecimentos (máximo 5 linhas)"
+              value={formData.acknowledgments || ''}
+              onChange={handleInputChange}
+              height="h-24"
+              maxLines={5}
+              fontSize="text-sm"
+              className={`${errors.acknowledgments ? "bg-red-50" : ""} mb-4`}
+              saveStatus={saveStatus}
+            />
+          </div>
+        )}
+
         <div className="space-y-2 flex-grow">
           <Label htmlFor="references" className="font-semibold block">Referências</Label>
           <FormattedTextArea

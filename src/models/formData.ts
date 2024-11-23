@@ -1,3 +1,5 @@
+import { SaveStatus } from '@/hooks/banner/types';
+
 export interface BannerFormData {
   title: string;
   authors: string;

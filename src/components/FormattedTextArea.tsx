@@ -103,7 +103,7 @@ const FormattedTextArea: React.FC<FormattedTextAreaProps> = ({
         )}
       </div>
       {isTyping && (
-        <div className="absolute -bottom-6 left-0 right-0">
+        <div className="w-full mt-2">
           <Progress 
             value={progress} 
             className={cn(

@@ -6,6 +6,7 @@ import { useToast } from "@/hooks/use-toast";
 import { MAX_CHARS_PER_PAGE } from '@/utils/docxStyles';
 import { Progress } from "@/components/ui/progress";
 import { cn } from "@/lib/utils";
+import { Card, CardContent } from "@/components/ui/card";
 
 const FormattedTextArea: React.FC<FormattedTextAreaProps> = ({
   id,
@@ -59,13 +60,10 @@ const FormattedTextArea: React.FC<FormattedTextAreaProps> = ({
       return;
     }
     
-    // Reset typing timeout
     if (typingTimeout) clearTimeout(typingTimeout);
     
-    // Show progress bar
     setIsTyping(true);
     
-    // Set new timeout to hide progress bar after 1.5 seconds of no typing
     const newTimeout = setTimeout(() => {
       setIsTyping(false);
     }, 1500);
@@ -75,48 +73,50 @@ const FormattedTextArea: React.FC<FormattedTextAreaProps> = ({
   };
 
   return (
-    <div className="relative w-full space-y-1">
-      <div className="w-full">
-        <TextArea
-          id={id}
-          name={name}
-          placeholder={placeholder}
-          value={value}
-          onChange={handleChange}
-          height={height}
-          maxLines={maxLines}
-          fontSize={fontSize}
-          className={className}
-          disabled={isDisabled}
-          readOnly={isDisabled}
-        />
-        {saveStatus && (
-          <div className="absolute right-2 bottom-2 flex items-center">
-            {saveStatus.isSaving ? (
-              <div className="w-4 h-4 rounded-full border-2 border-gray-300 border-t-transparent animate-spin" />
-            ) : saveStatus.isError ? (
-              <X className="w-4 h-4 text-red-500" />
-            ) : (
-              <Check className={`w-4 h-4 ${saveStatus.lastSaved ? 'text-green-500' : 'text-gray-300'}`} />
-            )}
+    <Card className="w-full">
+      <CardContent className="p-4">
+        <div className="relative w-full">
+          <TextArea
+            id={id}
+            name={name}
+            placeholder={placeholder}
+            value={value}
+            onChange={handleChange}
+            height={height}
+            maxLines={maxLines}
+            fontSize={fontSize}
+            className={className}
+            disabled={isDisabled}
+            readOnly={isDisabled}
+          />
+          {saveStatus && (
+            <div className="absolute right-2 bottom-2 flex items-center">
+              {saveStatus.isSaving ? (
+                <div className="w-4 h-4 rounded-full border-2 border-gray-300 border-t-transparent animate-spin" />
+              ) : saveStatus.isError ? (
+                <X className="w-4 h-4 text-red-500" />
+              ) : (
+                <Check className={`w-4 h-4 ${saveStatus.lastSaved ? 'text-green-500' : 'text-gray-300'}`} />
+              )}
+            </div>
+          )}
+        </div>
+        {isTyping && (
+          <div className="w-full mt-2">
+            <Progress 
+              value={progress} 
+              className={cn(
+                "h-1.5 transition-all",
+                getProgressColor(progress)
+              )}
+            />
+            <div className="text-xs text-gray-500 text-right mt-1">
+              {plainText.length}/{getMaxLength()} caracteres
+            </div>
           </div>
         )}
-      </div>
-      {isTyping && (
-        <div className="w-full mt-2">
-          <Progress 
-            value={progress} 
-            className={cn(
-              "h-1.5 transition-all",
-              getProgressColor(progress)
-            )}
-          />
-          <div className="text-xs text-gray-500 text-right mt-1">
-            {plainText.length}/{getMaxLength()} caracteres
-          </div>
-        </div>
-      )}
-    </div>
+      </CardContent>
+    </Card>
   );
 };
 

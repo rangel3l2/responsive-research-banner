@@ -92,17 +92,18 @@ const FormattedTextArea: React.FC<FormattedTextAreaProps> = ({
             height={height}
             maxLines={maxLines}
             fontSize={fontSize}
-            className={`${className} max-w-full pr-6`}
+            className={`${className} w-full`}
             disabled={isDisabled}
             readOnly={isDisabled}
             style={{
-              width: 'calc(100% - 24px)',
-              maxWidth: 'calc(100% - 24px)',
+              width: '100%',
+              maxWidth: 'calc(100% - 32px)',
               overflow: 'visible',
               wordWrap: 'break-word',
               whiteSpace: 'pre-wrap',
               lineHeight: '1.5',
-              padding: '0.5rem'
+              padding: '0.75rem',
+              marginRight: '32px'
             }}
           />
           {saveStatus && (

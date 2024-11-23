@@ -21,6 +21,8 @@ const FormattedTextArea: React.FC<FormattedTextAreaProps> = ({
 }) => {
   const { toast } = useToast();
   const [progress, setProgress] = useState(0);
+  const [isTyping, setIsTyping] = useState(false);
+  const [typingTimeout, setTypingTimeout] = useState<NodeJS.Timeout | null>(null);
 
   const getProgressColor = (progress: number) => {
     if (progress < 30) return "bg-gray-300";
@@ -32,7 +34,7 @@ const FormattedTextArea: React.FC<FormattedTextAreaProps> = ({
 
   const getMaxLength = () => {
     if (name === 'resultsAndDiscussion') return MAX_CHARS_PER_PAGE;
-    return maxLines * 80; // Aproximadamente 80 caracteres por linha
+    return maxLines * 80;
   };
 
   const plainText = value.replace(/<[^>]*>/g, '');
@@ -57,6 +59,18 @@ const FormattedTextArea: React.FC<FormattedTextAreaProps> = ({
       return;
     }
     
+    // Reset typing timeout
+    if (typingTimeout) clearTimeout(typingTimeout);
+    
+    // Show progress bar
+    setIsTyping(true);
+    
+    // Set new timeout to hide progress bar after 1.5 seconds of no typing
+    const newTimeout = setTimeout(() => {
+      setIsTyping(false);
+    }, 1500);
+    
+    setTypingTimeout(newTimeout);
     onChange(e);
   };
 
@@ -88,16 +102,20 @@ const FormattedTextArea: React.FC<FormattedTextAreaProps> = ({
           </div>
         )}
       </div>
-      <Progress 
-        value={progress} 
-        className={cn(
-          "h-1.5 transition-all",
-          getProgressColor(progress)
-        )}
-      />
-      <div className="text-xs text-gray-500 text-right">
-        {plainText.length}/{getMaxLength()} caracteres
-      </div>
+      {isTyping && (
+        <div className="absolute -bottom-6 left-0 right-0">
+          <Progress 
+            value={progress} 
+            className={cn(
+              "h-1.5 transition-all",
+              getProgressColor(progress)
+            )}
+          />
+          <div className="text-xs text-gray-500 text-right mt-1">
+            {plainText.length}/{getMaxLength()} caracteres
+          </div>
+        </div>
+      )}
     </div>
   );
 };

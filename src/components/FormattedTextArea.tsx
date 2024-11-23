@@ -21,12 +21,13 @@ const FormattedTextArea: React.FC<FormattedTextAreaProps> = ({
 }) => {
   const { toast } = useToast();
   const [progress, setProgress] = useState(0);
-  const [isFocused, setIsFocused] = useState(false);
 
   const getProgressColor = (progress: number) => {
-    if (progress < 60) return "bg-green-500";
-    if (progress < 80) return "bg-yellow-500";
-    return "bg-red-500";
+    if (progress < 30) return "bg-gray-300";
+    if (progress < 60) return "bg-gray-400";
+    if (progress < 80) return "bg-gray-500";
+    if (progress < 90) return "bg-gray-600";
+    return "bg-gray-700";
   };
 
   const getMaxLength = () => {
@@ -59,16 +60,8 @@ const FormattedTextArea: React.FC<FormattedTextAreaProps> = ({
     onChange(e);
   };
 
-  const handleFocus = () => {
-    setIsFocused(true);
-  };
-
-  const handleBlur = () => {
-    setIsFocused(false);
-  };
-
   return (
-    <div className="relative w-full">
+    <div className="relative w-full space-y-1">
       <div className="w-full">
         <TextArea
           id={id}
@@ -81,8 +74,6 @@ const FormattedTextArea: React.FC<FormattedTextAreaProps> = ({
           fontSize={fontSize}
           className={className}
           disabled={isDisabled}
-          onFocus={handleFocus}
-          onBlur={handleBlur}
           readOnly={isDisabled}
         />
         {saveStatus && (
@@ -97,17 +88,16 @@ const FormattedTextArea: React.FC<FormattedTextAreaProps> = ({
           </div>
         )}
       </div>
-      {isFocused && (
-        <div className="absolute -bottom-2 left-0 right-0 px-4">
-          <Progress 
-            value={progress} 
-            className={cn(
-              "h-2 transition-all",
-              getProgressColor(progress)
-            )}
-          />
-        </div>
-      )}
+      <Progress 
+        value={progress} 
+        className={cn(
+          "h-1.5 transition-all",
+          getProgressColor(progress)
+        )}
+      />
+      <div className="text-xs text-gray-500 text-right">
+        {plainText.length}/{getMaxLength()} caracteres
+      </div>
     </div>
   );
 };

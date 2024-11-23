@@ -7,6 +7,7 @@ import { MAX_CHARS_PER_PAGE } from '@/utils/docxStyles';
 import { Progress } from "@/components/ui/progress";
 import { cn } from "@/lib/utils";
 import { Card, CardContent } from "@/components/ui/card";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 const FormattedTextArea: React.FC<FormattedTextAreaProps> = ({
   id,
@@ -81,7 +82,7 @@ const FormattedTextArea: React.FC<FormattedTextAreaProps> = ({
       overflow: 'hidden'
     }}>
       <CardContent className="p-4">
-        <div className="relative w-full">
+        <ScrollArea className="relative w-full" style={{ maxHeight: height }}>
           <TextArea
             id={id}
             name={name}
@@ -97,7 +98,7 @@ const FormattedTextArea: React.FC<FormattedTextAreaProps> = ({
             style={{
               width: '100%',
               maxWidth: '100%',
-              overflow: 'auto'
+              overflow: 'visible'
             }}
           />
           {saveStatus && (
@@ -111,7 +112,7 @@ const FormattedTextArea: React.FC<FormattedTextAreaProps> = ({
               )}
             </div>
           )}
-        </div>
+        </ScrollArea>
         {isTyping && (
           <div className="w-full mt-2">
             <Progress 

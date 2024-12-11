@@ -2,7 +2,7 @@ import React, { useRef } from 'react';
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 import BannerHeader from './BannerHeader';
 import BannerInputs from './BannerInputs';
 import LayoutPreview from './LayoutPreview';
@@ -33,25 +33,45 @@ const BannerForm = () => {
     setFormData(prev => ({ ...prev, selectedLayout: layout }));
   };
 
+  const layouts: { value: LayoutType; label: string }[] = [
+    { value: 'classic', label: 'Layout Clássico' },
+    { value: 'modern', label: 'Layout Moderno' },
+    { value: 'zFlow', label: 'Layout em Z' },
+    { value: 'circular', label: 'Layout Circular' },
+    { value: 'hierarchical', label: 'Layout Hierárquico' },
+  ];
+
   return (
     <div className="container mx-auto px-4 py-8 max-w-4xl">
       <div className="mb-4 flex justify-between items-start">
         <div className="w-[200px]">
-          <Select 
-            value={formData.selectedLayout || 'classic'} 
-            onValueChange={handleLayoutChange}
-          >
-            <SelectTrigger>
-              <SelectValue placeholder="Escolha o layout" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="classic">Layout Clássico</SelectItem>
-              <SelectItem value="modern">Layout Moderno</SelectItem>
-              <SelectItem value="zFlow">Layout em Z</SelectItem>
-              <SelectItem value="circular">Layout Circular</SelectItem>
-              <SelectItem value="hierarchical">Layout Hierárquico</SelectItem>
-            </SelectContent>
-          </Select>
+          <Dialog>
+            <DialogTrigger asChild>
+              <Button variant="outline" className="w-full">
+                {formData.selectedLayout ? 
+                  layouts.find(l => l.value === formData.selectedLayout)?.label : 
+                  'Escolha o layout'}
+              </Button>
+            </DialogTrigger>
+            <DialogContent className="max-w-3xl">
+              <div className="grid grid-cols-2 gap-4 p-4">
+                {layouts.map((layout) => (
+                  <div
+                    key={layout.value}
+                    className="cursor-pointer hover:bg-gray-50 p-4 rounded-lg border transition-colors"
+                    onClick={() => {
+                      handleLayoutChange(layout.value);
+                      const closeButton = document.querySelector('[data-dialog-close]') as HTMLButtonElement;
+                      if (closeButton) closeButton.click();
+                    }}
+                  >
+                    <h3 className="font-medium mb-2">{layout.label}</h3>
+                    <LayoutPreview layout={layout.value} />
+                  </div>
+                ))}
+              </div>
+            </DialogContent>
+          </Dialog>
           <div className="mt-4">
             <LayoutPreview layout={formData.selectedLayout || 'classic'} />
           </div>

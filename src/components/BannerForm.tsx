@@ -6,6 +6,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import BannerHeader from './BannerHeader';
 import BannerInputs from './BannerInputs';
 import LayoutPreview from './LayoutPreview';
+import BannerPreview from './BannerPreview';
 import { useBannerForm } from '@/hooks/useBannerForm';
 import { LayoutType } from '@/utils/bannerLayouts';
 
@@ -62,6 +63,7 @@ const BannerForm = () => {
           <Button onClick={resetForm} variant="outline">
             Começar do Zero
           </Button>
+          <BannerPreview formData={formData} />
         </div>
       </div>
       <Card className="p-6" ref={formRef}>

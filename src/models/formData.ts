@@ -16,6 +16,7 @@ export interface BannerFormData {
   images: File[];
   imageCaptions: string[];
   selectedLayout: LayoutType;
+  logo?: File;
 }
 
 export interface BannerInputsProps {

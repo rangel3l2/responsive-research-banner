@@ -1,4 +1,4 @@
-import { ImageRun, Paragraph, AlignmentType, TextRun } from 'docx';
+import { ImageRun, Paragraph, AlignmentType, TextRun, Header } from 'docx';
 import { convertImageToBase64, createImageRunOptions } from './imageUtils';
 
 export const createImageParagraphs = async (images: File[], captions: string[]) => {
@@ -48,7 +48,7 @@ export const createLogoHeader = async (logo: File | undefined, defaultLogoPath: 
     logoBase64 = await convertImageToBase64(new File([blob], 'default-logo.png'));
   }
   
-  return {
+  return new Header({
     children: [
       new Paragraph({
         children: [
@@ -58,5 +58,5 @@ export const createLogoHeader = async (logo: File | undefined, defaultLogoPath: 
         spacing: { after: 200 },
       })
     ]
-  };
+  });
 };

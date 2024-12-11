@@ -6,6 +6,7 @@ import { useFormValidation } from './banner/useFormValidation';
 import { SaveStatus } from './banner/types';
 import { useFormActions } from './banner/useFormActions';
 import { useImageHandling } from './banner/useImageHandling';
+import { LayoutType } from '@/utils/bannerLayouts';
 
 const getInitialFormData = (): BannerFormData => ({
   title: '',
@@ -21,6 +22,7 @@ const getInitialFormData = (): BannerFormData => ({
   acknowledgments: '',
   images: [],
   imageCaptions: [],
+  selectedLayout: 'classic' as LayoutType,
 });
 
 export const useBannerForm = () => {

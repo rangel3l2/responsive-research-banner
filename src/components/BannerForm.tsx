@@ -5,6 +5,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import BannerHeader from './BannerHeader';
 import BannerInputs from './BannerInputs';
+import LayoutPreview from './LayoutPreview';
 import { useBannerForm } from '@/hooks/useBannerForm';
 import { LayoutType } from '@/utils/bannerLayouts';
 
@@ -33,22 +34,27 @@ const BannerForm = () => {
 
   return (
     <div className="container mx-auto px-4 py-8 max-w-4xl">
-      <div className="mb-4 flex justify-between items-center">
-        <Select 
-          value={formData.selectedLayout || 'classic'} 
-          onValueChange={handleLayoutChange}
-        >
-          <SelectTrigger className="w-[200px]">
-            <SelectValue placeholder="Escolha o layout" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="classic">Layout Clássico</SelectItem>
-            <SelectItem value="modern">Layout Moderno</SelectItem>
-            <SelectItem value="zFlow">Layout em Z</SelectItem>
-            <SelectItem value="circular">Layout Circular</SelectItem>
-            <SelectItem value="hierarchical">Layout Hierárquico</SelectItem>
-          </SelectContent>
-        </Select>
+      <div className="mb-4 flex justify-between items-start">
+        <div className="w-[200px]">
+          <Select 
+            value={formData.selectedLayout || 'classic'} 
+            onValueChange={handleLayoutChange}
+          >
+            <SelectTrigger>
+              <SelectValue placeholder="Escolha o layout" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="classic">Layout Clássico</SelectItem>
+              <SelectItem value="modern">Layout Moderno</SelectItem>
+              <SelectItem value="zFlow">Layout em Z</SelectItem>
+              <SelectItem value="circular">Layout Circular</SelectItem>
+              <SelectItem value="hierarchical">Layout Hierárquico</SelectItem>
+            </SelectContent>
+          </Select>
+          <div className="mt-4">
+            <LayoutPreview layout={formData.selectedLayout || 'classic'} />
+          </div>
+        </div>
         <div className="flex space-x-2">
           <Button onClick={loadFormFromCookies} variant="outline">
             Carregar Dados Salvos

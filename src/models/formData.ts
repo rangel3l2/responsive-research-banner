@@ -12,10 +12,9 @@ export interface BannerFormData {
   resultsAndDiscussion: string;
   conclusion: string;
   references: string;
-  acknowledgments?: string;
+  acknowledgments: string;
   images: File[];
   imageCaptions: string[];
-  logo?: File;
   selectedLayout: LayoutType;
 }
 

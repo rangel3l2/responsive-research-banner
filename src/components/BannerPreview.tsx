@@ -18,6 +18,9 @@ const BannerPreview: React.FC<BannerPreviewProps> = ({ formData }) => {
       minHeight: '400px',
       width: '100%',
       position: 'relative',
+      boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
+      border: '1px solid #e2e8f0',
+      aspectRatio: '1.4142', // Proporção A4
     };
 
     switch (layout) {
@@ -114,19 +117,19 @@ const BannerPreview: React.FC<BannerPreviewProps> = ({ formData }) => {
           Prévia do Banner
         </Button>
       </DialogTrigger>
-      <DialogContent className="max-w-[90vw] max-h-[90vh] overflow-y-auto">
+      <DialogContent className="max-w-[90vw] max-h-[90vh] overflow-y-auto bg-gray-100 p-8">
         <DialogHeader>
           <DialogTitle>Prévia do Banner - {formData.title}</DialogTitle>
         </DialogHeader>
         <div className="mt-4">
-          <div className="bg-gray-100 p-4 rounded-lg mb-4">
+          <div className="bg-white p-8 rounded-lg shadow-lg mb-4" style={{ maxWidth: '210mm', margin: '0 auto' }}>
             <h2 className="text-xl font-bold mb-2">{formData.title}</h2>
             <p className="text-gray-700">{formData.authors}</p>
             <p className="text-gray-600">{formData.institution}</p>
           </div>
           {renderContent()}
           {formData.acknowledgments && (
-            <div className="mt-4 bg-gray-50 p-4 rounded">
+            <div className="mt-4 bg-white p-4 rounded-lg shadow">
               <h3 className="font-bold mb-2">Agradecimentos</h3>
               <div dangerouslySetInnerHTML={{ __html: formData.acknowledgments }} />
             </div>

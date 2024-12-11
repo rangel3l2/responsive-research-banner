@@ -2,9 +2,11 @@ import React, { useRef } from 'react';
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import BannerHeader from './BannerHeader';
 import BannerInputs from './BannerInputs';
 import { useBannerForm } from '@/hooks/useBannerForm';
+import { LayoutType } from '@/utils/bannerLayouts';
 
 const BannerForm = () => {
   const {
@@ -25,15 +27,36 @@ const BannerForm = () => {
   
   const formRef = useRef<HTMLDivElement>(null);
 
+  const handleLayoutChange = (layout: LayoutType) => {
+    setFormData(prev => ({ ...prev, selectedLayout: layout }));
+  };
+
   return (
     <div className="container mx-auto px-4 py-8 max-w-4xl">
-      <div className="mb-4 flex justify-end space-x-2">
-        <Button onClick={loadFormFromCookies} variant="outline">
-          Carregar Dados Salvos
-        </Button>
-        <Button onClick={resetForm} variant="outline">
-          Começar do Zero
-        </Button>
+      <div className="mb-4 flex justify-between items-center">
+        <Select 
+          value={formData.selectedLayout || 'classic'} 
+          onValueChange={handleLayoutChange}
+        >
+          <SelectTrigger className="w-[200px]">
+            <SelectValue placeholder="Escolha o layout" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="classic">Layout Clássico</SelectItem>
+            <SelectItem value="modern">Layout Moderno</SelectItem>
+            <SelectItem value="zFlow">Layout em Z</SelectItem>
+            <SelectItem value="circular">Layout Circular</SelectItem>
+            <SelectItem value="hierarchical">Layout Hierárquico</SelectItem>
+          </SelectContent>
+        </Select>
+        <div className="flex space-x-2">
+          <Button onClick={loadFormFromCookies} variant="outline">
+            Carregar Dados Salvos
+          </Button>
+          <Button onClick={resetForm} variant="outline">
+            Começar do Zero
+          </Button>
+        </div>
       </div>
       <Card className="p-6" ref={formRef}>
         <Tabs defaultValue="header" className="w-full">

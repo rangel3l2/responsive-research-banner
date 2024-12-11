@@ -1,4 +1,5 @@
 import { SaveStatus } from '@/hooks/banner/types';
+import { LayoutType } from '@/utils/bannerLayouts';
 
 export interface BannerFormData {
   title: string;
@@ -15,6 +16,7 @@ export interface BannerFormData {
   images: File[];
   imageCaptions: string[];
   logo?: File;
+  selectedLayout: LayoutType;
 }
 
 export interface BannerInputsProps {
